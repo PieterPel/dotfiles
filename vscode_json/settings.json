@@ -1,0 +1,43 @@
+{
+    "workbench.colorTheme": "Default High Contrast",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        },
+        "cmd with permission": {
+            "path": "C:\\WINDOWS\\System32\\cmd.exe",
+            "args": []
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "workbench.settings.editor": "json",
+    "workbench.settings.useSplitJSON": true,
+    "jupyter.runStartupCommands": [
+        "%load_ext autoreload", "%autoreload 2"
+    ],
+    "notebook.output.scrolling": true,
+    "files.trimTrailingWhitespace": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "github.copilot.editor.enableAutoCompletions": false,
+        "editor.formatOnSave": true
+    },
+    "github.copilot.editor.enableAutoCompletions": true,
+    "errorLens.delay": 1000,
+    "black-formatter.args": [
+        "--line-length",
+        "79"
+    ]
+}
