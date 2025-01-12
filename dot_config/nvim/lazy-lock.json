@@ -8,7 +8,7 @@
   "friendly-snippets": { "branch": "main", "commit": "45a1b96e46efe5fce8af325d4bed45feb9d29d0f" },
   "harpoon": { "branch": "master", "commit": "ccae1b9bec717ae284906b0bf83d720e59d12b91" },
   "haskell-tools.nvim": { "branch": "master", "commit": "65d6993eba1a56bbd5211ef13a100d26ce3e644a" },
-  "lazy.nvim": { "branch": "main", "commit": "58c6bc4ab298dc0d808d325754585f918a031919" },
+  "lazy.nvim": { "branch": "main", "commit": "7e6c863bc7563efbdd757a310d17ebc95166cef3" },
   "lsp-zero.nvim": { "branch": "v1.x", "commit": "aa36afcf7a59fbd98008c9a434593c423d3d649a" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "37a336b653f8594df75c827ed589f1c91d91ff6c" },
   "mason.nvim": { "branch": "main", "commit": "f96a31855fa8aea55599cea412fe611b85a874ed" },

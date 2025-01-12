@@ -27,5 +27,5 @@ set fish_function_path $fish_function_path ~/plugin-foreign-env/functions
 fenv source ~/.nix-profile/etc/profile.d/nix.sh
 
 # Aliases
-
-alias --save dev="pushd ~/nix/standard; nix develop --command fish; popd"
+alias fish-config="cd ~/.config/fish"
+alias nix-flake="cd ~/nix/standard"
