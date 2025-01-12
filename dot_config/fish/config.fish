@@ -19,3 +19,13 @@ end
 set -x PATH $PATH /opt/nvim/
 set -x EDITOR nvim
 set -x TERM xterm-256color
+
+# Add fenv to path
+set fish_function_path $fish_function_path ~/plugin-foreign-env/functions
+
+# Source Nix setup script
+fenv source ~/.nix-profile/etc/profile.d/nix.sh
+
+# Aliases
+
+alias --save dev="pushd ~/nix/standard; nix develop --command fish; popd"
