@@ -1,5 +1,5 @@
 {
-  description = "My standard software setup";
+  description = "My standard terminal setup";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
@@ -14,6 +14,7 @@
         name = "my-packages";
         paths = with pkgs; [
           # Version control
+          git
           lazygit
           chezmoi
 
@@ -28,6 +29,7 @@
           # Developing
           neovim
           tmux
+          helix
 
           # Performance
           btop
