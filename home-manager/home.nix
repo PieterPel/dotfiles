@@ -34,6 +34,29 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+
+    # Version control
+    pkgs.git
+    pkgs.lazygit
+
+    # Languages
+    pkgs.cargo
+    pkgs.uv
+
+    # shell
+    pkgs.fish
+    pkgs.oh-my-fish
+
+    # Developing
+    pkgs.neovim
+    pkgs.tmux
+    pkgs.helix
+
+    # Performance
+    pkgs.btop
+
+    # Utilities
+    pkgs.unzip
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -49,7 +72,18 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
-  };
+
+    # Neovim
+    ".config/nvim".source = ../nvim;
+
+    # Fish
+    #".config/fish" = {
+    #    source = config.lib.file.mkOutOfStoreSymlink "../fish";
+    #};
+
+    # tmux
+      
+    };
 
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
