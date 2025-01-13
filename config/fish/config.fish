@@ -15,7 +15,11 @@ else
 end
 # <<< conda initialize <<<
 
-
+# Neovim
 set -x PATH $PATH /opt/nvim/
 set -x EDITOR nvim
 set -x TERM xterm-256color
+
+# Fish
+set -U fish_greeting ""
+zoxide init --cmd cd fish | source
