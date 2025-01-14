@@ -55,6 +55,9 @@
     # Performance
     pkgs.btop
 
+    # File management
+    pkgs.yazi
+
     # Utilities
     pkgs.unzip
   ];
@@ -73,8 +76,7 @@
     #   org.gradle.daemon.idletimeout=3600000
     # '';
 
-    # Neovim
-    ".config/nvim".source = ./dotconfig/nvim;
+    # Bash
 
     # tmux
       
@@ -98,19 +100,38 @@
   #
 
   xdg.configFile = {
-  #    "fish" = {
-  #          source = config.lib.file.mkOutofStoreSymlink ./dotconfig/fish;    
-  #      };
-
     "nvim" = {
-            source = config.lib.file.mkOutofStoreSymlink ./dotconfig/nvim;        
+            source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;        
         };
   };
 
   home.sessionVariables = {
-    # EDITOR = "emacs";
+    EDITOR = "nvim";
+    HOME = "/home/pieterpel/";
+    XDG_CONFIG_HOME = "/home/pieterpel/.config/";
   };
 
-  # Let Home Manager install and manage itself.
+  # Enable home-manager to govern programs..
   programs.home-manager.enable = true;
+  programs.fish = {
+        enable = true;
+        interactiveShellInit = ''
+            set fish_greeting # Disable greeting
+        '';
+
+        # Define plugins
+        plugins = [
+            { name = "tide"; src = pkgs.fishPlugins.tide.src; }
+        ];
+
+        # Define aliases
+        shellAliases = {
+          "hms" = "home-manager switch --flake .#pieterpel";
+        };
+
+  };
+    
+  programs.tmux = {
+        enable = true;
+  };
 }
