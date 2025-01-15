@@ -126,7 +126,8 @@
 
         # Define aliases
         shellAliases = {
-          "hms" = "home-manager switch --flake .#pieterpel";
+          "hms" = "home-manager switch --flake ~/dotfiles/home/#pieterpel";
+          "hme" = "nvim ~/dotfiles/user/home.nix";
         };
 
   };
