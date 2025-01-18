@@ -107,8 +107,8 @@
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    HOME = "/home/pieterpel/";
-    XDG_CONFIG_HOME = "/home/pieterpel/.config/";
+    HOME = "/home/pieterpel";
+    XDG_CONFIG_HOME = "/home/pieterpel/.config";
   };
 
   # Enable home-manager to govern programs..
@@ -126,7 +126,7 @@
 
         # Define aliases
         shellAliases = {
-          "hms" = "home-manager switch --flake ~/dotfiles/home/#pieterpel";
+          "hms" = "home-manager switch --flake ~/dotfiles/user/#pieterpel";
           "hme" = "nvim ~/dotfiles/user/home.nix";
         };
 
