@@ -42,6 +42,7 @@
     # Languages
     cargo
     uv
+    gcc
 
     # shell
     fish
@@ -140,5 +141,14 @@
 	options = [
 	  "--cmd cd"
 	];
+  };
+
+  programs.git = {
+    enable = true;
+    userEmail = "pelpieter@gmail.com";
+    userName = "Pieter Pel";
+    extraConfig = {
+        credential.helper = "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe";
+    };
   };
 }
