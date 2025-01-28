@@ -3,8 +3,8 @@
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "pieterpel";
-  home.homeDirectory = "/home/pieterpel";
+  home.username = "nixos";
+  home.homeDirectory = "/home/nixos";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -17,7 +17,7 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
+  home.packages = with pkgs; [
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -36,30 +36,31 @@
     # '')
 
     # Version control
-    pkgs.git
-    pkgs.lazygit
+    git
+    lazygit
 
     # Languages
-    pkgs.cargo
-    pkgs.uv
+    cargo
+    uv
 
     # shell
-    pkgs.fish
-    pkgs.oh-my-fish
+    fish
+    oh-my-fish
 
     # Developing
-    pkgs.neovim
-    pkgs.tmux
-    pkgs.helix
+    neovim
+    tmux
+    helix
 
     # Performance
-    pkgs.btop
+    btop
 
     # File management
-    pkgs.yazi
+    yazi
 
     # Utilities
-    pkgs.unzip
+    unzip
+    zoxide
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -107,8 +108,6 @@
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    HOME = "/home/pieterpel";
-    XDG_CONFIG_HOME = "/home/pieterpel/.config";
   };
 
   # Enable home-manager to govern programs..
@@ -134,5 +133,12 @@
     
   programs.tmux = {
         enable = true;
+  };
+
+  programs.zoxide = {
+	enable = true;
+	options = [
+	  "--cmd cd"
+	];
   };
 }
