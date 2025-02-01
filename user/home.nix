@@ -40,8 +40,8 @@
     lazygit
 
     # Languages
+    python3
     cargo
-    uv
     gcc
 
     # shell
@@ -52,6 +52,7 @@
     neovim
     tmux
     helix
+    devenv
 
     # Performance
     btop
@@ -61,6 +62,8 @@
 
     # Utilities
     unzip
+
+    # Terminal
     zoxide
   ];
 
@@ -126,8 +129,10 @@
 
         # Define aliases
         shellAliases = {
-          "hms" = "home-manager switch --flake ~/dotfiles/user/#pieterpel";
+          "hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
           "hme" = "nvim ~/dotfiles/user/home.nix";
+          "nos" = "sudo nixos-rebuild switch";
+          "noe" = "sudo nvim /etc/nixos/configuration.nix";
         };
 
   };
@@ -143,12 +148,4 @@
 	];
   };
 
-  programs.git = {
-    enable = true;
-    userEmail = "pelpieter@gmail.com";
-    userName = "Pieter Pel";
-    extraConfig = {
-        credential.helper = "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe";
-    };
-  };
 }
