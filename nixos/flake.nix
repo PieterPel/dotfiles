@@ -1,24 +1,21 @@
 {
-  description = "A very basic flake";
+  description = "A very basic flake for NixOS for WSL";
   
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl.url = "github:nix-community/nixos-wsl";
-    nixneovim.url = "github:nixneovim/nixneovim";
   };
 
-  outputs = { self, nixpkgs, nixos-wsl }: {
+  outputs = { self, nixpkgs, nixos-wsl } @inputs:
+  {
      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+       specialArgs = { inherit inputs; };
+
        system = "x86_64-linux";
        modules = [
         ./configuration.nix
         nixos-wsl.nixosModules.wsl
        ];
      };
-     
-     # More neovim plugins using https://github.com/NixNeovim/NixNeovimPlugins
-     nixpkgs.overlays = [
-        nixneovim.overlays.default 
-     ];
   };
 }
