@@ -38,6 +38,10 @@
   wget
   ];
 
+  # Set fish as default shell
+  programs.fish.enable = true;
+  users.users.nixos.shell = pkgs.fish;
+
   # Enable common container config files in /etc/containers
   virtualisation.containers.enable = true;
   virtualisation = {

@@ -43,6 +43,7 @@
     python3
     cargo
     gcc
+    nodejs_23
 
     # shell
     fish
@@ -131,8 +132,8 @@
         shellAliases = {
           "hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
           "hme" = "nvim ~/dotfiles/user/home.nix";
-          "nos" = "sudo nixos-rebuild switch";
-          "noe" = "sudo nvim /etc/nixos/configuration.nix";
+          "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#nixos";
+          "noe" = "sudo nvim ~/dotfiles/nixos/configuration.nix";
         };
 
   };
