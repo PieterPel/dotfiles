@@ -50,7 +50,6 @@
     oh-my-fish
 
     # Developing
-    neovim
     tmux
     helix
     devenv
@@ -110,7 +109,7 @@
     #  "nvim" = {
     #          source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;        
     #      };
-  };
+    #};
 
   home.sessionVariables = {
     EDITOR = "nvim";
