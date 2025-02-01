@@ -1,12 +1,18 @@
 {
-  description = "My NixOS Configuration";
+  description = "A very basic flake";
+  
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-wsl.url = "github:nix-community/nixos-wsl";
+  };
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-  outputs = { nixpkgs, ... }: {
-    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [ ./nixos/configuration.nix ];
-    };
+  outputs = { self, nixpkgs, nixos-wsl }: {
+     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+       system = "x86_64-linux";
+       modules = [
+        ./nixos/configuration.nix
+        nixos-wsl.nixosModules.wsl
+       ];
+     };
   };
 }
