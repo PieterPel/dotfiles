@@ -116,7 +116,11 @@
   };
 
   # Enable home-manager to govern programs..
-  programs.home-manager.enable = true;
+  programs.home-manager = {
+        enable = true;
+  };
+  
+  # Enable and configure others
   programs.fish = {
         enable = true;
         interactiveShellInit = ''
