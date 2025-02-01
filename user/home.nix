@@ -104,11 +104,12 @@
   #
   #  /etc/profiles/per-user/pieterpel/etc/profile.d/hm-session-vars.sh
   #
-
-  xdg.configFile = {
-    "nvim" = {
-            source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;        
-        };
+  
+    #Example, but I switched to managing plugins in nix/neovim.nix
+    #xdg.configFile = {
+    #  "nvim" = {
+    #          source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;        
+    #      };
   };
 
   home.sessionVariables = {
