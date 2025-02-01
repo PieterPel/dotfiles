@@ -8,7 +8,16 @@
 
   outputs = { self, nixpkgs, nixos-wsl } @inputs:
   {
-     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+     nixosConfigurations.nixos = let 
+       pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        config = {
+          allowUnfree = true;
+          allowUnfreePredicate = _: true;
+        };
+      };
+     in
+     nixpkgs.lib.nixosSystem {
        specialArgs = { inherit inputs; };
 
        system = "x86_64-linux";

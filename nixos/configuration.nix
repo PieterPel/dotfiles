@@ -5,7 +5,7 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   wsl.enable = true;
@@ -14,7 +14,8 @@
   nix.extraOptions = ''
        trusted-users = root nixos
   '';
-
+  
+  nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # this value at the release version of the first install of this system.

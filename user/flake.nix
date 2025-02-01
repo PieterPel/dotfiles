@@ -12,19 +12,22 @@
       inputs.nixpkgs.follows = "nixpkgs"; # Follow same version
     };
     
-    nixneovim = {
-      url = "github:nixneovim/nixneovim";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, nixneovim, ... } @ inputs:
+  outputs = { nixpkgs, home-manager, nixvim, ... } @ inputs:
 
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
          inherit system;
-	 overlays = [ nixneovim.overlays.default ];
-	 config = { };
+	     config = { 
+           allowUnfree = true;
+           allowUnfreePredicate = _: true;
+        };
       };
     in {
       homeConfigurations."nixos" = home-manager.lib.homeManagerConfiguration {
@@ -32,12 +35,12 @@
 
         # Specify your home configuration modules here 
         modules = [ 
-	    nixneovim.nixosModules.default
             ./home.nix
-            ./nix/nixneovim.nix
+	        nixvim.homeManagerModules.nixvim
+	        ./packages/nixvim.nix
         ];
 	
-	extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules
+	    extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules
       };
   };
 }
