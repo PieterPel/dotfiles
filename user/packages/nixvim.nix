@@ -4,7 +4,10 @@
     nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
 
     enable = true;
-    
+
+    colorscheme = "oxocarbon";
+    colorschemes.oxocarbon.enable = true;
+
     opts = {
       number = true;
       relativenumber = true;
@@ -36,15 +39,12 @@
     plugins = {
         # General
         undotree.enable = true; # Virtualize undo history
-        mini.enable = true; # Bunch of small utilities
         comment.enable = true; # Better commenting
         cmp.enable = true; # Completion
 
         # Apearance
         lightline.enable = true; # Pretty bar at the bottom
         web-devicons.enable = true; # Icons
-        treesitter.enable = true; # Color code
-        treesitter-context.enable = true; # Show context of code
 
         # Extension
         telescope.enable = true; # Fuzzy finder
@@ -52,18 +52,73 @@
         harpoon.enable = true; # Mark files to go back to
 
         # Language specific
-        rustaceanvim.enable = true; # Tools for Rust
+        rustaceanvim = {
+          enable = true;
+          settings = {
+            tools.enable_clippy = true;
+          };
+        };
+
         nix.enable = true; # Tools for Nix
+
+        # Treesitter
+        treesitter-context.enable = true;
+        treesitter-textobjects.enable = true;
+        treesitter = {
+          enable = true;
+          nixvimInjections = true;
+          settings = {
+            auto_install = true;
+            highlight = {
+              enable = true;
+            };
+            indent = {
+              enable = true;
+            };
+            fold = {
+              enable = true;
+            };
+          };
+        };
+
+        # LSP
+        lsp = {
+          enable = true;
+          servers = {
+            nil_ls.enable = true;
+            dockerls.enable = true;
+            pyright.enable = true;
+            bashls.enable = true;
+            yamlls.enable = true;
+            taplo.enable = true;
+          };
+        };
 
         # AI suggestions
         codeium-nvim = {
           enable = true;
           settings = {
             virtual_text = {
-              enables = true;
+              enabled = true;
+              keybindings = {
+              };
             };
           };
         };
+
+        # Bunch of small utilities
+        mini = {
+          enable = true;
+          modules = {
+            files = {};
+            comment = {};
+            bracketed = {};
+            indentscope = {};
+            tabline = {};
+            pairs = {};
+          };
+        };
+
         # Debug
         dap.enable = true; # Debug server
     };
