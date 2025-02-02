@@ -37,10 +37,10 @@
 
     keymaps = [
       # Disable arrow keys
-      { key = "<up>"; action = "<nop>"; }
-      { key = "<down>"; action = "<nop>"; }
-      { key = "<left>"; action = "<nop>"; }
-      { key = "<right>"; action = "<nop>"; }
+      { key = "<up>"; action = "<nop>"; mode = ["n" "i" "v"]; }
+      { key = "<down>"; action = "<nop>"; mode = ["n" "i" "v"]; }
+      { key = "<left>"; action = "<nop>"; mode = ["n" "i" "v"]; }
+      { key = "<right>"; action = "<nop>"; mode = ["n" "i" "v"]; }
       
       # Telescope
       { key = "<leader>ff"; action = "<cmd>Telescope find_files<CR>"; }
@@ -94,7 +94,7 @@
               enable = true;
             };
             indent = {
-              enable = true;
+              enable = false;
             };
             fold = {
               enable = true;
@@ -158,13 +158,24 @@
             owner = "pieterpel";
             repo = "venv-selector.nvim";
             # 02-02-2025
-            rev = "5c97c29e359c79e617cd3dfbf48a5ea217f5a137";
-            hash = "sha256-Cdani6euvqndkdNgIccpRS0wcaRatClw70UKJHMk+4s=";
+            rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
+            hash = "sha256-UXKlVn4D6Qj4s01mcFRUsIgXh8c9KmAX5E16Z/RenYE=";
         };
     })];
     
     extraConfigVim = ''
     '';
 
+    extraConfigLua = ''
+      require("venv-selector").setup({
+        settings = { 
+          search = {
+            find_devenvs = {
+              command = "fd '.devenv/state/venv/bin/python3$' ~/Programming/Python --full-path -IHL -E /proc"
+            }
+          }
+        }  
+      })
+    '';
   };
 }

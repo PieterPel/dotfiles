@@ -30,6 +30,10 @@
 
   home-manager
 
+  # CLI utility
+  fd
+  neofetch
+
   # Containers
   dive
   podman-tui

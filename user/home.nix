@@ -14,7 +14,7 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "24.11"; # Please read the comment before changing.
-
+  
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
@@ -136,14 +136,22 @@
         shellAliases = {
           "hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
           "hme" = "nvim ~/dotfiles/user/home.nix";
-          "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#nixos";
+          "hmf" = "nvim ~/dotfiles/user/flake.nix";
+          "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles/nixos#nixos";
           "noe" = "sudo nvim ~/dotfiles/nixos/configuration.nix";
+          "nof" = "sudo nvim ~/dotfiles/nixos/flake.nix";
         };
 
   };
     
   programs.tmux = {
-        enable = true;
+    enable = true;
+    shell = "fish";
+    terminal = "tmux-256color";
+    extraConfig = ''
+      set -gu default-command
+      set -g default-shell "$SHELL"
+    '';
   };
 
   programs.zoxide = {
