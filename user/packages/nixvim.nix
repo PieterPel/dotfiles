@@ -30,6 +30,22 @@
       textwidth = 0;
     };
 
+    globals = {
+     mapleader = " ";
+     maplocalleader = " ";
+    };
+
+    keymaps = [
+      # Disable arrow keys
+
+      
+      # Telescope
+      { key = "<leader>ff"; action = "<cmd>Telescope find_files<CR>"; }
+      { key = "<leader>fg"; action = "<cmd>Telescope live_grep<CR>"; }
+      { key = "<leader>fb"; action = "<cmd>Telescope buffers<CR>"; }
+      { key = "<leader>fh"; action = "<cmd>Telescope help_tags<CR>"; }
+    ];
+
     clipboard = {
       # Use system clipboard
       register = "unnamedplus";
@@ -40,7 +56,6 @@
         # General
         undotree.enable = true; # Virtualize undo history
         comment.enable = true; # Better commenting
-        cmp.enable = true; # Completion
 
         # Apearance
         lightline.enable = true; # Pretty bar at the bottom
@@ -92,6 +107,12 @@
             yamlls.enable = true;
             taplo.enable = true;
           };
+        };
+
+        # Completion
+        cmp.enable = true; # Needed for Codeium
+        blink-cmp = {
+          enable = true;
         };
 
         # AI suggestions
