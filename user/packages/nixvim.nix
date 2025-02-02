@@ -37,13 +37,19 @@
 
     keymaps = [
       # Disable arrow keys
-
+      { key = "<up>"; action = "<nop>"; }
+      { key = "<down>"; action = "<nop>"; }
+      { key = "<left>"; action = "<nop>"; }
+      { key = "<right>"; action = "<nop>"; }
       
       # Telescope
       { key = "<leader>ff"; action = "<cmd>Telescope find_files<CR>"; }
       { key = "<leader>fg"; action = "<cmd>Telescope live_grep<CR>"; }
       { key = "<leader>fb"; action = "<cmd>Telescope buffers<CR>"; }
       { key = "<leader>fh"; action = "<cmd>Telescope help_tags<CR>"; }
+
+      # Nvimtree
+      { key = "<leader>e"; action = "<cmd>NvimTreeToggle<CR>"; }
     ];
 
     clipboard = {
@@ -144,11 +150,21 @@
         dap.enable = true; # Debug server
     };
     
-    # Plugins only available on nixpkgs
-    extraPlugins = with pkgs.vimPlugins; [
-    ];
+    extraPlugins = [
+
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "venv-selector";
+        src = pkgs.fetchFromGitHub {
+            owner = "pieterpel";
+            repo = "venv-selector.nvim";
+            # 02-02-2025
+            rev = "5c97c29e359c79e617cd3dfbf48a5ea217f5a137";
+            hash = "sha256-Cdani6euvqndkdNgIccpRS0wcaRatClw70UKJHMk+4s=";
+        };
+    })];
     
     extraConfigVim = ''
     '';
+
   };
 }
