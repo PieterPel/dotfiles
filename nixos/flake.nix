@@ -4,9 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl.url = "github:nix-community/nixos-wsl";
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
-  outputs = { self, nixpkgs, nixos-wsl } @inputs:
+  outputs = { self, nixpkgs, nixos-wsl, vscode-server } @inputs:
   {
      nixosConfigurations.nixos = let 
        pkgs = import nixpkgs {
@@ -24,6 +25,7 @@
        modules = [
         ./configuration.nix
         nixos-wsl.nixosModules.wsl
+        vscode-server.nixosModules.default
        ];
      };
   };

@@ -43,6 +43,8 @@
   wget
   ];
 
+  services.vscode-server.enable = true;
+  
   # Set fish as default shell
   programs.fish.enable = true;
   users.users.nixos.shell = pkgs.fish;
