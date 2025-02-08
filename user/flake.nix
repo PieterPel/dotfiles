@@ -16,7 +16,8 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
+
+ };
 
   outputs = { nixpkgs, home-manager, nixvim, ... } @ inputs:
 
@@ -36,8 +37,8 @@
         # Specify your home configuration modules here 
         modules = [ 
             ./home.nix
-	        nixvim.homeManagerModules.nixvim
 	        ./packages/nixvim.nix
+	        nixvim.homeManagerModules.nixvim
         ];
 	
 	    extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules

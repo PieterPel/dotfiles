@@ -50,6 +50,9 @@
 
       # Nvimtree
       { key = "<leader>e"; action = "<cmd>NvimTreeToggle<CR>"; }
+
+      # venv-select
+      {key = "<leader>v"; action = "<cmd>VenvSelect<CR>"; }
     ];
 
     clipboard = {
