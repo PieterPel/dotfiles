@@ -50,6 +50,7 @@
   users.users.nixos.shell = pkgs.fish;
 
   # Enable common container config files in /etc/containers
+  boot.kernelParams = [ "systemd.unified_cgroup_hierarchy=1" ]; # Enable cgroups v2
   virtualisation.containers.enable = true;
   virtualisation = {
     podman = {
