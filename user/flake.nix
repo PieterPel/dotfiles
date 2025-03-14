@@ -37,8 +37,7 @@
         # Specify your home configuration modules here 
         modules = [ 
             ./home.nix
-	        ./packages/nixvim.nix
-	        nixvim.homeManagerModules.nixvim
+            ./wsl.nix
         ];
 	
 	    extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules
