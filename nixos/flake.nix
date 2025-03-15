@@ -13,9 +13,11 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... }@inputs: 
   let 
     system = "x86_64-linux";
 
@@ -30,6 +32,7 @@
         modules = [ 
           ./configuration.nix 
           home-manager.nixosModules.default
+          stylix.nixosModules.stylix
         ];
       };
     };
