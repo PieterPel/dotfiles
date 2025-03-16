@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./hyprland.nix
+      ./gnome.nix
     ];
 
   # Bootloader.
@@ -104,7 +105,7 @@
 
   stylix = {
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
-    image = ./flake.lock; # Needed for some reason
+    image = ../wallpapers/tux-teaching.jpg;
   };
 
   # Some programs need SUID wrappers, can be configured further or are

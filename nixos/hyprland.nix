@@ -1,6 +1,8 @@
 { config, pkgs, inputs, ... }:
 
 {
+  services.xserver.displayManager.gdm.wayland = true;
+
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
@@ -17,6 +19,11 @@
   };
 
   environment.systemPackages = [
+    # Wayland
+    pkgs.wayland
+    pkgs.wlroots
+    pkgs.wayland-utils
+
     # Top bar
     (pkgs.waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
