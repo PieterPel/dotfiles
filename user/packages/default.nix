@@ -6,6 +6,7 @@
     ./nixvim.nix
     ./kitty.nix
     ./hyprland/default.nix
+    ./vscodium.nix
     inputs.nixvim.homeManagerModules.nixvim
   ];
 }

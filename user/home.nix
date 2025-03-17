@@ -167,8 +167,4 @@
 	];
   };
 
-  programs.stylix = {
-    enable = true;
-  };
-
 }

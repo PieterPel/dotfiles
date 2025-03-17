@@ -23,9 +23,9 @@
     pkgs.wayland
     pkgs.wlroots
     pkgs.wayland-utils
+    pkgs.wl-clipboard
 
     # Top bar
-    pkgs.waybar
     (pkgs.waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
     })

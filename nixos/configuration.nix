@@ -77,7 +77,7 @@
   users.users.pieterp = {
     isNormalUser = true;
     description = "Pieter Pel";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "input"];
     packages = with pkgs; [
     #  thunderbird
     ];
