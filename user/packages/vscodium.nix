@@ -45,7 +45,7 @@
 
       # Markdown
       dendron.dendron-markdown-preview-enhanced
-      markdown-mermaid
+      bierner.markdown-mermaid
 
     ];
   };
