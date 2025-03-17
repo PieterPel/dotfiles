@@ -18,7 +18,7 @@
       # Python
       ms-python.python
       ms-pyright.pyright
-      charliermarsch.ruff
+      charliermarsh.ruff
       ms-python.debugpy
       ms-toolsai.jupyter
 
