@@ -3,8 +3,7 @@
 {
 
   imports = [
-    ./packages/nixvim.nix
-    inputs.nixvim.homeManagerModules.nixvim
+    ./packages/default.nix
   ];
 
   # This value determines the Home Manager release that your configuration is
@@ -166,6 +165,10 @@
 	options = [
 	  "--cmd cd"
 	];
+  };
+
+  programs.stylix = {
+    enable = true;
   };
 
 }

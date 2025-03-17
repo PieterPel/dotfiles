@@ -25,6 +25,7 @@
     pkgs.wayland-utils
 
     # Top bar
+    pkgs.waybar
     (pkgs.waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
     })

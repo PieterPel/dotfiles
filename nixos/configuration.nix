@@ -10,10 +10,14 @@
       ./hardware-configuration.nix
       ./hyprland.nix
       ./gnome.nix
+      ./ideapad.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+
+  # Login manager
+  services.xserver.displayManager.gdm.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -97,6 +101,7 @@
     extraSpecialArgs = { inherit inputs; };
     useGlobalPkgs = true;
     useUserPackages = true;
+    backupFileExtension = "backup";
 
     users = {
       "pieterp" = import ../user/home.nix;
@@ -104,9 +109,25 @@
   };
 
   stylix = {
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+    enable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
     image = ../wallpapers/tux-teaching.jpg;
+    polarity = "dark";
   };
+
+  # Automatic updating
+  system.autoUpgrade = {
+    enable = true;
+    dates = "weekly";
+  };
+
+  # Automatic cleanup
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older than 10d";
+  };
+  nix.settings.auto-optimise-store = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
