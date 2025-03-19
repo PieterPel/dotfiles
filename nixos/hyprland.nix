@@ -14,35 +14,38 @@
   };
 
   hardware = {
-    opengl.enable = true;
+    graphics.enable = true;
     nvidia.modesetting.enable = true;
   };
 
-  environment.systemPackages = [
+  environment.systemPackages = with pkgs; [
     # Wayland
-    pkgs.wayland
-    pkgs.wlroots
-    pkgs.wayland-utils
-    pkgs.wl-clipboard
+    wayland
+    wlroots
+    wayland-utils
+    wl-clipboard
 
     # Top bar
-    (pkgs.waybar.overrideAttrs (oldAttrs: {
+    (waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
     })
     )
     
     # Notifications
-    pkgs.mako
-    pkgs.libnotify
+    mako
+    libnotify
     
     # Wallpaper
-    pkgs.swww
+    swww
     
     # Terminal
-    pkgs.kitty
+    kitty
 
     # App launcher
-    pkgs.rofi-wayland
+    rofi-wayland
+
+    # Logout menu
+    wlogout
   ];
 
   xdg.portal.enable = true;

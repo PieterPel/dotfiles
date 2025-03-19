@@ -1,4 +1,4 @@
-
+# Source ZeneyOS
 {host, ...}: 
 let
     browser = "firefox";
@@ -8,7 +8,7 @@ in {
     bind = [
       "$modifier,Return,exec,${terminal}"
       #"$modifier SHIFT,Return,exec,rofi-launcher"
-      "$modifier,Return,exec,rofi -show run"
+      "$modifier,R,exec,rofi -show "
       "$modifier SHIFT,W,exec,web-search"
       "$modifier ALT,W,exec,wallsetter"
       "$modifier SHIFT,N,exec,swaync-client -rs"

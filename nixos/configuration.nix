@@ -95,6 +95,9 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     git
     base16-schemes
+    nerd-fonts.jetbrains-mono
+    font-awesome
+    neofetch
   ];
 
   home-manager = {
@@ -113,6 +116,12 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
     image = ../wallpapers/tux-teaching.jpg;
     polarity = "dark";
+    
+    cursor = {
+      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
+      name = "BreezX-RosePine-Linux";
+      size = 24;
+    };
   };
 
   # Automatic updating

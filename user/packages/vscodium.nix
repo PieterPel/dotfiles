@@ -4,7 +4,7 @@
   programs.vscode = {
     enable = true;
     package = pkgs.vscodium;
-    extensions = with pkgs.vscode-extensions; [
+    profiles.pieterp.extensions = with pkgs.vscode-extensions; [
       # General 
       usernamehw.errorlens
       tomoki1207.pdf

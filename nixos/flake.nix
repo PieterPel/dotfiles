@@ -20,6 +20,12 @@
     };
 
     stylix.url = "github:danth/stylix";
+    
+    rose-pine-hyprcursor = {
+      url = "github:ndom91/rose-pine-hyprcursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.hyprlang.follows = "hyprland/hyprlang";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... }@inputs: 
