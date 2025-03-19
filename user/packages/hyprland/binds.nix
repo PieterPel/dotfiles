@@ -14,7 +14,7 @@ in {
       "$modifier SHIFT,N,exec,swaync-client -rs"
       "$modifier,W,exec,${browser}"
       "$modifier,E,exec,emopicker9000"
-      "$modifier,S,exec,screenshootin"
+      "$modifier,S,exec,grim -g \"\$(slurp)\" - | swappy -f - "
       "$modifier,D,exec,discord"
       "$modifier,O,exec,obs"
       "$modifier,C,exec,hyprpicker -a"

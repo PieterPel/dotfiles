@@ -54,9 +54,6 @@
     helix
     devenv
 
-    # Performance
-    btop
-
     # File management
     yazi
 
@@ -65,6 +62,14 @@
 
     # Terminal
     zoxide
+
+    # Screenshots
+    grim
+    slurp
+    swappy
+
+    # Photoshop
+    gimp
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -116,49 +121,10 @@
 
   # Enable home-manager to govern programs..
   programs.home-manager = {
-        enable = true;
+    enable = true;
   };
   
   # Enable and configure others
-  programs.fish = {
-        enable = true;
-        interactiveShellInit = ''
-            set fish_greeting # Disable greeting
-        '';
-
-        # Define plugins
-        plugins = [
-            { name = "tide"; src = pkgs.fishPlugins.tide.src; }
-        ];
-
-        # Define aliases
-        shellAliases = {
-          "hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
-          "hme" = "nvim ~/dotfiles/user/home.nix";
-          "hmf" = "nvim ~/dotfiles/user/flake.nix";
-          "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles/nixos#nixos";
-          "noe" = "sudo nvim ~/dotfiles/nixos/configuration.nix";
-          "nof" = "sudo nvim ~/dotfiles/nixos/flake.nix";
-        };
-
-  };
-    
-  programs.tmux = {
-    enable = true;
-    shell = "${pkgs.fish}/bin/fish";
-    terminal = "tmux-256color";
-    plugins = with pkgs; [
-      tmuxPlugins.better-mouse-mode
-      tmuxPlugins.prefix-highlight
-      tmuxPlugins.power-theme
-      tmuxPlugins.continuum
-    ];
-    extraConfig = ''
-      set -gu default-command
-      set -g default-shell "$SHELL"
-      set -g mouse on
-    '';
-  };
 
   programs.zoxide = {
 	enable = true;
@@ -172,4 +138,5 @@
     targets.vscode.profileNames = [ "pieterp" ];
   };
 
+  programs.btop.enable = true;
 }

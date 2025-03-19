@@ -10,6 +10,10 @@
     ./waybar.nix
     ./wlogout
     ./rofi
+    ./spicetify.nix 
+    ./direnv.nix
+    ./fish.nix
+    ./tmux.nix
     inputs.nixvim.homeManagerModules.nixvim
   ];
 }
