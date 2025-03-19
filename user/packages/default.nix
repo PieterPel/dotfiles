@@ -5,10 +5,12 @@
   imports = [
     ./nixvim.nix
     ./kitty.nix
-    ./hyprland/default.nix
+    ./hyprland
     ./vscodium.nix
     ./waybar.nix
-    ./wlogout/default.nix
+    ./wlogout
+    ./steam.nix
+    ./rofi
     inputs.nixvim.homeManagerModules.nixvim
   ];
 }

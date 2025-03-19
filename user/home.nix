@@ -3,7 +3,7 @@
 {
 
   imports = [
-    ./packages/default.nix
+    ./packages
   ];
 
   # This value determines the Home Manager release that your configuration is
