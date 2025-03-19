@@ -8,7 +8,7 @@
     ./hyprland/default.nix
     ./vscodium.nix
     ./waybar.nix
-    ./wlogout.nix
+    ./wlogout/defaullt.nix
     inputs.nixvim.homeManagerModules.nixvim
   ];
 }

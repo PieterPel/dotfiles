@@ -170,6 +170,6 @@
   stylix = {
     enable = true;
     targets.vscode.profileNames = [ "pieterp" ];
-  }
+  };
 
 }
