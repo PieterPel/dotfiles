@@ -1,5 +1,5 @@
 
-# Source: ZeneyOS
+# Source: ZaneyOS
 { config, ... }:
 
 {
@@ -101,5 +101,9 @@
       	background-image: image(url("icons/hibernate.png"));
       }
     '';
+  };
+  home.file.".config/wlogout/icons" = {
+    source = ./icons;
+    recursive = true;
   };
 }

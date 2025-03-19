@@ -24,6 +24,7 @@
     wlroots
     wayland-utils
     wl-clipboard
+    firefox-wayland
 
     # Top bar
     (waybar.overrideAttrs (oldAttrs: {
