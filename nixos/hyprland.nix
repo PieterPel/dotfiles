@@ -47,6 +47,13 @@
 
     # Logout menu
     wlogout
+
+    # Multimedia
+    pw-volume
+    playerctl
+
+    # Brightness
+    brightnessctl
   ];
 
   xdg.portal.enable = true;

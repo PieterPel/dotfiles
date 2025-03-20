@@ -136,6 +136,10 @@
   stylix = {
     enable = true;
     targets.vscode.profileNames = [ "pieterp" ];
+    opacity = {
+      desktop = 0.5;
+      terminal = 0.8;
+    };
   };
 
   programs.btop.enable = true;

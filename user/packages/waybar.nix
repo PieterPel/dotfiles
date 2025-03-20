@@ -16,11 +16,11 @@ in
           position = "top";
           modules-center = ["hyprland/workspaces"];
           modules-left = [
-            "custom/startmenu"
+            #"custom/startmenu"
             "pulseaudio"
             "cpu"
             "memory"
-            "idle_inhibitor"
+            #"idle_inhibitor"
           ];
           modules-right = [
             "custom/hyprbindings"
@@ -103,7 +103,7 @@ in
                 ""
               ];
             };
-            on-click = "sleep 0.1 && pavucontrol";
+            on-click = "sleep 0.1 && pw-volume";
           };
           "custom/exit" = {
             tooltip = false;

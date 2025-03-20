@@ -1,4 +1,4 @@
-
+# Source: ZaneyOS
 {pkgs, ...}: {
   programs.kitty = {
     enable = true;

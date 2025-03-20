@@ -1,7 +1,6 @@
 { config, pkgs, inputs, ... }:
 
 {
-
   imports = [
     ./nixvim.nix
     ./kitty.nix
@@ -14,7 +13,9 @@
     ./direnv.nix
     ./fish.nix
     ./tmux.nix
+    ./git.nix
     inputs.nixvim.homeManagerModules.nixvim
+    inputs.spicetify-nix.homeManagerModules.spicetify
   ];
 }
 

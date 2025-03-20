@@ -30,7 +30,7 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, spicetify-nix, ... }@inputs: 
   let 
     system = "x86_64-linux";
 
@@ -46,6 +46,7 @@
           ./configuration.nix 
           home-manager.nixosModules.default
           stylix.nixosModules.stylix
+          spicetify-nix.nixosModules.spicetify
         ];
       };
     };
