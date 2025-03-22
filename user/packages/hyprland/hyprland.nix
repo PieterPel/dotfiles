@@ -15,6 +15,12 @@ in
 
       general = {
         "$modifier" = "SUPER";
+        gaps_in = 6;
+        gaps_out = 8;
+        border_size = 2;
+        resize_on_border = true;
+        #"col.active_border" = "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
+        #"col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
       };
 
       monitor = [
@@ -56,6 +62,22 @@ in
           "fade, 1, 10, default"
           "workspaces, 1, 5, wind"
         ];
+      };
+
+      decoration = {
+        rounding = 10;
+        blur = {
+          enabled = true;
+          size = 5;
+          passes = 3;
+          ignore_opacity = false;
+          new_optimizations = true;
+        };
+        shadow = {
+          enabled = true;
+          range = 4;
+          render_power = 3;
+        };
       };
     };
 

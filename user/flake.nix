@@ -17,9 +17,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    flatpaks = {
+      url = "github:GermanBread/declarative-flatpak/stable-v3";
+    };
  };
 
-  outputs = { nixpkgs, home-manager, nixvim, ... } @ inputs:
+  outputs = { nixpkgs, home-manager, nixvim, flatpaks,... } @ inputs:
 
     let
       system = "x86_64-linux";

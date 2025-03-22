@@ -1,5 +1,9 @@
 {config, pkgs, ...}:
 {
+  home.packages = [
+    pkgs.fd
+  ];
+
   programs.nixvim = {
     nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
 
@@ -52,7 +56,15 @@
       { key = "<leader>e"; action = "<cmd>NvimTreeToggle<CR>"; }
 
       # venv-select
-      {key = "<leader>v"; action = "<cmd>VenvSelect<CR>"; }
+      {key = "<leader>V"; action = "<cmd>VenvSelect<CR>"; }
+
+      # Splits and tabs
+      { key = "<leader>h"; action = "<cmd>split<CR>"; }
+      { key = "<leader>v"; action = "<cmd>vsplit<CR>"; }
+      { key = "<leader>t"; action = "<cmd>tabnew<CR>"; }
+
+      # Utility
+      { key = "<leader>q"; action = "<cmd>quit<CR>";}
     ];
 
     clipboard = {

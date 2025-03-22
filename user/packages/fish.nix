@@ -14,12 +14,14 @@
 
     # Define aliases
     shellAliases = {
-      "hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
-      "hme" = "nvim ~/dotfiles/user/home.nix";
-      "hmf" = "nvim ~/dotfiles/user/flake.nix";
+      #"hms" = "home-manager switch --flake ~/dotfiles/user/#nixos";
+      #"hme" = "nvim ~/dotfiles/user/home.nix";
+      #"hmf" = "nvim ~/dotfiles/user/flake.nix";
       "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles/nixos#nixos";
-      "noe" = "sudo nvim ~/dotfiles/nixos/configuration.nix";
-      "nof" = "sudo nvim ~/dotfiles/nixos/flake.nix";
+      #"noe" = "sudo nvim ~/dotfiles/nixos/configuration.nix";
+      #"nof" = "sudo nvim ~/dotfiles/nixos/flake.nix";
+      "noe" = "nvim ~/dotfiles/";
+      "dev-init" = "nix flake init --template github:cachix/devenv";
     };
 
   };

@@ -16,6 +16,7 @@
     ./git.nix
     inputs.nixvim.homeManagerModules.nixvim
     inputs.spicetify-nix.homeManagerModules.spicetify
+    inputs.flatpaks.homeManagerModules.declarative-flatpak
   ];
 }
 
