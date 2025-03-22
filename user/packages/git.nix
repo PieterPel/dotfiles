@@ -3,9 +3,7 @@
 {
   programs.git = {
     enable = true;
-    user = {
-      name = "Pieter Pel";
-      email = "pelpieter@gmail.com";
-    };
+    userName = "Pieter Pel";
+    userEmail = "pelpieter@gmail.com";
   };
 }

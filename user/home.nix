@@ -60,7 +60,7 @@
     # Utilities
     unzip
 
-    # Terminal
+    # Terminalplugin = "base16-nvim";
     zoxide
 
     # Screenshots
@@ -70,6 +70,9 @@
 
     # Photoshop
     gimp
+
+    # Font
+    montserrat
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -135,11 +138,21 @@
 
   stylix = {
     enable = true;
-    targets.vscode.profileNames = [ "pieterp" ];
     opacity = {
       desktop = 0.5;
       terminal = 0.8;
     };
+
+    cursor = {
+      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
+      name = "BreezX-RosePine-Linux";
+      size = 24;
+    };
+
+    targets = {
+      vscode.profileNames = [ "pieterp" ];
+      nixvim.plugin = "base16-nvim";
+    }; 
   };
 
   programs.btop.enable = true;

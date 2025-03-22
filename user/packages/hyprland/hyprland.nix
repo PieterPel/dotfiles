@@ -18,9 +18,12 @@ in
       };
 
       monitor = [
+        # Laptop below secondary monitor
         "eDP-1,1920x1080@60,0x1080,1.25,bitdepth,10"
         "HDMI-A-1,1920x1080@60,0x0,1,bitdepth,10"
       ];
+
+      input.natural_scroll = true; # Reverses trackpad scroll direction
 
       workspace = [
         "1,monitor:eDP-1,default:true"

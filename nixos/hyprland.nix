@@ -54,6 +54,15 @@
 
     # Brightness
     brightnessctl
+
+    # Wifi
+    networkmanagerapplet
+
+    # Bluetooth
+    blueman
+
+    # Audio
+    pavucontrol
   ];
 
   xdg.portal.enable = true;

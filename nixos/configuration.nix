@@ -79,10 +79,10 @@
     isNormalUser = true;
     description = "Pieter Pel";
     extraGroups = [ "networkmanager" "wheel" "input"];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+    shell = pkgs.fish;
   };
+
+  programs.fish.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -117,13 +117,8 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
     image = ../wallpapers/tux-teaching.jpg;
     polarity = "dark";
-    
-    cursor = {
-      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
-      name = "BreezX-RosePine-Linux";
-      size = 24;
-    };
-  };
+  };  
+
 
   # Automatic updating
   system.autoUpgrade = {

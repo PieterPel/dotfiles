@@ -5,8 +5,8 @@
 
     enable = true;
 
-    colorscheme = "oxocarbon";
-    colorschemes.oxocarbon.enable = true;
+    #colorscheme = "oxocarbon";
+    #colorschemes.oxocarbon.enable = true;
 
     opts = {
       number = true;
@@ -153,9 +153,9 @@
         dap.enable = true; # Debug server
     };
     
-    extraPlugins = [
+    extraPlugins = with pkgs; [
 
-      (pkgs.vimUtils.buildVimPlugin {
+      (vimUtils.buildVimPlugin {
         name = "venv-selector";
         src = pkgs.fetchFromGitHub {
             owner = "pieterpel";
@@ -164,7 +164,10 @@
             rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
             hash = "sha256-UXKlVn4D6Qj4s01mcFRUsIgXh8c9KmAX5E16Z/RenYE=";
         };
-    })];
+      })
+      
+      pkgs.vimPlugins.transparent-nvim
+    ];
     
     extraConfigVim = ''
     '';

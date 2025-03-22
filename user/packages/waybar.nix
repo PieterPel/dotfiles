@@ -8,7 +8,7 @@ in
   with lib; {
     # Configure & Theme Waybar
     programs.waybar = {
-      enable = true;
+      enable = true; 
       package = pkgs.waybar;
       settings = [
         {
@@ -23,10 +23,12 @@ in
             #"idle_inhibitor"
           ];
           modules-right = [
-            "custom/hyprbindings"
+            #"custom/hyprbindings"
             "custom/notification"
             "custom/exit"
             "battery"
+            "network"
+            "bluetooth"
             "tray"
             "clock"
           ];
@@ -42,7 +44,7 @@ in
             on-scroll-down = "hyprctl dispatch workspace e-1";
           };
           "clock" = {
-            format = '' {:L%H:%M}'';
+            format = ''{:L%H:%M}'';
             tooltip = true;
             tooltip-format = "<big>{:%A, %d.%B %Y }</big>\n<tt><small>{calendar}</small></tt>";
           };
@@ -79,7 +81,14 @@ in
             format-wifi = "{icon} {signalStrength}%";
             format-disconnected = "󰤮";
             tooltip = false;
+            on-click = "nm-connection-editor";
           };
+          "bluetooth" = {
+            format = " 󰂯 ";
+            tooltip = false;
+            tooltip-format = "Bluetooth Settings";
+            on-click = "blueman-manager";
+           };
           "tray" = {
             spacing = 12;
           };
@@ -103,7 +112,7 @@ in
                 ""
               ];
             };
-            on-click = "sleep 0.1 && pw-volume";
+            on-click = "sleep 0.1 && pavucontrol";
           };
           "custom/exit" = {
             tooltip = false;
@@ -177,7 +186,7 @@ in
         ''
           * {
             font-family: JetBrainsMono Nerd Font Mono;
-            font-size: 16px;
+            font-size: 18px;
             border-radius: 0px;
             border: none;
             min-height: 0px;
@@ -194,79 +203,83 @@ in
           }
           #workspaces button {
             font-weight: bold;
+            background: linear-gradient(45deg, #${config.lib.stylix.colors.base0A}, #${config.lib.stylix.colors.base0E}); 
             padding: 0px 5px;
             margin: 0px 3px;
             border-radius: 16px;
             color: #${config.lib.stylix.colors.base00};
-            background: linear-gradient(45deg, #${config.lib.stylix.colors.base08}, #${config.lib.stylix.colors.base0D});
             opacity: 0.5;
             transition: ${betterTransition};
           }
           #workspaces button.active {
             font-weight: bold;
+            background: linear-gradient(45deg, #${config.lib.stylix.colors.base0A}, #${config.lib.stylix.colors.base0E}); 
             padding: 0px 5px;
             margin: 0px 3px;
             border-radius: 16px;
-            color: #${config.lib.stylix.colors.base00};
-            background: linear-gradient(45deg, #${config.lib.stylix.colors.base08}, #${config.lib.stylix.colors.base0D});
+            /*color: #${config.lib.stylix.colors.base00};*/
             transition: ${betterTransition};
             opacity: 1.0;
             min-width: 40px;
           }
           #workspaces button:hover {
-            font-weight: bold;
+            font-weight: bold;  
+            background: linear-gradient(45deg, #${config.lib.stylix.colors.base0A}, #${config.lib.stylix.colors.base0E}); 
             border-radius: 16px;
             color: #${config.lib.stylix.colors.base00};
-            background: linear-gradient(45deg, #${config.lib.stylix.colors.base08}, #${config.lib.stylix.colors.base0D});
             opacity: 0.8;
             transition: ${betterTransition};
           }
           tooltip {
             background: #${config.lib.stylix.colors.base00};
-            border: 1px solid #${config.lib.stylix.colors.base08};
+            border: 1px solid #${config.lib.stylix.colors.base05};
             border-radius: 12px;
           }
           tooltip label {
-            color: #${config.lib.stylix.colors.base08};
+            color: #${config.lib.stylix.colors.base05};
           }
           #window, #pulseaudio, #cpu, #memory, #idle_inhibitor {
             font-weight: bold;
             margin: 4px 0px;
             margin-left: 7px;
             padding: 0px 18px;
-            background: #${config.lib.stylix.colors.base04};
-            color: #${config.lib.stylix.colors.base00};
-            border-radius: 24px 10px 24px 10px;
+            background: #${config.lib.stylix.colors.base00};
+            color: #${config.lib.stylix.colors.base05};
+            border-radius: 8px 8px 8px 8px;
+          }
+          #idle_inhibitor {
+          font-size: 28px;
           }
           #custom-startmenu {
             color: #${config.lib.stylix.colors.base0B};
             background: #${config.lib.stylix.colors.base02};
-            font-size: 28px;
+            font-size: 22px;
             margin: 0px;
-            padding: 0px 30px 0px 15px;
-            border-radius: 0px 0px 40px 0px;
+            padding: 0px 5px 0px 5px;
+            border-radius: 16px 16px 16px 16px;
           }
-          #custom-hyprbindings, #network, #battery,
+          #custom-hyprbindings, #network, #battery, #bluetooth
           #custom-notification, #tray, #custom-exit {
-            font-weight: bold;
-            background: #${config.lib.stylix.colors.base0F};
-            color: #${config.lib.stylix.colors.base00};
+            /* font-weight: bold; */
+            background: #${config.lib.stylix.colors.base00};
+            color: #${config.lib.stylix.colors.base05};
             margin: 4px 0px;
             margin-right: 7px;
-            border-radius: 10px 24px 10px 24px;
+            border-radius: 8px 8px 8px 8px;
             padding: 0px 18px;
           }
           #clock {
             font-weight: bold;
+            font-size: 16px;
             color: #0D0E15;
-            background: linear-gradient(90deg, #${config.lib.stylix.colors.base0E}, #${config.lib.stylix.colors.base0C});
+            background: linear-gradient(90deg, #${config.lib.stylix.colors.base0E}, #${config.lib.stylix.colors.base0A});
             margin: 0px;
-            padding: 0px 15px 0px 30px;
-            border-radius: 0px 0px 0px 40px;
+            padding: 0px 5px 0px 5px;
+            border-radius: 16px 16px 16px 16px;
           }
         ''
       ];
-    };
+   };
   }
 
 
