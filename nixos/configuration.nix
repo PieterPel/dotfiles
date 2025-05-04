@@ -82,6 +82,7 @@
     shell = pkgs.fish;
   };
 
+  # Enable fish so it can be used as the default shell.
   programs.fish.enable = true;
 
   # Install firefox.

@@ -29,8 +29,6 @@ in
         "HDMI-A-1,1920x1080@60,0x0,1,bitdepth,10"
       ];
 
-      input.natural_scroll = true; # Reverses trackpad scroll direction
-
       workspace = [
         "1,monitor:eDP-1,default:true"
         "2,monitor:eDP-1"
@@ -78,6 +76,12 @@ in
           range = 4;
           render_power = 3;
         };
+      };
+
+      misc = {
+        # Get rid of the anime stuff
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
       };
     };
 

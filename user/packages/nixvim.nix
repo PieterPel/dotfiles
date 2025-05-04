@@ -1,8 +1,13 @@
 {config, pkgs, ...}:
 {
-  home.packages = [
-    pkgs.fd
+  home.packages = with pkgs; [
+    fd
+    rust-analyzer
   ];
+
+  home.sessionVariables = {
+    RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+  };
 
   programs.nixvim = {
     nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
@@ -32,6 +37,7 @@
       autoindent = true;
 
       textwidth = 0;
+
     };
 
     globals = {
@@ -65,6 +71,7 @@
 
       # Utility
       { key = "<leader>q"; action = "<cmd>quit<CR>";}
+      { key = "<C-e"; action = "<cmd>lua vim.diagnostic.open_float()<CR>"; }
     ];
 
     clipboard = {
@@ -88,12 +95,17 @@
         harpoon.enable = true; # Mark files to go back to
 
         # Language specific
-        rustaceanvim = {
+/*         rustaceanvim = {
           enable = true;
           settings = {
             tools.enable_clippy = true;
+            server.default_settings = {
+              rust_analyzer = {
+                check.command = "clippy";
+              };
+            };
           };
-        };
+        }; */
 
         nix.enable = true; # Tools for Nix
 
@@ -120,20 +132,70 @@
         # LSP
         lsp = {
           enable = true;
+          inlayHints = true;
           servers = {
             nil_ls.enable = true;
             dockerls.enable = true;
             pyright.enable = true;
+            ruff.enable = true;
             bashls.enable = true;
             yamlls.enable = true;
             taplo.enable = true;
+            rust_analyzer = {
+              enable = true;
+              installRustc = true;
+              installCargo = true;
+            };
           };
         };
 
+        lsp-format.enable = true;
+
         # Completion
         cmp.enable = true; # Needed for Codeium
+        blink-copilot.enable = true;
         blink-cmp = {
           enable = true;
+          settings = {
+            keymap = {
+              "<C-k>" = [
+                "select_prev"
+                "fallback"
+              ];
+              "<C-j>" = [
+                "select_next"
+                "fallback"
+              ];
+            };
+          };
+          settings.sources = {
+            default = [
+              "lsp"
+              "path"
+              "buffer"
+              "copilot"
+            ];
+  
+            providers = {
+              copilot = {
+                async = true;
+                module = "blink-copilot";
+                name = "copilot";
+                score_offset = 100;
+                # Optional configurations
+                opts = {
+                  max_completions = 3;
+                  max_attempts = 4;
+                  kind = "Copilot";
+                  debounce = 750;
+                  auto_refresh = {
+                    backward = true;
+                    forward = true;
+                  };
+                };
+              };
+            };
+          };
         };
 
         # AI suggestions
@@ -170,7 +232,7 @@
       (vimUtils.buildVimPlugin {
         name = "venv-selector";
         src = pkgs.fetchFromGitHub {
-            owner = "pieterpel";
+            owner = "linux";
             repo = "venv-selector.nvim";
             # 02-02-2025
             rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
@@ -185,6 +247,15 @@
     '';
 
     extraConfigLua = ''
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.server_capabilities.inlayHintProvider then
+            vim.lsp.inlay_hint.enable(true, { args.buf }) 
+          end
+        end,
+      })
+
       require("venv-selector").setup({
         settings = { 
           search = {

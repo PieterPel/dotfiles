@@ -28,9 +28,13 @@
     };
 
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+
+    nix-flatpak = {
+      url = "github:gmodena/nix-flatpak/?ref=latest";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, spicetify-nix, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, spicetify-nix, nix-flatpak, ... }@inputs: 
   let 
     system = "x86_64-linux";
 

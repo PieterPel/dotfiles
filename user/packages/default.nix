@@ -14,9 +14,10 @@
     ./fish.nix
     ./tmux.nix
     ./git.nix
+    ./flatpaks.nix
     inputs.nixvim.homeManagerModules.nixvim
     inputs.spicetify-nix.homeManagerModules.spicetify
-    inputs.flatpaks.homeManagerModules.declarative-flatpak
+    inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
 }
 

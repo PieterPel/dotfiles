@@ -60,8 +60,10 @@
     # Utilities
     unzip
 
-    # Terminalplugin = "base16-nvim";
+    # CLI tools
     zoxide
+    bat
+    rsync
 
     # Screenshots
     grim

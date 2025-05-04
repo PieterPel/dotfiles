@@ -262,7 +262,7 @@ in
           #custom-notification, #tray, #custom-exit {
             /* font-weight: bold; */
             background: #${config.lib.stylix.colors.base00};
-            color: #${config.lib.stylix.colors.base05};evaluation warning: pieterp profile: stylix: qt: `config.stylix.targets.qt.platform` other than 'qtct' are currently unsupported: gnome. Support may be added in the future.
+            color: #${config.lib.stylix.colors.base05};
             margin: 4px 0px;
             margin-right: 7px;
             border-radius: 8px 8px 8px 8px;
