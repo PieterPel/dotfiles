@@ -6,7 +6,7 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ 
       ./hardware-configuration.nix
       ./hyprland.nix
       ./gnome.nix
@@ -102,6 +102,7 @@
     neofetch
   ];
 
+  # home-manager
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
     useGlobalPkgs = true;
@@ -113,6 +114,7 @@
     };
   };
 
+  # Stylix
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
@@ -147,6 +149,10 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  # Onedrive
+  # See https://nixos.wiki/wiki/OneDrive for what steps to take
+  services.onedrive.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
