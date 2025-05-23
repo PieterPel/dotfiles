@@ -34,7 +34,7 @@
         };
       };
     in {
-      homeConfigurations."nixos" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."pieterpel" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
         # Specify your home configuration modules here 

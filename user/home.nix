@@ -71,7 +71,7 @@
     swappy
 
     # Photoshop
-    gimp
+    # gimp
 
     # Font
     montserrat
@@ -138,24 +138,24 @@
 	];
   };
 
-  stylix = {
-    enable = true;
-    opacity = {
-      desktop = 0.5;
-      terminal = 0.8;
-    };
-
-    cursor = {
-      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
-      name = "BreezX-RosePine-Linux";
-      size = 24;
-    };
-
-    targets = {
-      vscode.profileNames = [ "pieterp" ];
-      nixvim.plugin = "base16-nvim";
-    }; 
-  };
-
+  # stylix = {
+  #   enable = true;
+  #   opacity = {
+  #     desktop = 0.5;
+  #     terminal = 0.8;
+  #   };
+  #
+    # cursor = {
+    #   package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
+    #   name = "BreezX-RosePine-Linux";
+    #   size = 24;
+    # };
+    #
+  #   targets = {
+  #     vscode.profileNames = [ "pieterp" ];
+  #     nixvim.plugin = "base16-nvim";
+  #   }; 
+  # };
+  #
   programs.btop.enable = true;
 }

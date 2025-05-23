@@ -153,7 +153,7 @@
 
         # Completion
         cmp.enable = true; # Needed for Codeium
-        blink-copilot.enable = true;
+        # blink-copilot.enable = true;
         blink-cmp = {
           enable = true;
           settings = {
@@ -173,28 +173,29 @@
               "lsp"
               "path"
               "buffer"
-              "copilot"
+              # "copilot"
             ];
   
-            providers = {
-              copilot = {
-                async = true;
-                module = "blink-copilot";
-                name = "copilot";
-                score_offset = 100;
-                # Optional configurations
-                opts = {
-                  max_completions = 3;
-                  max_attempts = 4;
-                  kind = "Copilot";
-                  debounce = 750;
-                  auto_refresh = {
-                    backward = true;
-                    forward = true;
-                  };
-                };
-              };
-            };
+            # providers = {
+            #   copilot = {
+            #     async = true;
+            #     # module = "blink-copilot";
+            #     module = "codeiiim";
+            #     name = "copilot";
+            #     score_offset = 100;
+            #     # Optional configurations
+            #     opts = {
+            #       max_completions = 3;
+            #       max_attempts = 4;
+            #       kind = "Copilot";
+            #       debounce = 750;
+            #       auto_refresh = {
+            #         backward = true;
+            #         forward = true;
+            #       };
+            #     };
+            #   };
+            # };
           };
         };
 
