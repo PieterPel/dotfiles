@@ -1,1 +1,0 @@
-{"binaries":["ruff"],"binary_aliases":{},"cdylibs":[],"cstaticlibs":[],"install_layout":"flat","install_prefix":"/home/pieterpel/.local/bin","modify_path":true,"provider":{"source":"cargo-dist","version":"0.25.2-prerelease.3"},"source":{"app_name":"ruff","name":"ruff","owner":"astral-sh","release_type":"github"},"version":"0.8.1"}
