@@ -11,8 +11,7 @@
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
 
-  environment.sessionVariables = {
-    WLR_NO_HARDWARE_CURSORS = "1";
+  environment.sessionVariables = { WLR_NO_HARDWARE_CURSORS = "1";
     NIXOS_OZONE_WL = "1";
   };
 
@@ -36,6 +35,7 @@
     )
     
     # Notifications
+    mako
     libnotify
     
     # Wallpaper
@@ -71,9 +71,4 @@
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
-
-  # Notification daemon
-  services.mako = {
-    enable = true;
-  }
 }

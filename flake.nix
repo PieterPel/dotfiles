@@ -47,7 +47,7 @@
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
         modules = [ 
-          ./nixos/configuration.nix 
+          ./modules/core/configuration.nix 
           home-manager.nixosModules.default
           stylix.nixosModules.stylix
           spicetify-nix.nixosModules.spicetify
@@ -60,8 +60,8 @@
 
       # Specify your home configuration modules here 
       modules = [ 
-          ./home.nix
-          ./wsl.nix
+          ./modules/home/home.nix
+          # ./wsl.nix
       ];
 
       extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules

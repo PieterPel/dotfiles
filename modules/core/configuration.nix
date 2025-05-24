@@ -113,7 +113,7 @@
     backupFileExtension = "backup";
 
     users = {
-      "pieterp" = import ../user/home.nix;
+      "pieterp" = import ../home/home.nix;
     };
   };
 
@@ -121,7 +121,7 @@
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
-    image = ../wallpapers/tux-teaching.jpg;
+    image = ../../wallpapers/tux-teaching.jpg;
     polarity = "dark";
   };  
 

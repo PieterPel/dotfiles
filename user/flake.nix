@@ -9,7 +9,7 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs"; # Follow same version
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     
     nixvim = {
