@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, host, username, profile, ... }:
 
 {
   imports =
@@ -24,7 +24,7 @@
 
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = host;
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -63,7 +63,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
     jack.enable = true;
 
     # use the example session manager (no others are packaged yet so this is enabled by default,
@@ -75,7 +74,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.pieterp = {
+  users.users.${username} = {
     isNormalUser = true;
     description = "Pieter Pel";
     extraGroups = [ "networkmanager" "wheel" "input"];
@@ -107,13 +106,19 @@
 
   # home-manager
   home-manager = {
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = { 
+      inherit inputs; 
+      inherit host;
+      inherit username;
+      inherit profile;
+    };
+
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
 
     users = {
-      "pieterp" = import ../home/home.nix;
+      ${username} = import ../home/home.nix;
     };
   };
 
@@ -175,7 +180,7 @@
 
   # Onedrive
   # See https://nixos.wiki/wiki/OneDrive for what steps to take
-  services.onedrive.enable = true;
+  services.onedrive.enable = false; # enable onedrive in future, now there is a notifcation bug
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

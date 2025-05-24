@@ -34,9 +34,13 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, spicetify-nix, nix-flatpak, ... }@inputs: 
+  outputs = { self, nixpkgs, ... } @ inputs: 
   let 
+    # Change these depending on your usecase
     system = "x86_64-linux";
+    host = "nixos";
+    username = "pieterp";
+    profile = "laptop";
 
     pkgs = import nixpkgs {
       inherit system;
@@ -44,27 +48,43 @@
     };
   in {
     nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs; };
+      laptop = nixpkgs.lib.nixosSystem {
+        specialArgs = { 
+          inherit inputs; 
+          inherit host;
+          inherit username;
+          inherit profile;
+        };
+
         modules = [ 
           ./modules/core/configuration.nix 
-          home-manager.nixosModules.default
-          stylix.nixosModules.stylix
-          spicetify-nix.nixosModules.spicetify
+          inputs.home-manager.nixosModules.default
+          inputs.stylix.nixosModules.stylix
+          inputs.spicetify-nix.nixosModules.spicetify
         ];
       };
     };
 
-    homeConfigurations."nixos" = home-manager.lib.homeManagerConfiguration {
+    # TODO: could make NixOS WSL profile here, but I don't use that currently
+    # TODO: make WSL profile for home-manager (for non-NixOS WSL) (maybe also for faster home-manager builds?)
+
+    homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
+      # This is NOT used for NixOS
+
       inherit pkgs;
 
-      # Specify your home configuration modules here 
       modules = [ 
           ./modules/home/home.nix
           # ./wsl.nix
       ];
 
-      extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules
+      extraSpecialArgs = { 
+         # Allows access to inputs in modules
+        inherit inputs; 
+        inherit host;
+        inherit username;
+        inherit profile;
+      };
     };
   };
 }
