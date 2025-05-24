@@ -7,10 +7,8 @@
 {
   imports =
     [ 
-      ./hardware-configuration.nix
       ./hyprland.nix
       ./gnome.nix
-      ./ideapad.nix
       ./steam.nix
     ];
 

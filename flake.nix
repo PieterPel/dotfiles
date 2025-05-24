@@ -38,7 +38,7 @@
   let 
     # Change these depending on your usecase
     system = "x86_64-linux";
-    host = "nixos";
+    host = "ideapad";
     username = "pieterp";
     profile = "laptop";
 
@@ -57,10 +57,9 @@
         };
 
         modules = [ 
-          ./modules/core/configuration.nix 
+          ./modules/core/configuration.nix
+          ./profiles/laptop/default.nix
           inputs.home-manager.nixosModules.default
-          inputs.stylix.nixosModules.stylix
-          inputs.spicetify-nix.nixosModules.spicetify
         ];
       };
     };

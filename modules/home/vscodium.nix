@@ -6,9 +6,8 @@
   ];
 
   programs.vscode = {
-    enable = false;
-    package = pkgs.vscodium;
-    #package = pkgs.vscode-fhs;
+    enable = true;
+    package = pkgs.vscode.fhs;
     profiles.pieterp.extensions = with pkgs.vscode-extensions; [
       # General 
       usernamehw.errorlens 
@@ -58,7 +57,13 @@
       emroussel.atomize-atom-one-dark-theme
       enkia.tokyo-night
       viktorqvarfordt.vscode-pitch-black-theme
-
+    ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+      {
+        name = "pyrefly";
+        publisher = "meta";
+        version = "0.16.2";
+        sha256 = "z6JNY8DWWyn8J/6HG2WH76Yrv+saqxzJ35RAnUx8N2c=";
+      }
     ];
   };
 }
