@@ -64,6 +64,7 @@
     zoxide
     bat
     rsync
+    ripgrep
 
     # Screenshots
     grim
@@ -75,6 +76,10 @@
 
     # Font
     montserrat
+
+    # Browser
+    brave
+    chromium
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -153,6 +158,7 @@
 
     targets = {
       vscode.profileNames = [ "pieterp" ];
+      vscode.enable = false;
       nixvim.plugin = "base16-nvim";
     }; 
   };

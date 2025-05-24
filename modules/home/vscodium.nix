@@ -1,12 +1,17 @@
 {config, pkgs, ...}:
 
 {
+  home.packages = with pkgs; [
+    vscodium
+  ];
+
   programs.vscode = {
-    enable = true;
+    enable = false;
     package = pkgs.vscodium;
+    #package = pkgs.vscode-fhs;
     profiles.pieterp.extensions = with pkgs.vscode-extensions; [
       # General 
-      usernamehw.errorlens
+      usernamehw.errorlens 
       tomoki1207.pdf
       tal7aouy.icons
       github.copilot
@@ -17,7 +22,7 @@
 
       # Python
       ms-python.python
-      ms-pyright.pyright
+      ms-python.vscode-pylance
       charliermarsh.ruff
       ms-python.debugpy
       ms-toolsai.jupyter
@@ -46,6 +51,13 @@
       # Markdown
       dendron.dendron-markdown-preview-enhanced
       bierner.markdown-mermaid
+
+      # Themes
+      hiukky.flate
+      dracula-theme.theme-dracula
+      emroussel.atomize-atom-one-dark-theme
+      enkia.tokyo-night
+      viktorqvarfordt.vscode-pitch-black-theme
 
     ];
   };

@@ -88,6 +88,9 @@
   # Install firefox.
   programs.firefox.enable = true;
 
+  # File manager
+  programs.thunar.enable = true;
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -121,6 +124,26 @@
     image = ../wallpapers/tux-teaching.jpg;
     polarity = "dark";
   };  
+
+  # Font stuff
+  fonts = {
+    fontconfig = {
+      antialias = true;
+      
+      # Fixes antialiasing blur
+      hinting = {
+        enable = true;
+        style = "full"; # no difference
+        autohint = true; # no difference
+      };
+
+      subpixel = {
+        # Makes it bolder
+        rgba = "rgb";
+        lcdfilter = "default"; # no difference
+      };
+    };
+  };
 
 
   # Automatic updating

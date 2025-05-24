@@ -5,7 +5,10 @@
 
   programs.hyprland = {
     enable = true;
-    xwayland.enable = true;
+    xwayland = {
+      enable = true;
+    };
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
 
   environment.sessionVariables = {
@@ -33,7 +36,6 @@
     )
     
     # Notifications
-    mako
     libnotify
     
     # Wallpaper
@@ -65,6 +67,13 @@
     pavucontrol
   ];
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+
+  # Notification daemon
+  services.mako = {
+    enable = true;
+  }
 }

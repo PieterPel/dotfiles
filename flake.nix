@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "Flake that I can use both for NixOS and home-manager standalone";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -44,15 +44,27 @@
     };
   in {
     nixosConfigurations = {
-      nixos  = nixpkgs.lib.nixosSystem {
+      nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
         modules = [ 
-          ./configuration.nix 
+          ./nixos/configuration.nix 
           home-manager.nixosModules.default
           stylix.nixosModules.stylix
           spicetify-nix.nixosModules.spicetify
         ];
       };
+    };
+
+    homeConfigurations."nixos" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+
+      # Specify your home configuration modules here 
+      modules = [ 
+          ./home.nix
+          ./wsl.nix
+      ];
+
+      extraSpecialArgs = { inherit inputs; }; # Allows access to inputs in modules
     };
   };
 }

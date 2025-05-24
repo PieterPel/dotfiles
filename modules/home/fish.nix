@@ -15,7 +15,7 @@
     # Define aliases
     shellAliases = {
       # NixOS
-      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles/nixos#nixos";
+      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#nixos";
       "noe" = "nvim ~/dotfiles/";
 
       # Devenv

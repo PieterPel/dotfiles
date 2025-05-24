@@ -1,7 +1,7 @@
 # Source ZeneyOS
 {host, ...}: 
 let
-    browser = "firefox";
+    browser = "chromium";
     terminal = "kitty";
 in {
   wayland.windowManager.hyprland.settings = {
