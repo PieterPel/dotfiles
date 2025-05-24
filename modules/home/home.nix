@@ -1,9 +1,11 @@
-{ config, pkgs, inputs, ... }:
+{ lib, config, pkgs, inputs, profile, ... }:
 
 {
 
   imports = [
-    ./default.nix
+    ./terminal-apps.nix
+  ] ++ lib.optionals (profile == "laptop") [
+    ./desktop-apps.nix
   ];
 
   # This value determines the Home Manager release that your configuration is
@@ -15,73 +17,6 @@
   # release notes.
   home.stateVersion = "24.11"; # Please read the comment before changing.
   
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = with pkgs; [
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
-
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-
-    # Version control
-    git
-    lazygit
-
-    # Languages
-    python3
-    cargo
-    gcc
-    nodejs_23
-
-    # shell
-    fish
-    oh-my-fish
-
-    # Developing
-    tmux
-    helix
-    devenv
-
-    # File management
-    yazi
-
-    # Utilities
-    unzip
-
-    # CLI tools
-    zoxide
-    bat
-    rsync
-    ripgrep
-
-    # Screenshots
-    grim
-    slurp
-    swappy
-
-    # Photoshop
-    gimp
-
-    # Font
-    montserrat
-
-    # Browser
-    brave
-    chromium
-  ];
-
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -135,33 +70,4 @@
   };
   
   # Enable and configure others
-
-  programs.zoxide = {
-	enable = true;
-	options = [
-	  "--cmd cd"
-	];
-  };
-
-  stylix = {
-    enable = true;
-    opacity = {
-      desktop = 0.5;
-      terminal = 0.8;
-    };
-
-    cursor = {
-      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
-      name = "BreezX-RosePine-Linux";
-      size = 24;
-    };
-
-    targets = {
-      vscode.profileNames = [ "pieterp" ];
-      vscode.enable = false;
-      nixvim.plugin = "base16-nvim";
-    }; 
-  };
-
-  programs.btop.enable = true;
 }

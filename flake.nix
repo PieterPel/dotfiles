@@ -69,13 +69,11 @@
     # TODO: make WSL profile for home-manager (for non-NixOS WSL) (maybe also for faster home-manager builds?)
 
     homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
-      # This is NOT used for NixOS
 
       inherit pkgs;
 
       modules = [ 
           ./modules/home/home.nix
-          # ./wsl.nix
       ];
 
       extraSpecialArgs = { 
