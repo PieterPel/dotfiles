@@ -9,7 +9,7 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs"; # Follow same version
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     
     nixvim = {
@@ -17,9 +17,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    flatpaks = {
+      url = "github:GermanBread/declarative-flatpak/stable-v3";
+    };
  };
 
-  outputs = { nixpkgs, home-manager, nixvim, ... } @ inputs:
+  outputs = { nixpkgs, home-manager, nixvim, flatpaks,... } @ inputs:
 
     let
       system = "x86_64-linux";
