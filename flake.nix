@@ -59,7 +59,6 @@
         modules = [ 
           ./modules/core/configuration.nix
           ./profiles/laptop/default.nix
-          inputs.home-manager.nixosModules.default
         ];
       };
     };

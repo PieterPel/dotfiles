@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, host, username, profile, ... }:
+{ pkgs, host, username, ... }:
 
 {
   imports =
@@ -10,6 +10,10 @@
       ./hyprland.nix
       ./gnome.nix
       ./steam.nix
+      ./spicetify.nix
+      ./home-manager.nix
+      ./stylix.nix
+      ./fonts.nix
     ];
 
   # Bootloader.
@@ -96,58 +100,9 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     git
-    base16-schemes
-    nerd-fonts.jetbrains-mono
-    font-awesome
+    base16-schemes 
     neofetch
   ];
-
-  # home-manager
-  home-manager = {
-    extraSpecialArgs = { 
-      inherit inputs; 
-      inherit host;
-      inherit username;
-      inherit profile;
-    };
-
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "backup";
-
-    users = {
-      ${username} = import ../home/home.nix;
-    };
-  };
-
-  # Stylix
-  stylix = {
-    enable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
-    image = ../../wallpapers/tux-teaching.jpg;
-    polarity = "dark";
-  };  
-
-  # Font stuff
-  fonts = {
-    fontconfig = {
-      antialias = true;
-      
-      # Fixes antialiasing blur
-      hinting = {
-        enable = true;
-        style = "full"; # no difference
-        autohint = true; # no difference
-      };
-
-      subpixel = {
-        # Makes it bolder
-        rgba = "rgb";
-        lcdfilter = "default"; # no difference
-      };
-    };
-  };
-
 
   # Automatic updating
   system.autoUpgrade = {
