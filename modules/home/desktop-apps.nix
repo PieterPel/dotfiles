@@ -10,6 +10,7 @@
     ./rofi
     ./spicetify.nix 
     ./flatpaks.nix
+    ./zed.nix
     inputs.spicetify-nix.homeManagerModules.spicetify
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
@@ -29,6 +30,9 @@
     # Browser
     brave
     chromium
+
+    # Editor
+    libreoffice-qt6-fresh
   ];
 
   stylix = {

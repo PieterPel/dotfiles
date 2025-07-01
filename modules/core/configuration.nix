@@ -104,6 +104,11 @@
     neofetch
   ];
 
+  # Fore redis to work optimally
+  boot.kernel.sysctl = {
+    "vm.overcommit_memory" = 1;
+  };
+
   # Automatic updating
   system.autoUpgrade = {
     enable = true;
