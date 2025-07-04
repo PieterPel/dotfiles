@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -12,13 +17,16 @@
 
   home.packages = with pkgs; [
     git
+    pre-commit
     lazygit
 
     # Languages
     python3
     cargo
     gcc
-    nodejs_23
+    nodejs_22
+    cabal-install
+    ghc
 
     # shell
     fish
@@ -43,13 +51,11 @@
   ];
 
   programs.zoxide = {
-	enable = true;
-	options = [
-	  "--cmd cd"
-	];
+    enable = true;
+    options = [
+      "--cmd cd"
+    ];
   };
 
   programs.btop.enable = true;
 }
-
-

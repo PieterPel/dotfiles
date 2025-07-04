@@ -5,18 +5,26 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   wsl.enable = true;
   wsl.defaultUser = "nixos";
 
   nix.extraOptions = ''
-       trusted-users = root nixos
+    trusted-users = root nixos
   '';
-  
+
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
@@ -24,27 +32,32 @@
   system.stateVersion = "24.05"; # Did you read the comment?
 
   environment.systemPackages = with pkgs; [
-  git
-  vim
-  neovim
+    # Version control
+    git
+    pre-commit
 
-  home-manager
+    # Editors
+    vim
+    neovim
+    nano
 
-  # CLI utility
-  fd
-  neofetch
+    home-manager
 
-  # Containers
-  dive
-  podman-tui
-  podman-compose
+    # CLI utility
+    fd
+    neofetch
 
-  # WSL
-  wget
+    # Containers
+    dive
+    podman-tui
+    podman-compose
+
+    # WSL
+    wget
   ];
 
   services.vscode-server.enable = true;
-  
+
   # Set fish as default shell
   programs.fish.enable = true;
   users.users.nixos.shell = pkgs.fish;

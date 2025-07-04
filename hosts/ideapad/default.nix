@@ -1,5 +1,5 @@
-
-{...}: {
+{ ... }:
+{
   imports = [
     ./hardware-configuration.nix
   ];
@@ -9,5 +9,5 @@
   };
 
   powerManagement.enable = true;
- 
+
 }

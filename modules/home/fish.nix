@@ -1,15 +1,23 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-        set fish_greeting # Disable greeting
+      set fish_greeting # Disable greeting
     '';
 
     # Define plugins
     plugins = [
-        { name = "tide"; src = pkgs.fishPlugins.tide.src; }
+      {
+        name = "tide";
+        src = pkgs.fishPlugins.tide.src;
+      }
     ];
 
     # Define aliases

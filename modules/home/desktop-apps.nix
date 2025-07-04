@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -8,8 +13,10 @@
     ./waybar.nix
     ./wlogout
     ./rofi
-    ./spicetify.nix 
+    ./spicetify.nix
     ./flatpaks.nix
+    ./zed.nix
+    ./stylix.nix
     inputs.spicetify-nix.homeManagerModules.spicetify
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
@@ -29,28 +36,8 @@
     # Browser
     brave
     chromium
+
+    # Editor
+    libreoffice-qt6-fresh
   ];
-
-  stylix = {
-    enable = true;
-    opacity = {
-      desktop = 0.5;
-      terminal = 0.8;
-    };
-
-    cursor = {
-      package = inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default;
-      name = "BreezX-RosePine-Linux";
-      size = 24;
-    };
-
-    targets = {
-      vscode.profileNames = [ "pieterp" ];
-      vscode.enable = false;
-      nixvim.plugin = "base16-nvim";
-    }; 
-  };
-
-
 }
-

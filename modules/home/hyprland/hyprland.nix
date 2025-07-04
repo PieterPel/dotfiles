@@ -1,10 +1,15 @@
-{config, pkgs, lib, ...}:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
-    startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-      ${pkgs.waybar}/bin/waybar &
-      ${pkgs.swww}/bin/swww init &
-    '';
+  startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
+    ${pkgs.waybar}/bin/waybar &
+    ${pkgs.swww}/bin/swww init &
+  '';
 in
 {
   wayland.windowManager.hyprland = {
