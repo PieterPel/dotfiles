@@ -152,7 +152,7 @@
         lsp-format.enable = true;
 
         # Completion
-        cmp.enable = true; # Needed for Codeium
+        cmp.enable = true; # Needed for Windurf
         blink-copilot.enable = true;
         blink-cmp = {
           enable = true;
@@ -199,7 +199,7 @@
         };
 
         # AI suggestions
-        codeium-nvim = {
+        windsurf-nvim = {
           enable = true;
           settings = {
             virtual_text = {
@@ -232,7 +232,7 @@
       (vimUtils.buildVimPlugin {
         name = "venv-selector";
         src = pkgs.fetchFromGitHub {
-            owner = "linux";
+            owner = "pieterpel";
             repo = "venv-selector.nvim";
             # 02-02-2025
             rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
