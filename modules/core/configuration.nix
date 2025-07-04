@@ -20,7 +20,7 @@
   boot.loader.systemd-boot.enable = true;
 
   # Login manager
-  services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.gdm.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

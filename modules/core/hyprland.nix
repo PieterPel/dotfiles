@@ -1,7 +1,7 @@
 { config, pkgs, inputs, ... }:
 
 {
-  services.xserver.displayManager.gdm.wayland = true;
+  services.displayManager.gdm.wayland = true;
 
   programs.hyprland = {
     enable = true;
