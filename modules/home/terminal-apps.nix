@@ -18,7 +18,7 @@
     python3
     cargo
     gcc
-    nodejs_23
+    nodejs_22
 
     # shell
     fish
@@ -51,5 +51,3 @@
 
   programs.btop.enable = true;
 }
-
-
