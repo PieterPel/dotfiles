@@ -17,6 +17,7 @@
 
   home.packages = with pkgs; [
     git
+    pre-commit
     lazygit
 
     # Languages
@@ -24,7 +25,8 @@
     cargo
     gcc
     nodejs_22
-    nixfmt-rfc-style
+    cabal-install
+    ghc
 
     # shell
     fish
