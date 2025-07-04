@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   services.displayManager.gdm.wayland = true;
@@ -11,7 +16,8 @@
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
 
-  environment.sessionVariables = { WLR_NO_HARDWARE_CURSORS = "1";
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1";
     NIXOS_OZONE_WL = "1";
   };
 
@@ -31,16 +37,15 @@
     # Top bar
     (waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
-    })
-    )
-    
+    }))
+
     # Notifications
     mako
     libnotify
-    
+
     # Wallpaper
     swww
-    
+
     # Terminal
     kitty
 

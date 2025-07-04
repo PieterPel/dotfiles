@@ -1,9 +1,10 @@
 # Source ZeneyOS
-{host, ...}: 
+{ host, ... }:
 let
-    browser = "brave";
-    terminal = "kitty";
-in {
+  browser = "brave";
+  terminal = "kitty";
+in
+{
   wayland.windowManager.hyprland.settings = {
     bind = [
       "$modifier,Return,exec,${terminal}"

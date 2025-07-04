@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -19,6 +24,7 @@
     cargo
     gcc
     nodejs_22
+    nixfmt-rfc-style
 
     # shell
     fish
@@ -43,10 +49,10 @@
   ];
 
   programs.zoxide = {
-	enable = true;
-	options = [
-	  "--cmd cd"
-	];
+    enable = true;
+    options = [
+      "--cmd cd"
+    ];
   };
 
   programs.btop.enable = true;

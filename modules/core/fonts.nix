@@ -1,5 +1,4 @@
-
-{pkgs, ...}:
+{ pkgs, ... }:
 
 {
 
@@ -11,7 +10,7 @@
   fonts = {
     fontconfig = {
       antialias = true;
-      
+
       # Fixes antialiasing blur
       hinting = {
         enable = true;

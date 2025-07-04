@@ -2,19 +2,23 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ pkgs, host, username, ... }:
+{
+  pkgs,
+  host,
+  username,
+  ...
+}:
 
 {
-  imports =
-    [ 
-      ./hyprland.nix
-      ./gnome.nix
-      ./steam.nix
-      ./spicetify.nix
-      ./home-manager.nix
-      ./stylix.nix
-      ./fonts.nix
-    ];
+  imports = [
+    ./hyprland.nix
+    ./gnome.nix
+    ./steam.nix
+    ./spicetify.nix
+    ./home-manager.nix
+    ./stylix.nix
+    ./fonts.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -22,7 +26,10 @@
   # Login manager
   services.displayManager.gdm.enable = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
@@ -79,7 +86,11 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Pieter Pel";
-    extraGroups = [ "networkmanager" "wheel" "input"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "input"
+    ];
     shell = pkgs.fish;
   };
 
@@ -100,7 +111,8 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     git
-    base16-schemes 
+    pre-commit
+    base16-schemes
     neofetch
   ];
 

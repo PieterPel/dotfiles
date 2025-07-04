@@ -1,4 +1,5 @@
-{pkgs, inputs, ...}: {
+{ pkgs, inputs, ... }:
+{
   imports = [
     inputs.stylix.nixosModules.stylix
   ];
@@ -8,5 +9,5 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
     image = ../../wallpapers/tux-teaching.jpg;
     polarity = "dark";
-  };  
+  };
 }

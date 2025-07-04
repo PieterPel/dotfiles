@@ -1,5 +1,6 @@
 # Source: ZaneyOS
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.kitty = {
     enable = true;
     package = pkgs.kitty;
@@ -74,4 +75,3 @@
     '';
   };
 }
-

@@ -1,4 +1,4 @@
-{config, pkgs, ...}:
+{ config, pkgs, ... }:
 {
   home.packages = with pkgs; [
     # There is a home-manager module but it sucks
