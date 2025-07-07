@@ -82,13 +82,8 @@
 
         modules = [
           ./modules/home/default.nix
+          ./modules/home/standalone.nix
           potentialUserModule
-          {
-            # NOTE: if there come more discrepencies between nixos and home-manager standalone,
-            # make seperate module
-            home.username = username;
-            home.homeDirectory = "/home/${username}";
-          }
         ];
 
         extraSpecialArgs = {
