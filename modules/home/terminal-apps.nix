@@ -13,7 +13,6 @@
     ./tmux.nix
     ./git.nix
     inputs.nixvim.homeManagerModules.nixvim
-    inputs.stylix.homeModules.stylix
   ];
 
   home.packages = with pkgs; [

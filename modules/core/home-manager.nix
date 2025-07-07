@@ -25,5 +25,6 @@
     users = {
       ${username} = import ../home/default.nix;
     };
+
   };
 }
