@@ -37,18 +37,26 @@
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
-      # Change these depending on your usecase
-      system = "x86_64-linux";
-      host = "ideapad";
-      username = "pieterp";
-      profile = "laptop";
+      # You can change settings per system in flake-settings.nix
+      settings = import ./flake-settings.nix;
+      inherit (settings)
+        system
+        host
+        username
+        profile
+        ;
 
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
+
+      potentialUserModulePath = ./hosts/${host}/users/${username}/default.nix;
+      potentialUserModule =
+        if builtins.pathExists (potentialUserModulePath) then potentialUserModulePath else { };
     in
     {
+      # This flake provides output for sudo nixos-rebuild
       nixosConfigurations = {
         ${profile} = nixpkgs.lib.nixosSystem {
           specialArgs = {
@@ -61,19 +69,26 @@
           modules = [
             ./modules/core/configuration.nix
             ./profiles/${profile}/default.nix
+            ./hosts/${host}/default.nix
+            potentialUserModule
           ];
         };
       };
 
-      # TODO: could make NixOS WSL profile here, but I don't use that currently
-      # TODO: make WSL profile for home-manager (for non-NixOS WSL) (maybe also for faster home-manager builds?)
-
+      # And for home-manager switch
       homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
 
         inherit pkgs;
 
         modules = [
-          ./modules/home/home.nix
+          ./modules/home/default.nix
+          potentialUserModule
+          {
+            # NOTE: if there come more discrepencies between nixos and home-manager standalone,
+            # make seperate module
+            home.username = username;
+            home.homeDirectory = "/home/${username}";
+          }
         ];
 
         extraSpecialArgs = {

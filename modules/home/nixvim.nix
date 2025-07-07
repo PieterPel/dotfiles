@@ -1,4 +1,13 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  profile,
+  ...
+}:
+
+let
+  isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
+in
 {
   home.packages = with pkgs; [
     fd
@@ -114,6 +123,19 @@
         action = "<cmd>VenvSelect<CR>";
       }
 
+      # Trouble
+      {
+        key = "<leader>xx";
+        action = "<cmd>Trouble diagnostics toggle<CR>";
+      }
+
+      {
+        key = "<leader>xX";
+        action = "<cmd>Trouble diagnostics toggle.buf=0<CR>";
+      }
+
+      # Debug
+
       # Splits and tabs
       {
         key = "<leader>h";
@@ -142,7 +164,7 @@
     clipboard = {
       # Use system clipboard
       register = "unnamedplus";
-      providers.wl-copy.enable = true;
+      providers.wl-copy.enable = isWayland;
     };
 
     plugins = {
@@ -158,6 +180,7 @@
       telescope.enable = true; # Fuzzy finder
       nvim-tree.enable = true; # File explorer
       harpoon.enable = true; # Mark files to go back to
+      trouble.enable = true; # Give diagnostics overview
 
       # Language specific
       /*
@@ -219,7 +242,7 @@
       lsp-format.enable = true;
 
       # Completion
-      cmp.enable = true; # Needed for Windurf
+      cmp.enable = true; # Needed for Windsurf
       blink-copilot.enable = true;
       blink-cmp = {
         enable = true;

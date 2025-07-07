@@ -10,7 +10,7 @@ let
 in
 {
   programs.spicetify = {
-    enable = true;
+    enable = config.enableDesktopApps;
     enabledExtensions = with spicePkgs.extensions; [
       adblockify
       shuffle # shuffle+ (special characters are sanitized out of extension names)

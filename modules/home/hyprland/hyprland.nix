@@ -13,7 +13,7 @@ let
 in
 {
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = config.enableDesktopApps;
 
     settings = {
       exec-once = ''${startupScript}/bin/start'';

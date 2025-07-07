@@ -113,6 +113,7 @@
     git
     base16-schemes
     neofetch
+    home-manager # So we can also rebuild home-manager as flake itself
   ];
 
   # Fore redis to work optimally

@@ -6,7 +6,7 @@
   ];
 
   programs.vscode = {
-    enable = true;
+    enable = config.enableDesktopApps;
     package = pkgs.vscode.fhs;
     profiles.pieterp.extensions =
       with pkgs.vscode-extensions;

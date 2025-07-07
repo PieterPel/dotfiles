@@ -3,7 +3,7 @@
 {
   programs = {
     rofi = {
-      enable = true;
+      enable = config.enableDesktopApps;
       package = pkgs.rofi-wayland;
       extraConfig = {
         modi = "drun,filebrowser,run";

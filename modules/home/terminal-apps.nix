@@ -13,6 +13,7 @@
     ./tmux.nix
     ./git.nix
     inputs.nixvim.homeManagerModules.nixvim
+    inputs.stylix.homeModules.stylix
   ];
 
   home.packages = with pkgs; [
@@ -31,7 +32,6 @@
     # shell
     fish
     oh-my-fish
-
     # Developing
     tmux
     helix
@@ -48,6 +48,9 @@
     bat
     rsync
     ripgrep
+
+    # AI
+    gemini-cli
   ];
 
   programs.zoxide = {

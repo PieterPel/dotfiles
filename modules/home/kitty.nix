@@ -1,8 +1,8 @@
 # Source: ZaneyOS
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs.kitty = {
-    enable = true;
+    enable = config.enableDesktopApps;
     package = pkgs.kitty;
     settings = {
       font_size = 12;

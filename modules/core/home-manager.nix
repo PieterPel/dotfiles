@@ -23,7 +23,7 @@
     backupFileExtension = "backup";
 
     users = {
-      ${username} = import ../home/home.nix;
+      ${username} = import ../home/default.nix;
     };
   };
 }

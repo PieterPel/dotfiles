@@ -3,7 +3,7 @@
 
 {
   programs.wlogout = {
-    enable = true;
+    enable = config.enableDesktopApps;
     layout = [
       {
         label = "shutdown";
