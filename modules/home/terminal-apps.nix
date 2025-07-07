@@ -31,7 +31,6 @@
     # shell
     fish
     oh-my-fish
-
     # Developing
     tmux
     helix
@@ -48,6 +47,9 @@
     bat
     rsync
     ripgrep
+
+    # AI
+    gemini-cli
   ];
 
   programs.zoxide = {

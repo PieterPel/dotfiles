@@ -1,0 +1,7 @@
+{
+  ...
+}:
+{
+  enableDesktopApps = true;
+  nixosStylix = true;
+}

@@ -6,8 +6,11 @@
 }:
 
 {
+  home.packages = with pkgs; [ base16-schemes ];
+
   stylix = {
     enable = true;
+
     opacity = {
       desktop = 0.5;
       terminal = 0.8;

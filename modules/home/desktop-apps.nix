@@ -21,23 +21,28 @@
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
 
-  home.packages = with pkgs; [
-    # Screenshots
-    grim
-    slurp
-    swappy
+  home.packages =
+    with pkgs;
+    if config.enableDesktopApps then
+      [
+        # Screenshots
+        grim
+        slurp
+        swappy
 
-    # Photoshop
-    gimp
+        # Photoshop
+        gimp
 
-    # Font
-    montserrat
+        # Font
+        montserrat
 
-    # Browser
-    brave
-    chromium
+        # Browser
+        brave
+        chromium
 
-    # Editor
-    libreoffice-qt6-fresh
-  ];
+        # Editor
+        libreoffice-qt6-fresh
+      ]
+    else
+      [ ];
 }

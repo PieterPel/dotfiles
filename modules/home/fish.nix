@@ -2,6 +2,8 @@
   config,
   pkgs,
   inputs,
+  username,
+  profile,
   ...
 }:
 
@@ -23,8 +25,11 @@
     # Define aliases
     shellAliases = {
       # NixOS
-      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#laptop";
+      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#${profile}";
       "noe" = "nvim ~/dotfiles/";
+
+      # Home-manager
+      "hms" = "home-manager switch --flake ~/dotfiles/";
 
       # Devenv
       "dev-init" = "nix flake init --template github:cachix/devenv";

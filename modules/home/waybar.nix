@@ -14,7 +14,7 @@ with lib;
 {
   # Configure & Theme Waybar
   programs.waybar = {
-    enable = true;
+    enable = config.enableDesktopApps;
     package = pkgs.waybar;
     settings = [
       {
