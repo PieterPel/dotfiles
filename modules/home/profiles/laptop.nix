@@ -3,5 +3,4 @@
 }:
 {
   enableDesktopApps = true;
-  nixosStylix = true;
 }

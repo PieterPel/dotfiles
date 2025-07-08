@@ -9,6 +9,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     hyprland = {
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,7 +59,7 @@
 
     in
     {
-      # This flake provides output for sudo nixos-rebuild
+      # This flake provides output for `sudo nixos-rebuild switch`
       nixosConfigurations = {
         ${system-profile} = nixpkgs.lib.nixosSystem {
           specialArgs = {
@@ -67,30 +72,48 @@
 
           modules = [
             ./modules/core/configuration.nix
+            ./modules/nixos/configuration.nix
             ./profiles/${system-profile}/default.nix
             ./hosts/${host}/default.nix
           ];
         };
       };
 
-      # And for home-manager switch
-      homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
-
-        inherit pkgs;
-
-        modules = [
-          ./modules/home/default.nix
-          ./modules/home/standalone.nix
-        ];
-
-        extraSpecialArgs = {
-          # Allows access to inputs in modules
+      # And for `sudo darwin-rebuild switch`
+      darwinConfigurations.${host} = inputs.nix-darwin.lib.darwinSystem {
+        specialArgs = {
           inherit inputs;
           inherit host;
           inherit username;
           inherit system-profile;
           inherit user-profile;
         };
+
+        modules = [
+          ./modules/core/configuration.nix
+          ./modules/darwin/configuration.nix
+          ./profiles/${system-profile}/default.nix
+          ./hosts/${host}/default.nix
+        ];
+      };
+
+      # And for `home-manager switch`
+      homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
+
+        inherit pkgs;
+
+        extraSpecialArgs = {
+          inherit inputs;
+          inherit host;
+          inherit username;
+          inherit system-profile;
+          inherit user-profile;
+        };
+
+        modules = [
+          ./modules/home/default.nix
+          ./modules/home/standalone.nix
+        ];
       };
     };
 }
