@@ -1,0 +1,7 @@
+# Future proofing
+{
+  ...
+}:
+
+{
+}
