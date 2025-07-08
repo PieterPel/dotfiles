@@ -3,6 +3,7 @@
 let
   browser = "brave";
   terminal = "kitty";
+  explorer = "thunar";
 in
 {
   wayland.windowManager.hyprland.settings = {
@@ -14,7 +15,7 @@ in
       #"$modifier ALT,W,exec,wallsetter"
       "$modifier SHIFT,N,exec,swaync-client -rs"
       "$modifier,W,exec,${browser}"
-      "$modifier,E,exec,emopicker9000"
+      "$modifier,E,exec,${explorer}"
       "$modifier,S,exec,grim -g \"\$(slurp)\" - | swappy -f - " # Screenshot and markup selected area
       #"$modifier,D,exec,discord"
       #"$modifier,O,exec,obs"

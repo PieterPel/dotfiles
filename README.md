@@ -13,9 +13,15 @@ The inspiration for the repo layout and large part of some modules are derived f
 - **Modular Structure:** Configurations are broken down into reusable modules for better organization and maintainability.
 - **Multi-Host Support:** Easily manage configurations for different machines (e.g., `ideapad`, `surface`).
 - **Home Manager Integration:** Manages user-specific configurations (e.g., shell, applications, fonts) with Home Manager.
+- **NixOS Integration:** Manages system configurations with NixOS.
+- **nix-darwin Integration:** Manages macOS configurations with nix-darwin. I have not tested this but the layout works
 - **Hyprland:** Configuration for the Hyprland Wayland compositor.
 - **NixVim:** Integrated Neovim configuration managed by Nix.
 - **Various Applications:** Configurations for `fish`, `kitty`, `tmux`, `vscodium`, `zed`, `waybar`, `rofi`, `wlogout`, and more.
+
+## Screenshot
+
+![Screenshot](img/empty-wallpaper.png)
 
 ## Repository Structure
 
@@ -51,7 +57,7 @@ The general process involves cloning this repository and then using `sudo nixos-
     `system-profile`s are used to load a unique NixOS/nix-darwin module under `profiles/`.
     `host`s are used to load a unique NixOS/nix-darwin module under `hosts/<your-host>`.
 
-3.  **NixOS Configuration (for system-wide changes):**
+3.  **NixOS Configuration:**
     Edit `hosts/<your-host>/` to include your auto-generated `hardware-configuration.nix`. Then, from the repository root:
     ```bash
     sudo nixos-rebuild switch --flake .
@@ -65,8 +71,6 @@ The general process involves cloning this repository and then using `sudo nixos-
     ```bash
     home-manager switch --flake .
     ```
-    (e.g., `home-manager switch --flake .`)
-
 
 ## Contributing
 

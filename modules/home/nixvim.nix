@@ -25,6 +25,41 @@ in
     #colorscheme = "oxocarbon";
     #colorschemes.oxocarbon.enable = true;
 
+    diagnostic.settings = {
+      # Enable virtual text for inline diagnostics
+      virtual_text = {
+        spacing = 2;
+        prefix = "";
+      };
+
+      # Configure signs in the sign column
+      signs = {
+        text = {
+          ERROR = "E";
+          WARN = "W";
+          INFO = "I";
+          HINT = "H";
+        };
+      };
+
+      # Underline problematic text
+      underline = true;
+
+      # Update diagnostics in insert mode
+      update_in_insert = false;
+
+      # Sort diagnostics by severity
+      severity_sort = true;
+
+      # Floating window configuration
+      float = {
+        border = "rounded";
+        source = "always";
+        header = "";
+        prefix = "";
+      };
+    };
+
     opts = {
       number = true;
       relativenumber = true;

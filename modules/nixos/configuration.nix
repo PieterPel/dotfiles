@@ -72,10 +72,14 @@
   };
 
   # File manager
-  programs.thunar.enable = true;
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs.xfce; [
+      thunar-archive-plugin
+    ];
+  };
+  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  services.tumbler.enable = true; # Thumbnail support for images
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -52,6 +52,9 @@
     home-manager # So we can also rebuild home-manager as flake itself
   ];
 
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
   # Automatic cleanup
   nix.gc = {
     automatic = true;
