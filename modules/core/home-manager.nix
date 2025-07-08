@@ -2,7 +2,8 @@
   inputs,
   host,
   username,
-  profile,
+  system-profile,
+  user-profile,
   ...
 }:
 {
@@ -15,7 +16,8 @@
       inherit inputs;
       inherit host;
       inherit username;
-      inherit profile;
+      inherit system-profile;
+      inherit user-profile;
     };
 
     useGlobalPkgs = true;

@@ -1,7 +1,8 @@
 {
   # Change these depending on your usecase
   system = "x86_64-linux";
-  host = "ideapad";
-  username = "pieterp";
-  profile = "laptop";
+  host = "robeco";
+  username = "pieterpel";
+  system-profile = "wsl";
+  user-profile = "wsl";
 }

@@ -3,7 +3,7 @@
   pkgs,
   inputs,
   username,
-  profile,
+  system-profile,
   ...
 }:
 
@@ -25,7 +25,7 @@
     # Define aliases
     shellAliases = {
       # NixOS
-      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#${profile}";
+      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#${system-profile}";
       "noe" = "nvim ~/dotfiles/";
 
       # Home-manager

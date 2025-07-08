@@ -43,7 +43,8 @@
         system
         host
         username
-        profile
+        system-profile
+        user-profile
         ;
 
       pkgs = import nixpkgs {
@@ -51,26 +52,23 @@
         config.allowUnfree = true;
       };
 
-      potentialUserModulePath = ./hosts/${host}/users/${username}/default.nix;
-      potentialUserModule =
-        if builtins.pathExists (potentialUserModulePath) then potentialUserModulePath else { };
     in
     {
       # This flake provides output for sudo nixos-rebuild
       nixosConfigurations = {
-        ${profile} = nixpkgs.lib.nixosSystem {
+        ${system-profile} = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs;
             inherit host;
             inherit username;
-            inherit profile;
+            inherit system-profile;
+            inherit user-profile;
           };
 
           modules = [
             ./modules/core/configuration.nix
-            ./profiles/${profile}/default.nix
+            ./profiles/${system-profile}/default.nix
             ./hosts/${host}/default.nix
-            potentialUserModule
           ];
         };
       };
@@ -83,7 +81,6 @@
         modules = [
           ./modules/home/default.nix
           ./modules/home/standalone.nix
-          potentialUserModule
         ];
 
         extraSpecialArgs = {
@@ -91,7 +88,8 @@
           inherit inputs;
           inherit host;
           inherit username;
-          inherit profile;
+          inherit system-profile;
+          inherit user-profile;
         };
       };
     };
