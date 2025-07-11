@@ -7,7 +7,7 @@
 
 {
   imports = [
-    ./nixvim.nix
+    ./nixvim/default.nix
     ./direnv.nix
     ./fish.nix
     ./tmux.nix
