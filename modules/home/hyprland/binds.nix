@@ -1,21 +1,16 @@
 # Source ZeneyOS
-{ host, ... }:
-let
-  browser = "brave";
-  terminal = "kitty";
-  explorer = "thunar";
-in
+{ host, config, ... }:
 {
   wayland.windowManager.hyprland.settings = {
     bind = [
-      "$modifier,Return,exec,${terminal}"
+      "$modifier,Return,exec,${config.terminal}"
       #"$modifier SHIFT,Return,exec,rofi-launcher"
       "$modifier,R,exec,rofi -show run "
       #"$modifier SHIFT,W,exec,web-search"
       #"$modifier ALT,W,exec,wallsetter"
       "$modifier SHIFT,N,exec,swaync-client -rs"
-      "$modifier,W,exec,${browser}"
-      "$modifier,E,exec,${explorer}"
+      "$modifier,W,exec,${config.browser}"
+      "$modifier,E,exec,${config.explorer}"
       "$modifier,S,exec,grim -g \"\$(slurp)\" - | swappy -f - " # Screenshot and markup selected area
       #"$modifier,D,exec,discord"
       #"$modifier,O,exec,obs"
