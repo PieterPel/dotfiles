@@ -22,9 +22,6 @@ in
 
     enable = true;
 
-    #colorscheme = "oxocarbon";
-    #colorschemes.oxocarbon.enable = true;
-
     diagnostic.settings = {
       # Enable virtual text for inline diagnostics
       virtual_text = {
@@ -184,6 +181,26 @@ in
         action = "<cmd>tabnew<CR>";
       }
 
+      # Copilot Chat
+      {
+        key = "<leader>co";
+        action = "<cmd>CopilotChatOpen<CR>";
+      }
+      {
+        key = "<leader>cc";
+        action = "<cmd>CopilotChatClose<CR>";
+      }
+      {
+        key = "<leader>ct";
+        action = "<cmd>CopilotChatToggle<CR>";
+      }
+
+      # LazyGit
+      {
+        key = "<leader>lg";
+        action = "<cmd>LazyGit<CR>";
+      }
+
       # Utility
       {
         key = "<leader>q";
@@ -205,6 +222,8 @@ in
       # General
       undotree.enable = true; # Virtualize undo history
       comment.enable = true; # Better commenting
+      which-key.enable = true; # Show keybindings
+      direnv.enable = true; # Direnv integration
 
       # Apearance
       lightline.enable = true; # Pretty bar at the bottom
@@ -215,6 +234,7 @@ in
       nvim-tree.enable = true; # File explorer
       harpoon.enable = true; # Mark files to go back to
       trouble.enable = true; # Give diagnostics overview
+      lazygit.enable = true; # Lazygit from within nvim
 
       # Language specific
       /*
@@ -323,6 +343,7 @@ in
       };
 
       # AI suggestions
+      copilot-chat.enable = true;
       windsurf-nvim = {
         enable = true;
         settings = {

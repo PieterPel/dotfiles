@@ -4,9 +4,8 @@
   username,
   ...
 }:
-
 {
-  # Here you can stuff that is only needed if home-manager is used standalone
+  # Here you can put stuff that is only needed if home-manager is used standalone
   imports = [
     inputs.stylix.homeModules.stylix
   ];
