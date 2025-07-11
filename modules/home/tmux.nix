@@ -20,6 +20,7 @@
       set -gu default-command
       set -g default-shell "$SHELL"
       set -g mouse on
+      set -g @tmux_power_theme 'violet'
     '';
   };
 }
