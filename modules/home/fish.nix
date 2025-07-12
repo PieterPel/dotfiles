@@ -1,13 +1,15 @@
 {
-  config,
   pkgs,
-  inputs,
-  username,
   system-profile,
   ...
 }:
 
 {
+
+  programs.bash.enable = true;
+  programs.zsh.enable = true;
+  programs.nushell.enable = true;
+
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
@@ -22,21 +24,23 @@
       }
     ];
 
-    # Define aliases
-    shellAliases = {
-      # NixOS
-      "nos" = "sudo nixos-rebuild switch --flake ~/dotfiles#${system-profile}";
-      "noe" = "nvim ~/dotfiles/";
+  };
 
-      # Home-manager
-      "hms" = "home-manager switch --flake ~/dotfiles/";
+  home.shellAliases = {
+    # NixOS
+    nos = "sudo nixos-rebuild switch --flake ~/dotfiles#${system-profile}";
+    noe = "nvim ~/dotfiles/";
 
-      # Devenv
-      "dev-init" = "nix flake init --template github:cachix/devenv";
+    # Home-manager
+    hms = "home-manager switch --flake ~/dotfiles/";
 
-      # CLI dropins
-      "cat" = "bat";
-    };
+    # Devenv
+    dev-init = "nix flake init --template github:cachix/devenv";
 
+    # CLI dropins
+    cat = "bat";
+
+    # LazyGit
+    lg = "lazygit";
   };
 }
