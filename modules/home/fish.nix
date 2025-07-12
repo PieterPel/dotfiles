@@ -5,7 +5,7 @@
 }:
 
 {
-
+  # Enable more shells than aliases also work for them
   programs.bash.enable = true;
   programs.zsh.enable = true;
   programs.nushell.enable = true;
@@ -28,11 +28,11 @@
 
   home.shellAliases = {
     # NixOS
-    nos = "sudo nixos-rebuild switch --flake ~/dotfiles#${system-profile}";
+    nos = "sudo nh os switch ~/dotfiles#${system-profile}";
     noe = "nvim ~/dotfiles/";
 
     # Home-manager
-    hms = "home-manager switch --flake ~/dotfiles/";
+    hms = "nh home switch ~/dotfiles/";
 
     # Devenv
     dev-init = "nix flake init --template github:cachix/devenv";

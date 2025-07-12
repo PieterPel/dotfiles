@@ -16,9 +16,13 @@
   ];
 
   home.packages = with pkgs; [
+    # Verstion control
     git
     pre-commit
     lazygit
+
+    # Nix
+    nh
 
     # Languages
     python3
@@ -31,6 +35,7 @@
     # shell
     fish
     oh-my-fish
+
     # Developing
     tmux
     helix
