@@ -5,11 +5,6 @@
 }:
 
 {
-  # Enable more shells than aliases also work for them
-  programs.bash.enable = true;
-  programs.zsh.enable = true;
-  programs.nushell.enable = true;
-
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
