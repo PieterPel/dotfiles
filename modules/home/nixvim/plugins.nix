@@ -10,6 +10,7 @@
       undotree.enable = true; # Virtualize undo history
       comment.enable = true; # Better commenting
       direnv.enable = true; # Direnv integration
+      lz-n.enable = true; # Lazy loading
 
       # Apearance
       lightline.enable = true; # Pretty bar at the bottom
@@ -43,7 +44,11 @@
 
       nix.enable = true; # Tools for Nix
       typescript-tools.enable = true; # Tools for TypeScript
-      render-markdown.enable = true; # Render markdown
+      render-markdown = {
+        # Render markdown
+        enable = true;
+        lazyLoad.settings.ft = "markdown";
+      };
 
       # Treesitter
       treesitter-context.enable = true;
@@ -171,7 +176,7 @@
       # Testing
       neotest.enable = true;
 
-      # Keeping track of time
+      # Keeping track of time (enable with :WakaTimeApiKey)
       wakatime.enable = true;
 
       # Dependency of gemini-cli

@@ -12,7 +12,7 @@
     enable = true;
 
     # These colors were very dark by default which can make text on a dark background unreadable
-    override.base03 = "ffb9ff";
+    # override.base03 = "ffb9ff";
     override.base0F = "ff729a";
 
     opacity = {

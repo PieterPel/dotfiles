@@ -13,10 +13,21 @@
     ./fonts.nix
   ];
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+
+    substituters = [
+      "https://cache.nixos.org/"
+      "https://devenv.cachix.org"
+    ];
+
+    trusted-public-keys = [
+      "devenv.cachix.org-1:LsUwPwJv9iW7NLhFhJPDGFkqpT7LhNkpIws88soZV/M="
+    ];
+  };
 
   # Set your time zone.
   time.timeZone = "Europe/Amsterdam";
