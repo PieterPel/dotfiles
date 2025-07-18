@@ -23,7 +23,7 @@
 
   home.shellAliases = {
     # NixOS
-    nos = "sudo nh os switch ~/dotfiles#${system-profile}";
+    nos = "nh os switch ~/dotfiles#${system-profile}";
     noe = "nvim ~/dotfiles/";
 
     # Home-manager
