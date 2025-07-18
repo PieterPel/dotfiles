@@ -109,8 +109,12 @@
       action = "<cmd>CopilotChatClose<CR>";
     }
     {
-      key = "<leader>ct";
+      key = "<leader>cp";
       action = "<cmd>CopilotChatToggle<CR>";
+    }
+    {
+      key = "<leader>cg";
+      action = "<cmd>Gemini toggle<CR>";
     }
 
     # LazyGit

@@ -24,6 +24,7 @@
       harpoon.enable = true; # Mark files to go back to
       trouble.enable = true; # Give diagnostics overview
       lazygit.enable = true; # Lazygit from within nvim
+      toggle-term.enable = true; # More ergonomic toggling of terminals
 
       # Language specific
       /*
@@ -78,6 +79,7 @@
           taplo.enable = true;
           ts_ls.enable = true;
           lua_ls.enable = true;
+          gleam.enable = true;
           rust_analyzer = {
             enable = true;
             installRustc = true;
@@ -157,9 +159,11 @@
           bracketed = { };
           indentscope = { };
           tabline = { };
-          pairs = { };
+          # pairs = { }; # I changed this for nvim-autopairs
         };
       };
+
+      nvim-autopairs.enable = true;
 
       # Debug
       dap.enable = true; # Debug server
@@ -169,6 +173,9 @@
 
       # Keeping track of time
       wakatime.enable = true;
+
+      # Dependency of gemini-cli
+      snacks.enable = true;
     };
 
     extraPlugins = with pkgs; [
@@ -181,6 +188,17 @@
           # 02-02-2025
           rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
           hash = "sha256-UXKlVn4D6Qj4s01mcFRUsIgXh8c9KmAX5E16Z/RenYE=";
+        };
+      })
+
+      (vimUtils.buildVimPlugin {
+        name = "gemini-cli";
+        src = pkgs.fetchFromGitHub {
+          owner = "marcinjahn";
+          repo = "gemini-cli.nvim";
+          # 18-07-2025
+          rev = "c9fd62adda823628f5131a939d9c56ef7a898600";
+          hash = "sha256-C4OI6NM+Bpa5WffmXY+tNLfuYyX0LNbmsAe9GDBRVCQ=";
         };
       })
 
