@@ -52,6 +52,7 @@
     bat
     rsync
     ripgrep
+    eza
 
     # AI
     gemini-cli

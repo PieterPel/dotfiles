@@ -106,7 +106,7 @@ in
       endif
 
       " Fix slow exiting of terminal mode
-      set ttimeoutlen = 10
+      set ttimeoutlen=10
     '';
 
     extraConfigLua = ''
