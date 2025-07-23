@@ -6,34 +6,16 @@
 
 let
   isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
-  autoAutoreadSrc = pkgs.fetchFromGitHub {
-    owner = "TheZoq2";
-    repo = "neovim-auto-autoread";
-    rev = "21fc7d47eaaec03f4e5ab76abacc00d8702e4590";
-    sha256 = "sha256-MwfxxcLazHM5AWNZuujP+5f1iJgxrFyw7aiwW1T733M=";
-  };
-
-  autoAutoreadRplugin =
-    pkgs.runCommand "auto-autoread-rplugin"
-      {
-      }
-      ''
-        mkdir -p $out
-        cp -r ${autoAutoreadSrc}/rplugin $out/
-      '';
 in
 {
   home.packages = with pkgs; [
     fd
     rust-analyzer
-    (python313.withPackages (ps: with ps; [ pynvim ]))
   ];
 
   home.sessionVariables = {
     RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
   };
-
-  home.file.".config/nvim/rplugin".source = "${autoAutoreadRplugin}/rplugin";
 
   programs.nixvim = {
     nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
@@ -118,11 +100,7 @@ in
         \ }
 
       " Autoreload files when changed externally
-      let g:python3_host_prog = exepath('python3')
       set autoread
-      if has('nvim') "Prevent errors when using standard vim
-          autocmd VimEnter * AutoreadLoop
-      endif
 
       " Fix slow exiting of terminal mode
       set ttimeoutlen=10
@@ -148,7 +126,6 @@ in
         }  
       })
 
-      vim.opt.rtp:append("${autoAutoreadRplugin}")
       require("gemini_cli").setup()
     '';
   };
