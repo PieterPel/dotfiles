@@ -196,7 +196,7 @@
       })
 
       (vimUtils.buildVimPlugin {
-        name = "gemini-cli";
+        name = "gemini_cli";
         src = pkgs.fetchFromGitHub {
           owner = "marcinjahn";
           repo = "gemini-cli.nvim";

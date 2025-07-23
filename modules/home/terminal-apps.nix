@@ -25,7 +25,6 @@
     nh
 
     # Languages
-    python3
     cargo
     gcc
     nodejs_22
