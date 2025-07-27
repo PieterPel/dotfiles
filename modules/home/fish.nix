@@ -48,5 +48,8 @@
     lS = "eza -1 --color=always --group-directories-first --icons";
     lt = "eza --tree --level=2 --color=always --group-directories-first --icons";
     "l." = "eza -a | grep -E '^\\.'";
+
+    # fastfetch
+    neofetch = "fastfetch";
   };
 }

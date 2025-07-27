@@ -50,12 +50,18 @@
     # CLI tools
     zoxide
     bat
-    rsync
     ripgrep
     eza
+    lazydocker
+    lazysql
 
     # AI
     gemini-cli
+    opencode
+    podman-tui
+
+    # Misc
+    spotify-player
   ];
 
   programs.zoxide = {
