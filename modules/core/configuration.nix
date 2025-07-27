@@ -11,6 +11,7 @@
     ./home-manager.nix
     ./stylix.nix
     ./fonts.nix
+    ./virtualization.nix
   ];
 
   nix.settings = {

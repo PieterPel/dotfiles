@@ -52,13 +52,17 @@
     bat
     ripgrep
     eza
-    lazydocker
     lazysql
 
     # AI
     gemini-cli
     opencode
+
+    # Containers
     podman-tui
+    podman-compose
+    dive
+    lazydocker
 
     # Misc
     spotify-player
