@@ -1,7 +1,7 @@
 {
   pkgs,
-  host,
   username,
+  inputs,
   ...
 }:
 
@@ -26,6 +26,11 @@
 
     trusted-public-keys = [
       "devenv.cachix.org-1:LsUwPwJv9iW7NLhFhJPDGFkqpT7LhNkpIws88soZV/M="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+
+    trusted-users = [
+      username
     ];
   };
 
@@ -77,6 +82,14 @@
   # Automatic updating
   system.autoUpgrade = {
     enable = true;
-    dates = "weekly";
+    flake = inputs.self.outPath;
+    flags = [
+      "--update-input"
+      "nixpkgs"
+      "--no-write-lock-file"
+      "-L" # print build logs
+    ];
+    dates = "02:00";
+    randomizedDelaySec = "45min";
   };
 }
