@@ -1,8 +1,7 @@
-{
-  user-profile,
-  host,
-  username,
-  ...
+{ user-profile
+, host
+, username
+, ...
 }:
 
 let
@@ -10,7 +9,7 @@ let
   potentialUserModule =
     if builtins.pathExists (potentialUserModulePath) then potentialUserModulePath else { };
 
-  potentialUserProfilePath = ./profiles/${user-profile}.nix; # TODO: change to directory?
+  potentialUserProfilePath = ./profiles/user/${user-profile}.nix; # TODO: change to directory?
   potentialUserProfile =
     if builtins.pathExists (potentialUserProfilePath) then potentialUserProfilePath else { };
 in

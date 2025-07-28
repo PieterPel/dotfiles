@@ -1,7 +1,6 @@
-{
-  pkgs,
-  system-profile,
-  ...
+{ pkgs
+, system-profile
+, ...
 }:
 
 {
@@ -12,10 +11,10 @@
     '';
 
     # Define plugins
-    plugins = [
+    plugins = with pkgs.fishPlugins; [
       {
         name = "tide";
-        src = pkgs.fishPlugins.tide.src;
+        src = tide.src;
       }
     ];
 

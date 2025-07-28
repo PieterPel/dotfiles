@@ -8,11 +8,11 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixos-wsl,
-      vscode-server,
+    { self
+    , nixpkgs
+    , nixos-wsl
+    , vscode-server
+    ,
     }@inputs:
     {
       nixosConfigurations.nixos =

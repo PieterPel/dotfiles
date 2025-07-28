@@ -84,7 +84,7 @@
           modules = [
             ./modules/core/configuration.nix
             ./modules/nixos/configuration.nix
-            ./profiles/${system-profile}/default.nix
+            ./profiles/system/${system-profile}/default.nix
             ./hosts/${host}/default.nix
           ];
         };
@@ -103,7 +103,7 @@
         modules = [
           ./modules/core/configuration.nix
           ./modules/darwin/configuration.nix
-          ./profiles/${system-profile}/default.nix
+          ./profiles/system/${system-profile}/default.nix
           ./hosts/${host}/default.nix
         ];
       };
