@@ -37,6 +37,10 @@
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/?ref=latest";
     };
+
+    pre-commit-hooks = {
+      url = "github:cachix/git-hooks.nix";
+    };
   };
 
   outputs =

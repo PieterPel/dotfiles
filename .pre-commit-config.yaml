@@ -1,5 +1,0 @@
-repos:
-    - repo: https://github.com/NixOS/nixfmt
-      rev: af5529a9e56b3429408c9d281518527d3a63cf33
-      hooks:
-            - id: nixfmt
