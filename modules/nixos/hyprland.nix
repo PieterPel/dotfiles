@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {
@@ -68,6 +67,9 @@
 
     # Audio
     pavucontrol
+
+    # Blue light filter
+    hyprshade
   ];
 
   xdg.portal = {

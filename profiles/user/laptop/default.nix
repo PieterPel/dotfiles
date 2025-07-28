@@ -1,5 +1,4 @@
-{
-  ...
+{ ...
 }:
 {
   enableDesktopApps = true;

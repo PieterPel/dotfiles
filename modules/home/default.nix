@@ -16,6 +16,9 @@ in
 {
   imports = [
     ./options.nix
+    {
+      enableDesktopApps = true;
+    }
     ./home.nix
     potentialUserModule
     potentialUserProfile

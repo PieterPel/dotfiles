@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }:
 
 {
@@ -53,6 +52,7 @@
       treesitter-context.enable = true;
       treesitter-textobjects.enable = true;
       treesitter = {
+        autoLoad = true;
         enable = true;
         nixvimInjections = true;
         settings = {
@@ -148,8 +148,7 @@
         settings = {
           virtual_text = {
             enabled = true;
-            keybindings = {
-            };
+            keybindings = { };
           };
         };
       };
