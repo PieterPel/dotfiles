@@ -26,10 +26,12 @@
       }
     ];
     extraConfig = ''
+      # General 
       set -gu default-command
       set -g default-shell "$SHELL"
       set -g mouse on
       set-option -g allow-rename off # Don't rename self-named windows
+      set-option -g wrap-search on # Go from window N to window 1 
 
       ## Keybinds
       # Source conf file
@@ -40,6 +42,10 @@
       bind -n M-l select-pane -R
       bind -n M-k select-pane -U
       bind -n M-j select-pane -D
+
+      # Navigation between windows
+      bind -n C-h previous-window
+      bind -n C-l next-window
 
       # Split panes using | and -
       bind | split-window -h
