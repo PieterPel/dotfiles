@@ -44,8 +44,8 @@
       bind -n M-j select-pane -D
 
       # Navigation between windows
-      bind -n C-h previous-window
-      bind -n C-l next-window
+      bind -n M-[ previous-window
+      bind -n M-] next-window
 
       # Split panes using | and -
       bind | split-window -h
