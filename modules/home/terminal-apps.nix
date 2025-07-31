@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
+{ config
+, pkgs
+, inputs
+, ...
 }:
 
 {
@@ -16,11 +15,6 @@
   ];
 
   home.packages = with pkgs; [
-    # Verstion control
-    git
-    pre-commit
-    lazygit
-
     # Nix
     nh
 
@@ -48,7 +42,6 @@
     unzip
 
     # CLI tools
-    zoxide
     bat
     ripgrep
     eza
