@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
+{ config
+, pkgs
+, inputs
+, ...
 }:
 
 {
@@ -42,6 +41,9 @@
 
         # Editor
         libreoffice-qt6-fresh
+
+        # Notes
+        logseq
       ]
     else
       [ ];
