@@ -1,5 +1,4 @@
-{
-  ...
+{ ...
 }:
 
 {
@@ -144,6 +143,27 @@
       key = "<C-e";
       action = "<cmd>lua vim.diagnostic.open_float()<CR>";
     }
-  ];
 
+    # Flash
+    {
+      key = "s";
+      action.__raw = ''
+        function()
+          require'flash'.jump({
+        })
+        end
+      '';
+      options.remap = true;
+    }
+    {
+      key = "<C-s>";
+      action.__raw = ''
+        function()
+          require'flash'.toggle({
+        })
+        end
+      '';
+      options.remap = true;
+    }
+  ];
 }

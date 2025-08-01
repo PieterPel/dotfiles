@@ -24,6 +24,7 @@
       harpoon.enable = true; # Mark files to go back to
       trouble.enable = true; # Give diagnostics overview
       lazygit.enable = true; # Lazygit from within nvim
+      flash.enable = true; # Jump to anywhere
 
       # Language specific
       /*
