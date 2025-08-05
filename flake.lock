@@ -818,6 +818,7 @@
         "nixvim": "nixvim",
         "pre-commit-hooks": "pre-commit-hooks_2",
         "rose-pine-hyprcursor": "rose-pine-hyprcursor",
+        "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",
         "stylix": "stylix"
       }
@@ -844,6 +845,26 @@
       "original": {
         "owner": "ndom91",
         "repo": "rose-pine-hyprcursor",
+        "type": "github"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1754328224,
+        "narHash": "sha256-glPK8DF329/dXtosV7YSzRlF4n35WDjaVwdOMEoEXHA=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "49021900e69812ba7ddb9e40f9170218a7eca9f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
         "type": "github"
       }
     },
