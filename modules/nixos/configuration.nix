@@ -2,11 +2,11 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{
-  pkgs,
-  host,
-  username,
-  ...
+{ pkgs
+, host
+, username
+, inputs
+, ...
 }:
 
 {
@@ -14,6 +14,10 @@
     ./hyprland.nix
     ./gnome.nix
     ./steam.nix
+    # TODO: this shouldn't be here
+    inputs.home-manager.nixosModules.default
+    inputs.sops-nix.nixosModules.sops
+    inputs.spicetify-nix.nixosModules.spicetify
   ];
 
   # Bootloader.

@@ -1,16 +1,11 @@
-{
-  inputs,
-  host,
-  username,
-  system-profile,
-  user-profile,
-  ...
+{ inputs
+, host
+, username
+, system-profile
+, user-profile
+, ...
 }:
 {
-  imports = [
-    inputs.home-manager.nixosModules.default
-  ];
-
   home-manager = {
     extraSpecialArgs = {
       inherit inputs;

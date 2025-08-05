@@ -44,6 +44,9 @@
 
         # Notes
         logseq
+
+        # Messaging
+        legcord
       ]
     else
       [ ];

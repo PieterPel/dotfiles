@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, username, ... }:
 
 {
   # Enable the X11 windowing system.
