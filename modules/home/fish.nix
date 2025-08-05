@@ -1,8 +1,13 @@
 { pkgs
 , system-profile
+, lib
 , ...
 }:
 
+let
+  eza = lib.getExe pkgs.eza;
+  nh = lib.getExe pkgs.nh;
+in
 {
   programs.fish = {
     enable = true;
@@ -22,37 +27,37 @@
 
   home.shellAliases = {
     # NixOS
-    nos = "nh os switch --hostname ${system-profile} ~/dotfiles"; # Not a typo, this is what nh wants
-    noe = "nvim ~/dotfiles/";
+    nos = "${nh} os switch --hostname ${system-profile} ~/dotfiles"; # Not a typo, this is what nh wants
+    noe = "${lib.getExe pkgs.neovim} ~/dotfiles/";
 
     # Home-manager
-    hms = "nh home switch ~/dotfiles/";
+    hms = "${nh} home switch ~/dotfiles/";
 
     # Devenv
     dev-init = "nix flake init --template github:cachix/devenv";
 
     # CLI dropins
-    cat = "bat";
-    curl = "curlie";
+    cat = lib.getExe pkgs.bat;
+    curl = lib.getExe pkgs.curlie;
 
     # LazyGit
-    lg = "lazygit";
+    lg = lib.getExe pkgs.lazygit;
 
     # Lazyjj
-    lj = "lazyjj";
+    lj = lib.getExe pkgs.lazyjj;
 
     # eza
-    ls = "eza --color=always --group-directories-first --icons";
-    ll = "eza -la --icons --octal-permissions --group-directories-first";
-    l = "eza -bGF --header --git --color=always --group-directories-first --icons";
-    llm = "eza -lbGd --header --git --sort=modified --color=always --group-directories-first --icons";
-    la = "eza --long --all --group --group-directories-first";
-    lx = "eza -lbhHigUmuSa@ --time-style=long-iso --git --color-scale --color=always --group-directories-first --icons";
-    lS = "eza -1 --color=always --group-directories-first --icons";
-    lt = "eza --tree --level=2 --color=always --group-directories-first --icons";
-    "l." = "eza -a | grep -E '^\\.'";
+    ls = "${eza} --color=always --group-directories-first --icons";
+    ll = "${eza} -la --icons --octal-permissions --group-directories-first";
+    l = "${eza} -bGF --header --git --color=always --group-directories-first --icons";
+    llm = "${eza} -lbGd --header --git --sort=modified --color=always --group-directories-first --icons";
+    la = "${eza} --long --all --group --group-directories-first";
+    lx = "${eza} -lbhHigUmuSa@ --time-style=long-iso --git --color-scale --color=always --group-directories-first --icons";
+    lS = "${eza} -1 --color=always --group-directories-first --icons";
+    lt = "${eza} --tree --level=2 --color=always --group-directories-first --icons";
+    "l." = "${eza} -a | grep -E '^\\.'";
 
     # fastfetch
-    neofetch = "fastfetch";
+    neofetch = lib.getExe pkgs.fastfetch;
   };
 }

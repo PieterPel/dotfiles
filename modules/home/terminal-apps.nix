@@ -1,6 +1,7 @@
 { config
 , pkgs
 , inputs
+, lib
 , ...
 }:
 
@@ -46,7 +47,6 @@
     ripgrep
     eza
     lazysql
-    fzf
     silver-searcher
     curlie
 

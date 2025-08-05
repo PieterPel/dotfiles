@@ -1,10 +1,12 @@
-{
-  pkgs,
-  username,
-  inputs,
-  ...
+{ pkgs
+, username
+, inputs
+, ...
 }:
 
+let
+  corePackages = import ./packages.nix { inherit pkgs; };
+in
 {
   imports = [
     ./spicetify.nix
@@ -61,14 +63,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    git
-    base16-schemes
-    fastfetch
-    home-manager # So we can also rebuild home-manager as flake itself
-    comma
-  ];
+  environment.systemPackages = corePackages.packages;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
