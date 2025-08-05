@@ -33,9 +33,13 @@
 
     # CLI dropins
     cat = "bat";
+    curl = "curlie";
 
     # LazyGit
     lg = "lazygit";
+
+    # Lazyjj
+    lj = "lazyjj";
 
     # eza
     ls = "eza --color=always --group-directories-first --icons";

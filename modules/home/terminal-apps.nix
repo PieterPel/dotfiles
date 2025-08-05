@@ -46,6 +46,9 @@
     ripgrep
     eza
     lazysql
+    fzf
+    silver-searcher
+    curlie
 
     # AI
     gemini-cli
@@ -59,6 +62,11 @@
 
     # Misc
     spotify-player
+
+    # Jujutsu
+    jujutsu
+    lazyjj
+    jjui
   ];
 
   programs.zoxide = {
