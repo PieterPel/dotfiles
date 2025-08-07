@@ -9,7 +9,6 @@ on:
 jobs:
   update-sops-keys:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, '.sops.yaml')
     
     steps:
     - name: Checkout code
