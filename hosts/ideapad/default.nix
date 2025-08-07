@@ -5,7 +5,7 @@ let
   system = "x86_64-linux";
 in
 {
-  nixosConfigurations.hostname = inputs.nixpkgs.lib.nixosSystem {
+  flake.nixosConfigurations.hostname = inputs.nixpkgs.lib.nixosSystem {
     inherit system;
     specialArgs = {
       inherit inputs;

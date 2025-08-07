@@ -45,24 +45,16 @@
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+    };
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    { self, nixpkgs, flake-parts, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } (top@{ config, withSystem, moduleWithSystem, ... }:
     let
-      # You can change settings per system in flake-settings.nix
-      settings = import ./flake-settings.nix;
-      inherit (settings)
-        system
-        host
-        username
-        ;
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -79,23 +71,24 @@
         # 3) Home-manager standalone
         ./hosts
       ];
-
-      # Define checks
-      checks = forAllSystems (system: {
-        pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixpkgs-fmt.enable = true;
+      systems = supportedSystems;
+      flake = {
+        # Define checks
+        checks = forAllSystems (system: {
+          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixpkgs-fmt.enable = true;
+            };
           };
-        };
-      });
-
-      # Define dev shells
-      devShells = forAllSystems (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
-          inherit (self.checks.${system}.pre-commit-check) shellHook;
-          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-        };
-      });
-    };
+        });
+        # Define dev shells
+        devShells = forAllSystems (system: {
+          default = nixpkgs.legacyPackages.${system}.mkShell {
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
+            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+          };
+        });
+      };
+    });
 }
