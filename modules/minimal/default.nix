@@ -1,10 +1,8 @@
 { ...
 }:
-
 {
   imports = [
     ../common-options.nix
-    ./options.nix
-    ./home.nix
+    ./configuration.nix
   ];
 }

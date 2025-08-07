@@ -1,12 +1,10 @@
-{
-  pkgs,
-  config,
-  inputs,
-  ...
+{ pkgs
+, ...
 }:
 {
-  imports = [
-    inputs.stylix.nixosModules.stylix
+
+  environment.systemPackages = with pkgs; [
+    base16-schemes
   ];
 
   stylix = {

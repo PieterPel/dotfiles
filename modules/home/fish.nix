@@ -1,6 +1,6 @@
 { pkgs
-, system-profile
 , lib
+, config
 , ...
 }:
 
@@ -27,7 +27,7 @@ in
 
   home.shellAliases = {
     # NixOS
-    nos = "${nh} os switch --hostname ${system-profile} ~/dotfiles"; # Not a typo, this is what nh wants
+    nos = "${nh} os switch --hostname ${config.hostname} ~/dotfiles";
     noe = "${lib.getExe pkgs.neovim} ~/dotfiles/";
 
     # Home-manager
@@ -59,5 +59,9 @@ in
 
     # fastfetch
     neofetch = lib.getExe pkgs.fastfetch;
+
+    # Sops
+    gen-age = "nix-shell -p ssh-to-age --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'`";
+
   };
 }
