@@ -1,23 +1,25 @@
 { pkgs
 , inputs
-, username
 , lib
+, config
 , ...
 }:
 let
-  corePackages = import ../core/packages.nix { inherit pkgs; };
+  corePackages = import ../minimal/packages.nix { inherit pkgs; };
+  username = config.username;
 in
 {
+  imports = [
+    ./options.nix
+    ../home
+    # Stylix has both a NixOS module and a home-manager module, not having the former
+    # requires us to do some stuff double
+    inputs.stylix.homeModules.stylix
+  ];
   # Here you can put stuff that is only needed if home-manager is used standalone
   home.username = username;
   home.homeDirectory = "/home/${username}";
   home.packages = corePackages.packages;
-
-  # Stylix has both a NixOS module and a home-manager module, not having the former
-  # requires us to do some stuff double
-  imports = [
-    inputs.stylix.homeModules.stylix
-  ];
 
   stylix = {
     base16Scheme = "${pkgs.base16-schemes}/share/themes/purpledream.yaml";

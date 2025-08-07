@@ -1,7 +1,9 @@
 # Future proofing
-{
-  ...
+{ ...
 }:
 
 {
+  imports = [
+    ../core
+  ];
 }

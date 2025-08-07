@@ -1,0 +1,8 @@
+{ ... }:
+{
+  imports = [
+    ./ideapad
+    ./nixberry
+    ./surface
+  ];
+}

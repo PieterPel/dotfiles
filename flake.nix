@@ -41,6 +41,10 @@
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
     };
+
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+    };
   };
 
   outputs =
@@ -52,8 +56,6 @@
         system
         host
         username
-        system-profile
-        user-profile
         ;
 
       pkgs = import nixpkgs {
@@ -70,62 +72,13 @@
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
-      # This flake provides output for `sudo nixos-rebuild switch`
-      nixosConfigurations = {
-        ${system-profile} = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            inherit host;
-            inherit username;
-            inherit system-profile;
-            inherit user-profile;
-          };
-
-          modules = [
-            ./modules/core/configuration.nix
-            ./modules/nixos/configuration.nix
-            ./profiles/system/${system-profile}/default.nix
-            ./hosts/${host}/default.nix
-          ];
-        };
-      };
-
-      # And for `sudo darwin-rebuild switch`
-      darwinConfigurations.${host} = inputs.nix-darwin.lib.darwinSystem {
-        specialArgs = {
-          inherit inputs;
-          inherit host;
-          inherit username;
-          inherit system-profile;
-          inherit user-profile;
-        };
-
-        modules = [
-          ./modules/core/configuration.nix
-          ./modules/darwin/configuration.nix
-          ./profiles/system/${system-profile}/default.nix
-          ./hosts/${host}/default.nix
-        ];
-      };
-
-      # And for `home-manager switch`
-      homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
-
-        inherit pkgs;
-
-        extraSpecialArgs = {
-          inherit inputs;
-          inherit host;
-          inherit username;
-          inherit system-profile;
-          inherit user-profile;
-        };
-
-        modules = [
-          ./modules/home/default.nix
-          ./modules/home/standalone.nix
-        ];
-      };
+      imports = [
+        # My modules are set up in a way that you can create outputs for
+        # 1) NixOS
+        # 2) Nix-darwin
+        # 3) Home-manager standalone
+        ./hosts
+      ];
 
       # Define checks
       checks = forAllSystems (system: {

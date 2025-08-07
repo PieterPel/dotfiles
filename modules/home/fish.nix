@@ -1,6 +1,6 @@
 { pkgs
-, system-profile
 , lib
+, config
 , ...
 }:
 
@@ -27,7 +27,7 @@ in
 
   home.shellAliases = {
     # NixOS
-    nos = "${nh} os switch --hostname ${system-profile} ~/dotfiles"; # Not a typo, this is what nh wants
+    nos = "${nh} os switch --hostname ${config.hostname} ~/dotfiles";
     noe = "${lib.getExe pkgs.neovim} ~/dotfiles/";
 
     # Home-manager

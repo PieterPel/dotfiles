@@ -24,5 +24,4 @@
     default = "kitty";
     description = "Default terminal";
   };
-
 }
