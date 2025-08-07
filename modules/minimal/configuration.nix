@@ -79,4 +79,7 @@ in
     dates = "02:00";
     randomizedDelaySec = "45min";
   };
+
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
 }

@@ -2,6 +2,7 @@ keys:
   - &admin_pieterp age1hdktq9ega9lcv0ula8ew9s9tmh7ndpkhyj0v2atmagnlh395aaus04hxwg
   - &admin_guest age130e3rt0l7hj7d2uyacr7ktpjk0zerluemh62ev0x0t7pzdruw3gqvwuymn
   - &server_ideapad age154mjp28j3kqj8hnaszzfdfkqp25uyt7cz9rdev9c7wzp23yhzswqcapvkq
+  - &server_nixberry age1qf5jjqefdmz8v3gjxlm9zlzq740cu3l2tqjknrwkkfj367kxt5mslxry7h
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -9,3 +10,4 @@ creation_rules:
       - *admin_pieterp
       - *admin_guest
       - *server_ideapad
+      - *server_nixberry
