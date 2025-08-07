@@ -8,18 +8,6 @@
 }:
 
 {
-  imports = [
-    ../options.nix
-    ../core
-    ./hyprland.nix
-    ./gnome.nix
-    ./steam.nix
-    # TODO: this shouldn't be here
-    inputs.home-manager.nixosModules.default
-    inputs.sops-nix.nixosModules.sops
-    inputs.spicetify-nix.nixosModules.spicetify
-  ];
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -1,6 +1,11 @@
-{ ... }:
+{ inputs, ... }:
+
+let
+  hostname = "surface";
+  system = "x86_64-linux";
+in
 {
   imports = [
-    ./users/pieterpel
+    (import ./users/pieterpel { inherit inputs system hostname; })
   ];
 }

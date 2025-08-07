@@ -6,7 +6,7 @@ let
   username = "pieterp";
 in
 {
-  users.users.${username} = mkUser pkgs { inherit username; };
+  users.users.${username} = mkUser pkgs username;
   home-manager.users.${username} = {
     imports = [
       ../../../modules/home

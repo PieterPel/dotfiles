@@ -5,14 +5,14 @@ let
   system = "x86_64-linux";
 in
 {
-  flake.nixosConfigurations.hostname = inputs.nixpkgs.lib.nixosSystem {
+  flake.nixosConfigurations.${hostname} = inputs.nixpkgs.lib.nixosSystem {
     inherit system;
     specialArgs = {
       inherit inputs;
     };
 
     modules = [
-      ../../modules/nixos/configuration.nix
+      ../../modules/nixos
       ../../profiles/system/laptop
       ./hardware-configuration.nix
       ./users

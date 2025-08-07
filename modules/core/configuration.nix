@@ -2,14 +2,6 @@
 }:
 
 {
-  imports = [
-    ../minimal
-    ./home-manager.nix
-    ./stylix.nix
-    ./fonts.nix
-    ./virtualization.nix
-    ./sops.nix
-  ];
-
+  # core is more like "both in nixos and nix-darwin"
   programs.firefox.enable = true;
 }
