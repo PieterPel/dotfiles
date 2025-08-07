@@ -46,26 +46,20 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+    };
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+    };
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    { self, nixpkgs, flake-parts, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } (top@{ config, withSystem, moduleWithSystem, ... }:
     let
-      # You can change settings per system in flake-settings.nix
-      settings = import ./flake-settings.nix;
-      inherit (settings)
-        system
-        host
-        username
-        system-profile
-        user-profile
-        ;
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -75,79 +69,31 @@
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
-      # This flake provides output for `sudo nixos-rebuild switch`
-      nixosConfigurations = {
-        ${system-profile} = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            inherit host;
-            inherit username;
-            inherit system-profile;
-            inherit user-profile;
+      imports = [
+        # My modules are set up in a way that you can create outputs for
+        # 1) NixOS
+        # 2) Nix-darwin
+        # 3) Home-manager standalone
+        ./hosts
+      ];
+      systems = supportedSystems;
+      flake = {
+        # Define checks
+        checks = forAllSystems (system: {
+          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixpkgs-fmt.enable = true;
+            };
           };
-
-          modules = [
-            ./modules/core/configuration.nix
-            ./modules/nixos/configuration.nix
-            ./profiles/system/${system-profile}/default.nix
-            ./hosts/${host}/default.nix
-          ];
-        };
-      };
-
-      # And for `sudo darwin-rebuild switch`
-      darwinConfigurations.${host} = inputs.nix-darwin.lib.darwinSystem {
-        specialArgs = {
-          inherit inputs;
-          inherit host;
-          inherit username;
-          inherit system-profile;
-          inherit user-profile;
-        };
-
-        modules = [
-          ./modules/core/configuration.nix
-          ./modules/darwin/configuration.nix
-          ./profiles/system/${system-profile}/default.nix
-          ./hosts/${host}/default.nix
-        ];
-      };
-
-      # And for `home-manager switch`
-      homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
-
-        inherit pkgs;
-
-        extraSpecialArgs = {
-          inherit inputs;
-          inherit host;
-          inherit username;
-          inherit system-profile;
-          inherit user-profile;
-        };
-
-        modules = [
-          ./modules/home/default.nix
-          ./modules/home/standalone.nix
-        ];
-      };
-
-      # Define checks
-      checks = forAllSystems (system: {
-        pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixpkgs-fmt.enable = true;
+        });
+        # Define dev shells
+        devShells = forAllSystems (system: {
+          default = nixpkgs.legacyPackages.${system}.mkShell {
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
+            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           };
-        };
-      });
-
-      # Define dev shells
-      devShells = forAllSystems (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
-          inherit (self.checks.${system}.pre-commit-check) shellHook;
-          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-        };
-      });
-    };
+        });
+      };
+    });
 }

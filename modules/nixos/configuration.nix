@@ -3,14 +3,14 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { pkgs
-, host
-, username
-, inputs
+, config
 , ...
 }:
 
 {
   imports = [
+    ../options.nix
+    ../core
     ./hyprland.nix
     ./gnome.nix
     ./steam.nix
@@ -25,14 +25,14 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
   boot.kernel.sysctl = {
-    # Fore redis to work optimally
+    # Force redis to work optimally
     "vm.overcommit_memory" = 1;
   };
 
   # Login manager
   services.displayManager.gdm.enable = true;
 
-  networking.hostName = host;
+  networking.hostName = config.hostname;
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -62,18 +62,6 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${username} = {
-    isNormalUser = true;
-    description = "Pieter Pel";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "input"
-    ];
-    shell = pkgs.fish;
-  };
 
   # File manager
   programs.thunar = {
