@@ -76,4 +76,8 @@
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
+
+  # Set up hyprlock
+  security.pam.services.hyprlock = { };
+  programs.hyprlock.enable = true;
 }

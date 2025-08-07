@@ -1,5 +1,5 @@
 # Source ZeneyOS
-{ host, config, ... }:
+{ config, ... }:
 {
   wayland.windowManager.hyprland.settings = {
     bind = [
@@ -12,6 +12,7 @@
       "$modifier,W,exec,${config.browser}"
       "$modifier,E,exec,${config.explorer}"
       "$modifier,S,exec,grim -g \"\$(slurp)\" - | swappy -f - " # Screenshot and markup selected area
+      "$modifier,L,exec,hyprlock"
       #"$modifier,D,exec,discord"
       #"$modifier,O,exec,obs"
       #"$modifier,C,exec,hyprpicker -a"
