@@ -8,31 +8,31 @@
   };
 
   options.browser = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     default = "brave";
     description = "Default browser";
   };
 
   options.explorer = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     default = "thunar";
     description = "Default file explorer";
   };
 
   options.terminal = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     default = "kitty";
     description = "Default terminal";
   };
 
   options.editor = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     default = "nvim";
     description = "Default editor";
   };
 
   options.stateVersion = lib.mkOption {
-    type = lib.types.string;
+    type = lib.types.str;
     # This value determines the Home Manager release that your configuration is
     # compatible with. This helps avoid breakage when a new Home Manager release
     # introduces backwards incompatible changes.
