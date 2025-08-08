@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     pre-commit
+    gh
   ];
 
   programs.lazygit.enable = true;
