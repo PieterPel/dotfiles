@@ -1,76 +1,75 @@
-# Pieter's NixOS & nix-darwin & Home Manager Dotfiles
+# My NixOS Dotfiles
 
-This repository contains my personal NixOS and Home Manager configurations, managed as a [Nix flake](https://nixos.wiki/wiki/Flakes). 
-It aims to provide a declarative, reproducible, and modular way to manage my system configurations across different machines.
-A good dotfiles repo can be a lifetime project, so expect many breaking changes. 
-If you decide to use this as basis for your own dotfiles I HIGHLY recommend forking it and making it your own.
-The inspiration for the repo layout and large part of some modules are derived from [ZaneyOS](https://gitlab.com/Zaney/zaneyos).
-
-## Features
-
-- **Declarative Configuration:** All system and user configurations are defined declaratively using Nix.
-- **Reproducible Environments:** Ensures consistent environments across different machines.
-- **Modular Structure:** Configurations are broken down into reusable modules for better organization and maintainability.
-- **Multi-Host Support:** Easily manage configurations for different machines (e.g., `ideapad`, `surface`).
-- **Home Manager Integration:** Manages user-specific configurations (e.g., shell, applications, fonts) with Home Manager.
-- **NixOS Integration:** Manages system configurations with NixOS.
-- **nix-darwin Integration:** Manages macOS configurations with nix-darwin. I have not tested this but the layout works
-- **Hyprland:** Configuration for the Hyprland Wayland compositor.
-- **NixVim:** Integrated Neovim configuration managed by Nix.
-- **Various Applications:** Configurations for `fish`, `kitty`, `tmux`, `vscodium`, `zed`, `waybar`, `rofi`, `wlogout`, and more.
+This repository contains my personal NixOS, nix-darwin and Home-Manager configurations, managed as a [Nix flake](https://nixos.wiki/wiki/Flakes).
+It provides a declarative and reproducible way to manage my system configurations across different machines.
+Easy to add hosts that run NixOS, nix-darwin or a standalone Home-Homemanager instance on (non-)NixOS.
+Uses `flake-parts` to seperate the flake outputs to different host modules.
 
 ## Screenshot
 
 ![Screenshot](img/empty-wallpaper.png)
 
-## Repository Structure
+## Structure
 
-- `flake.nix`: The main Nix flake definition.
-- `hosts/`: Contains machine-specific NixOS configurations.
-  - `ideapad/`: Configuration for my Ideapad laptop.
-  - `surface/`: Configuration for my Surface device.
-- `modules/`: Reusable Nix modules for both system and user configurations.
-  - `core/`: Core system-wide configurations.
-  - `home/`: Home Manager modules for user-specific settings.
-  - `nixos/`: NixOS-specific modules.
-  - `darwin/`: macOS-specific configurations (if applicable).
-- `profiles/`: Defines different user profiles (e.g., `laptop`, `wsl`).
-- `scripts/`: Utility scripts.
-- `wallpapers/`: Directory for wallpapers.
+The repository is structured as follows:
 
-## Installation & Usage
+-   `flake.nix`: The entry point for the flake, defining inputs and outputs.
+-   `hosts/`: Contains machine-specific configurations. Each host has a `default.nix` that defines the NixOS configuration for that machine, and a `users` directory for user-specific configurations.
+    -   `ideapad/`: Configuration for my Ideapad laptop.
+    -   `nixberry/`: Configuration for my Raspberry Pi.
+    -   `surface/`: Configuration for my Surface device, which uses home-manager standalone.
+-   `modules/`: Contains reusable modules for configuring different aspects of the system.
+    -   `core/`: Core modules shared between NixOS and nix-darwin.
+    -   `darwin/`: Modules specific to nix-darwin.
+    -   `hm-standalone/`: Modules for home-manager standalone.
+    -   `home/`: Home Manager modules for user-specific configurations.
+    -   `nixos/`: NixOS specific modules, now further modularized into files like `boot.nix`, `sound.nix`, etc.
+-   `profiles/`: Defines different profiles that can be applied to hosts or users.
+    -   `system/`: System-level profiles.
+    -   `user/`: User-level profiles.
+-   `lib/`: Contains helper functions, like `mkUser.nix` for creating users.
+-   `secrets/`: Contains secrets managed by `sops-nix`.
 
-To use these dotfiles, you will need Nix installed. 
-You can use this flake as NixOS, nix-darwin or home-manager standalone.
-Make sure you enable flake support.
-The general process involves cloning this repository and then using `sudo nixos-rebuild`, `sudo darwin-rebuild switch` or `home-manager switch` with the flake.
+## Installation and Usage
+
+To use these dotfiles, you will need Nix installed with flake support enabled.
 
 **Warning:** These are my personal dotfiles and are highly customized. Use them at your own risk and adapt them to your needs.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/dotfiles.git ~/dotfiles # Or wherever you prefer
+    git clone https://github.com/pieterpel/dotfiles.git ~/dotfiles
     cd ~/dotfiles
     ```
-2.  **Change `flake-settings.nix` to match your situation**
-    `user-profile`s are used to load a unique Home Manager module under `modules/home/profiles`.
-    `system-profile`s are used to load a unique NixOS/nix-darwin module under `profiles/`.
-    `host`s are used to load a unique NixOS/nix-darwin module under `hosts/<your-host>`.
 
-3.  **NixOS Configuration:**
-    Edit `hosts/<your-host>/` to include your auto-generated `hardware-configuration.nix`. Then, from the repository root:
+2.  **Customize the configuration:**
+    You will likely need to edit the files in `hosts/` to match your hardware and user setup. For a new NixOS host, you would typically add a new directory under `hosts/` and include your machine's `hardware-configuration.nix`.
+
+3.  **Apply the configuration:**
+
+    ### NixOS
+    To build a NixOS configuration, run:
     ```bash
-    sudo nixos-rebuild switch --flake .
+    sudo nixos-rebuild switch --flake .#<hostname>
     ```
-4.  **nix-darwin Configuration**
+    Where `<hostname>` is one of the hosts defined in `hosts/` (e.g., `ideapad`, `nixberry`).
+
+    ### Home Manager Standalone
+    To build a home-manager standalone configuration, run:
     ```bash
-    sudo darwin-rebuild switch --flake .
+    home-manager switch --flake .#<username>
+    ```
+    Where `<username>` is a user with a home-manager standalone configuration (e.g., `pieterpel`).
+
+    ### nix-darwin
+    This configuration also supports `nix-darwin`. To build a `nix-darwin` configuration, you would add a new host in the `hosts` directory and use `inputs.nix-darwin.lib.darwinSystem` to create the configuration. Then, you can apply it by running:
+    ```bash
+    darwin-rebuild switch --flake .#<darwin-hostname>
     ```
 
-5.  **Standalone Home Manager Configuration:**
-    ```bash
-    home-manager switch --flake .
-    ```
+## Secrets
+
+This repository uses `sops-nix` to manage secrets. The secrets are encrypted and stored in the `secrets/` directory. See the `sops-nix` documentation for more information on how to use it.
 
 ## Contributing
 
