@@ -6,6 +6,8 @@
     ./hyprland.nix
     ./gnome.nix
     ./steam.nix
+    ./internationalization.nix
+    ./virtualization.nix
 
     # TODO: this shouldn't be here
     inputs.home-manager.nixosModules.default

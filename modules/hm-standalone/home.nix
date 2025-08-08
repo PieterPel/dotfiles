@@ -4,7 +4,7 @@
 , ...
 }:
 let
-  corePackages = import ../minimal/packages.nix { inherit pkgs; };
+  corePackages = import ../core/packages.nix { inherit pkgs; };
   username = config.username;
 in
 {

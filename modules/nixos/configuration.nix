@@ -3,7 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { pkgs
-, config
+, inputs
 , ...
 }:
 
@@ -20,7 +20,6 @@
   # Login manager
   services.displayManager.gdm.enable = true;
 
-  networking.hostName = config.hostname;
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -71,9 +70,6 @@
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-
   # Onedrive
   # See https://nixos.wiki/wiki/OneDrive for what steps to take
   services.onedrive.enable = false; # enable onedrive in future, now there is a notifcation bug
@@ -83,4 +79,18 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  # Automatic updating
+  system.autoUpgrade = {
+    enable = true;
+    flake = inputs.self.outPath;
+    flags = [
+      "--update-input"
+      "nixpkgs"
+      "--no-write-lock-file"
+      "-L" # print build logs
+    ];
+    dates = "02:00";
+    randomizedDelaySec = "45min";
+  };
 }
