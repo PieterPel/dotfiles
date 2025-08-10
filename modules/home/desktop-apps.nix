@@ -1,3 +1,4 @@
+# Source: ZaneyOS
 { config
 , pkgs
 , inputs
@@ -16,6 +17,7 @@
     ./flatpaks.nix
     ./zed.nix
     ./stylix.nix
+    ./hyprlock.nix
     inputs.spicetify-nix.homeManagerModules.spicetify
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
