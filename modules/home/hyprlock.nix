@@ -1,4 +1,10 @@
-{ ... }: {
+{ ... }:
+
+let
+  wallpaper = ../../wallpapers/tux-teaching.jpg;
+  face = ../../img/face.jpg;
+in
+{
   programs.hyprlock = {
     enable = true;
     settings = {
@@ -10,14 +16,14 @@
       };
       background = [
         {
-          # path = "/home/${username}/Pictures/Wallpapers/beautifulmountainscape.jpg";
+          path = "${wallpaper}";
           blur_passes = 3;
           blur_size = 8;
         }
       ];
       image = [
         {
-          # path = "/home/${username}/.config/face.jpg";
+          path = "${face}";
           size = 150;
           border_size = 4;
           border_color = "rgb(0C96F9)";

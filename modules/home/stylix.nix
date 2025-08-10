@@ -30,6 +30,7 @@
       nixvim.plugin = "base16-nvim";
       rofi.enable = true;
       tmux.enable = false;
+      hyprlock.enable = false;
     };
   };
 }
