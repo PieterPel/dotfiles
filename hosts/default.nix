@@ -4,5 +4,6 @@
     ./ideapad
     ./nixberry
     ./surface
+    ./mac
   ];
 }
