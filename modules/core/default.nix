@@ -1,4 +1,5 @@
 { config, lib, ... }:
+
 {
   imports = [
     ../common-options.nix
@@ -10,8 +11,8 @@
     ./nix.nix
   ];
 
-  config = lib.mkIf (!config.minimal) {
-    modules.core = {
+  config = {
+    modules.core = lib.mkIf (!config.minimal) {
       configuration.enable = true;
       fonts.enable = true;
       home-manager.enable = true;
@@ -21,3 +22,4 @@
     };
   };
 }
+

@@ -21,8 +21,8 @@
     inputs.stylix.nixosModules.stylix
   ];
 
-  config = lib.mkIf (!config.minimal) {
-    modules.nixos = {
+  config = {
+    modules.nixos = lib.mkIf (!config.minimal) {
       boot.enable = true;
       configuration.enable = true;
       gnome.enable = true;
