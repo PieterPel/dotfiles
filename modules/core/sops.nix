@@ -18,9 +18,6 @@ in
 
     sops = {
       secrets = {
-        "wifi/HomeNetwork/ssid" = {
-          sopsFile = wifiSecrets;
-        };
         "wifi/HomeNetwork/password" = {
           sopsFile = wifiSecrets;
         };
