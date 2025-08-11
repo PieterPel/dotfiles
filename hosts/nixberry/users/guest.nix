@@ -7,5 +7,5 @@ let
 in
 {
   users.users.${username} = mkUser pkgs username;
-  # users.users.${username}.password = "";
+  # users.users.${username}.password = 
 }

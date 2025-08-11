@@ -4,11 +4,20 @@
   minimal = true;
 
   # Enable password authentication for SSHing into the RPi
-  services.openssh.settings.PasswordAuthentication = true;
+  services.openssh = {
+    settings.PasswordAuthentication = true; # TODO: put to false
+    permitRootLogin = "no";
+  };
 
   # Make users immutable
   # TODO: implement
   # users.mutableUsers = false;
+
+  # Enable sudo without password
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = false; # members of wheel group don't need password
+  };
 
   # Enable modules conditionally based on `minimal`
   modules.core = {
@@ -20,7 +29,6 @@
   modules.nixos = {
     internationalization.enable = true;
     networking.enable = true;
-    sound.enable = true;
     updating.enable = true;
     virtualization.enable = true;
   };
