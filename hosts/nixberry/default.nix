@@ -16,7 +16,6 @@ in
         system.stateVersion = "25.05"; # Do not change this !
       }
 
-      ../../modules/minimal
       ../../profiles/system/rpi
       ./users
 
