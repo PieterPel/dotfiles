@@ -11,15 +11,12 @@
     ./nix.nix
   ];
 
-  config = {
-    modules.core = lib.mkIf (!config.minimal) {
-      configuration.enable = true;
-      fonts.enable = true;
-      home-manager.enable = true;
-      nix.enable = true;
-      sops.enable = true;
-      stylix.enable = true;
-    };
+  modules.core = lib.mkIf (!config.minimal) {
+    configuration.enable = true;
+    fonts.enable = true;
+    home-manager.enable = true;
+    nix.enable = true;
+    sops.enable = true;
+    stylix.enable = true;
   };
 }
-
