@@ -7,6 +7,7 @@
     ./configuration.nix
 
     # We want a very minimal config
+    ../../../modules/common-options.nix
     ../../../modules/core/configuration.nix
     ../../../modules/core/sops.nix
     ../../../modules/core/nix.nix
