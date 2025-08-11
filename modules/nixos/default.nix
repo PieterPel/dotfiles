@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, lib, ... }:
 {
   imports = [
     ../core
@@ -21,4 +21,20 @@
     inputs.stylix.nixosModules.stylix
   ];
 
+  config = lib.mkIf (!config.minimal) {
+    modules.nixos = {
+      boot.enable = true;
+      configuration.enable = true;
+      gnome.enable = true;
+      hyprland.enable = true;
+      internationalization.enable = true;
+      networking.enable = true;
+      printing.enable = true;
+      sound.enable = true;
+      steam.enable = true;
+      thunar.enable = true;
+      updating.enable = true;
+      virtualization.enable = true;
+    };
+  };
 }

@@ -2,31 +2,39 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ ...
-}:
+{ config, lib, ... }:
 
+let
+  cfg = config.modules.nixos.configuration;
+in
 {
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  options.modules.nixos.configuration = {
+    enable = lib.mkEnableOption "Enable nixos configuration";
+  };
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  config = lib.mkIf cfg.enable {
+    # Enable touchpad support (enabled default in most desktopManager).
+    # services.xserver.libinput.enable = true;
 
-  # List services that you want to enable:
+    # Some programs need SUID wrappers, can be configured further or are
+    # started in user sessions.
+    # programs.mtr.enable = true;
+    # programs.gnupg.agent = {
+    #   enable = true;
+    #   enableSSHSupport = true;
+    # };
 
-  # Onedrive
-  # See https://nixos.wiki/wiki/OneDrive for what steps to take
-  services.onedrive.enable = false; # enable onedrive in future, now there is a notifcation bug
+    # List services that you want to enable:
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+    # Onedrive
+    # See https://nixos.wiki/wiki/OneDrive for what steps to take
+    services.onedrive.enable = false; # enable onedrive in future, now there is a notifcation bug
 
+    # Open ports in the firewall.
+    # networking.firewall.allowedTCPPorts = [ ... ];
+    # networking.firewall.allowedUDPPorts = [ ... ];
+    # Or disable the firewall altogether.
+    # networking.firewall.enable = false;
+
+  };
 }

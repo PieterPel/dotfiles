@@ -1,27 +1,35 @@
 { config
 , pkgs
+, lib
 , ...
 }:
 
 # NOTE: these settings must be shared by both nix-darwin and nixos
 let
+  cfg = config.modules.core.configuration;
   corePackages = import ./packages.nix { inherit pkgs; };
 in
 {
-  environment.systemPackages = corePackages.packages;
-  programs.firefox.enable = true;
+  options.modules.core.configuration = {
+    enable = lib.mkEnableOption "Enable core configuration";
+  };
 
-  # Enable fish so it can be used as the default shell.
-  programs.fish.enable = true;
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = corePackages.packages;
+    programs.firefox.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+    # Enable fish so it can be used as the default shell.
+    programs.fish.enable = true;
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+    # Allow unfree packages
+    nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = config.hostname;
+    # Enable the OpenSSH daemon.
+    services.openssh.enable = true;
 
-  # Set your time zone.
-  time.timeZone = "Europe/Amsterdam";
+    networking.hostName = config.hostname;
+
+    # Set your time zone.
+    time.timeZone = "Europe/Amsterdam";
+  };
 }

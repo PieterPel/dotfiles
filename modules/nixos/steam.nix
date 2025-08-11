@@ -1,21 +1,31 @@
-{ pkgs, ... }:
-{
-  programs = {
-    steam = {
-      enable = true;
-      remotePlay.openFirewall = true;
-      dedicatedServer.openFirewall = false;
-      gamescopeSession.enable = true;
-      extraCompatPackages = [ pkgs.proton-ge-bin ];
-    };
+{ config, lib, pkgs, ... }:
 
-    gamescope = {
-      enable = true;
-      capSysNice = true;
-      args = [
-        "--rt"
-        "--expose-wayland"
-      ];
+let
+  cfg = config.modules.nixos.steam;
+in
+{
+  options.modules.nixos.steam = {
+    enable = lib.mkEnableOption "Enable steam module";
+  };
+
+  config = lib.mkIf cfg.enable {
+    programs = {
+      steam = {
+        enable = true;
+        remotePlay.openFirewall = true;
+        dedicatedServer.openFirewall = false;
+        gamescopeSession.enable = true;
+        extraCompatPackages = [ pkgs.proton-ge-bin ];
+      };
+
+      gamescope = {
+        enable = true;
+        capSysNice = true;
+        args = [
+          "--rt"
+          "--expose-wayland"
+        ];
+      };
     };
   };
 }

@@ -1,22 +1,29 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
+  cfg = config.modules.core.sops;
   wifiSecrets = ../../secrets/wifi.yaml;
 in
 {
-  environment.systemPackages = with pkgs; [
-    sops
-    age
-    ssh-to-age
-  ];
+  options.modules.core.sops = {
+    enable = lib.mkEnableOption "Enable sops module";
+  };
 
-  sops = {
-    secrets = {
-      "wifi/HomeNetwork/ssid" = {
-        sopsFile = wifiSecrets;
-      };
-      "wifi/HomeNetwork/password" = {
-        sopsFile = wifiSecrets;
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = with pkgs; [
+      sops
+      age
+      ssh-to-age
+    ];
+
+    sops = {
+      secrets = {
+        "wifi/HomeNetwork/ssid" = {
+          sopsFile = wifiSecrets;
+        };
+        "wifi/HomeNetwork/password" = {
+          sopsFile = wifiSecrets;
+        };
       };
     };
   };
