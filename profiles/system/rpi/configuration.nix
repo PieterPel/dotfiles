@@ -1,22 +1,22 @@
-{ config
-, ...
-}:
+{ ... }:
+
 {
+  minimal = true;
+
   # Enable password authentication for SSHing into the RPi
   services.openssh.settings.passwordAuthentication = true;
 
   # Make users immutable
   users.mutableUsers = false;
 
-  # Enable our minimal modules
-  minimal = true;
-
-  config.modules.core = {
+  # Enable modules conditionally based on `minimal`
+  modules.core = {
     configuration.enable = true;
     nix.enable = true;
     sops.enable = true;
   };
-  config.modules.nixos = {
+
+  modules.nixos = {
     internationalization.enable = true;
     networking.enable = true;
     sound.enable = true;
