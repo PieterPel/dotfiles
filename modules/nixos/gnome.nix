@@ -1,4 +1,7 @@
-{ config, lib, username, ... }:
+{ config
+, lib
+, ...
+}:
 
 let
   cfg = config.modules.nixos.gnome;

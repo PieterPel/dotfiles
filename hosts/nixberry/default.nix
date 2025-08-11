@@ -4,8 +4,12 @@ let
   hostname = "nixberry";
 in
 {
-  flake.nixosConfigurations.${hostname} = inputs.nixos-raspberrypi.lib.nixosSystemFull {
-    specialArgs = inputs;
+  flake.nixosConfigurations.${hostname} = inputs.nixos-raspberrypi.lib.nixosSystem {
+    specialArgs = {
+      inherit inputs;
+      # NOTE: this is needed
+      nixos-raspberrypi = inputs.nixos-raspberrypi;
+    };
     modules = [
       {
         imports = with inputs.nixos-raspberrypi.nixosModules; [
