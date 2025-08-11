@@ -7,7 +7,7 @@ let
   cfg = config.modules.nixos.gnome;
 in
 {
-  options.modules.nixos.gnome = {
+  options.modules.nixos-x86.gnome = {
     enable = lib.mkEnableOption "Enable gnome module";
   };
 

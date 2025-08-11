@@ -7,8 +7,6 @@
   imports = [
     ../core
     ./configuration.nix
-    ./hyprland.nix
-    ./gnome.nix
     ./steam.nix
     ./internationalization.nix
     ./virtualization.nix
@@ -28,8 +26,6 @@
   modules.nixos = lib.mkIf (!config.minimal) {
     boot.enable = true;
     configuration.enable = true;
-    gnome.enable = true;
-    hyprland.enable = true;
     internationalization.enable = true;
     networking.enable = true;
     printing.enable = true;

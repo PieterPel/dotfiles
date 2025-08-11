@@ -4,10 +4,11 @@
   minimal = true;
 
   # Enable password authentication for SSHing into the RPi
-  services.openssh.settings.passwordAuthentication = true;
+  services.openssh.settings.PasswordAuthentication = true;
 
   # Make users immutable
-  users.mutableUsers = false;
+  # TODO: implement
+  # users.mutableUsers = false;
 
   # Enable modules conditionally based on `minimal`
   modules.core = {

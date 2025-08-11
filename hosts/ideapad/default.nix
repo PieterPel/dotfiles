@@ -12,7 +12,7 @@ in
     };
 
     modules = [
-      ../../modules/nixos
+      ../../modules/nixos-x86
       ../../profiles/system/laptop
       ./hardware-configuration.nix
       ./users

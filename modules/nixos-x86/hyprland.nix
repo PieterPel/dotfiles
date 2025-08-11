@@ -8,7 +8,7 @@ let
   cfg = config.modules.nixos.hyprland;
 in
 {
-  options.modules.nixos.hyprland = {
+  options.modules.nixos-x86.hyprland = {
     enable = lib.mkEnableOption "Enable hyprland module";
   };
 

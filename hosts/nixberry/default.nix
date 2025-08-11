@@ -22,6 +22,7 @@ in
 
       ../../profiles/system/rpi
       ./users
+      ./hardware-configuration.nix
 
     ];
   };
