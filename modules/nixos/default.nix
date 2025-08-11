@@ -16,6 +16,7 @@
     ./thunar.nix
     ./boot.nix
     ./printing.nix
+    ./networking.nix
     ./updating.nix
 
     inputs.home-manager.nixosModules.default
