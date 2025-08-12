@@ -4,7 +4,7 @@
 }:
 
 let
-  cfg = config.modules.nixos.gnome;
+  cfg = config.modules.nixos-x86.gnome;
 in
 {
   options.modules.nixos-x86.gnome = {

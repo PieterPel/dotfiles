@@ -5,7 +5,7 @@
 }:
 
 let
-  cfg = config.modules.nixos.hyprland;
+  cfg = config.modules.nixos-x86.hyprland;
 in
 {
   options.modules.nixos-x86.hyprland = {

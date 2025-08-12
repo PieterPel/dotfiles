@@ -15,7 +15,7 @@ in
   config = lib.mkIf cfg.enable {
     # File manager
     programs.thunar = {
-      enable = config.minimal;
+      enable = true;
       plugins = with pkgs.xfce; [
         thunar-archive-plugin
       ];
