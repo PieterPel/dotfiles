@@ -37,10 +37,11 @@ in
       # Module specific
       directory = {
         style = "bg:${firstColor}";
+        read_only_style = "bg:${firstColor}";
         format = "[$path]($style)[$read_only]($read_only_style)";
         truncate_to_repo = false;
         fish_style_pwd_dir_length = 1;
-        read_only = "🔒";
+        read_only = "  ";
         use_os_path_sep = false;
         home_symbol = "~";
       };
