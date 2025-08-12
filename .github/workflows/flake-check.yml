@@ -8,13 +8,11 @@ on:
   pull_request:
 
 jobs:
-  setup:
-    uses: ./.github/workflows/setup-nix.yml
-  update-sops-keys:
-    needs: setup
+  flake-check:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: ./.github/workflows/setup-nix.yml
       - run: nix flake check
       
 

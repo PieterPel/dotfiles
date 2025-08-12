@@ -7,13 +7,11 @@ on:
       - '.sops.yaml'
 
 jobs:
-  setup:
-    uses: ./.github/workflows/setup-nix.yml
   update-sops-keys:
-    needs: setup
     runs-on: ubuntu-latest
     
     steps:
+    - uses: ./.github/workflows/setup-nix.yml
     - name: Update SOPS keys
       run: ./scripts/secrets/regenerate_all.sh
     
