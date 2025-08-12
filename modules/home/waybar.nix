@@ -1,10 +1,9 @@
 # Source: ZaneyOS
 
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 
 let

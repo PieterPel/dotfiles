@@ -1,0 +1,21 @@
+
+name: Flake check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  setup:
+    uses: ./.github/workflows/setup-nix.yml
+  update-sops-keys:
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: nix flake check
+      
+
+      
