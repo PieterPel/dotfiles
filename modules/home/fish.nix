@@ -17,12 +17,7 @@ in
 
     # Define plugins
     plugins = with pkgs.fishPlugins; [
-      {
-        name = "tide";
-        src = tide.src;
-      }
     ];
-
   };
 
   home.shellAliases = {

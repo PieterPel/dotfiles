@@ -10,6 +10,7 @@
     ./fish.nix
     ./tmux.nix
     ./git.nix
+    ./starship.nix
     inputs.nixvim.homeManagerModules.nixvim
   ];
 
