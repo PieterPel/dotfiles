@@ -40,6 +40,7 @@
 
     # Utilities
     unzip
+    viu
 
     # CLI tools
     bat
