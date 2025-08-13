@@ -15,14 +15,10 @@ in
   config = lib.mkIf cfg.enable {
     programs.tmux = {
       enable = true;
-      shell = "${pkgs.fish}/bin/fish";
       terminal = "tmux-256color";
       baseIndex = 1;
-      disableConfirmationPrompt = true;
       keyMode = "vi";
       historyLimit = 10000;
-      mouse = true;
-      prefix = "C-a";
       plugins = with pkgs.tmuxPlugins; [
         better-mouse-mode
         prefix-highlight
@@ -39,7 +35,6 @@ in
         # General 
         set -gu default-command
         set -g default-shell "$SHELL"
-        set -g mouse on
         set-option -g allow-rename off # Don't rename self-named windows
         set-option -g wrap-search on # Go from window N to window 1 
 
@@ -62,8 +57,19 @@ in
         bind - split-window -v
         unbind '"'
         unbind %
+
+        ## These have home-manager settings, but no NixOS settings for some reason
+        # Disable confirmation prompts (e.g., for killing panes)
+        set -s confirm-before off
+
+        # Enable mouse support
+        set -g mouse on
+
+        # Change prefix key to Ctrl-a
+        unbind C-b
+        set -g prefix C-a
+        bind C-a send-prefix
       '';
     };
   };
 }
-

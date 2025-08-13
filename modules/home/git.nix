@@ -13,12 +13,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
+    packages = with pkgs; [
       pre-commit
       gh
     ];
-
-    programs.lazygit.enable = true;
 
     programs.git = {
       enable = true;
@@ -27,4 +25,3 @@ in
     };
   };
 }
-

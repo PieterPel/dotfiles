@@ -9,5 +9,6 @@
     inputs.spicetify-nix.darwinModules.spicetify
     inputs.sops-nix.darwinModules.sops
     inputs.stylix.darwinModules.stylix
+    inputs.nixvim.darwinModules.nixvim
   ];
 }

@@ -1,7 +1,6 @@
 # Source: ZaneyOS
 
 { config
-, pkgs
 , lib
 , ...
 }:
@@ -19,7 +18,6 @@ in
     # Configure & Theme Waybar
     programs.waybar = {
       enable = true;
-      package = pkgs.waybar;
       settings = [
         {
           layer = "top";
@@ -292,4 +290,3 @@ in
     };
   };
 }
-

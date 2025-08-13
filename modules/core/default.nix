@@ -3,6 +3,7 @@
 {
   imports = [
     ../common-options.nix
+    ../programs
     ./configuration.nix
     ./home-manager.nix
     ./stylix.nix

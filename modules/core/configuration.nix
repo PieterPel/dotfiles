@@ -1,5 +1,4 @@
 { config
-, pkgs
 , lib
 , ...
 }:
@@ -7,7 +6,6 @@
 # NOTE: these settings must be shared by both nix-darwin and nixos
 let
   cfg = config.modules.core.configuration;
-  corePackages = import ./packages.nix { inherit pkgs; };
 in
 {
   options.modules.core.configuration = {
@@ -15,7 +13,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = corePackages.packages;
+    environment.systemPackages = config.packages;
+    environment.shellAliases = config.aliases;
+
     programs.firefox.enable = true;
 
     # Enable fish so it can be used as the default shell.
