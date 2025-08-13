@@ -14,5 +14,12 @@
     programs.tmux.shell = "${pkgs.fish}/bin/fish";
 
     programs.btop.enable = true;
+
+    programs.zoxide = {
+      enable = true;
+      options = [
+        "--cmd cd"
+      ];
+    };
   };
 }

@@ -70,14 +70,6 @@
       btop
     ];
 
-    programs.zoxide = {
-      enable = true;
-      options = [
-        "--cmd cd"
-      ];
-    };
-
-
     programs.lazygit.enable = true;
   };
 }
