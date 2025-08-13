@@ -8,7 +8,6 @@
     modules.programs = {
       direnv.enable = true;
       tmux.enable = true;
-      git.enable = true;
       starship.enable = true;
       nixvim.enable = true;
     };
