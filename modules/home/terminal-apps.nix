@@ -6,12 +6,12 @@
 }:
 {
   imports = [
-    ./nixvim
-    ./direnv.nix
-    ./fish.nix
-    ./tmux.nix
-    ./git.nix
-    ./starship.nix
+    ../programs/nixvim
+    ../programs/direnv.nix
+    ../programs/fish.nix
+    ../programs/tmux.nix
+    ../programs/git.nix
+    ../programs/starship.nix
     inputs.nixvim.homeManagerModules.nixvim
   ];
 

@@ -8,15 +8,15 @@
   imports = [
     ./kitty.nix
     ./hyprland
-    ./vscodium.nix
-    ./waybar.nix
-    ./wlogout
-    ./rofi
-    ./spicetify.nix
-    ./flatpaks.nix
-    ./zed.nix
     ./stylix.nix
-    ./hyprlock.nix
+    ./wlogout
+    ./flatpaks.nix
+    ../programs/vscodium.nix
+    ../programs/waybar.nix
+    ../programs/rofi
+    ../programs/spicetify.nix
+    ../programs/zed.nix
+    ../programs/hyprlock.nix
     inputs.spicetify-nix.homeManagerModules.spicetify
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
