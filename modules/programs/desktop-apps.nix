@@ -6,7 +6,6 @@
 {
   config = lib.mkIf config.enableDesktopApps {
     modules.programs = {
-      rofi.enable = true;
       spicetify.enable = true;
       zed.enable = true;
     };
