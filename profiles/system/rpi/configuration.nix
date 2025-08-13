@@ -6,7 +6,7 @@
   # Enable password authentication for SSHing into the RPi
   services.openssh = {
     settings.PasswordAuthentication = true; # TODO: put to false
-    permitRootLogin = "no";
+    settings.PermitRootLogin = "no";
   };
 
   # Make users immutable

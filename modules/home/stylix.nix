@@ -14,7 +14,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [ base16-schemes ];
+    packages = with pkgs; [ base16-schemes ];
 
     stylix = {
       enable = true;
@@ -44,4 +44,3 @@ in
     };
   };
 }
-

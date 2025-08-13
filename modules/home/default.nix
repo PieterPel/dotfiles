@@ -20,6 +20,7 @@
     ./wlogout
     ./rofi
 
+    ./terminal-apps.nix
     ./desktop-apps.nix
 
     inputs.nixvim.homeManagerModules.nixvim
