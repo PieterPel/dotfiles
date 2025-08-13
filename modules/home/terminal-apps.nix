@@ -1,20 +1,9 @@
 { config
 , lib
 , pkgs
-, inputs
 , ...
 }:
 {
-  imports = [
-    ../programs/nixvim
-    ../programs/direnv.nix
-    ../programs/fish.nix
-    ../programs/tmux.nix
-    ../programs/git.nix
-    ../programs/starship.nix
-    inputs.nixvim.homeManagerModules.nixvim
-  ];
-
   config = lib.mkIf config.enableTerminalApps {
     modules.programs = {
       direnv.enable = true;

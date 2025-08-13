@@ -1,26 +1,9 @@
 { pkgs
 , config
-, inputs
 , lib
 , ...
 }:
 {
-  imports = [
-    ./kitty.nix
-    ./hyprland
-    ./stylix.nix
-    ./wlogout
-    ./flatpaks.nix
-    ../programs/vscodium.nix
-    ../programs/waybar.nix
-    ../programs/rofi
-    ../programs/spicetify.nix
-    ../programs/zed.nix
-    ../programs/hyprlock.nix
-    inputs.spicetify-nix.homeManagerModules.spicetify
-    inputs.nix-flatpak.homeManagerModules.nix-flatpak
-  ];
-
   config = lib.mkIf config.enableDesktopApps {
     modules.programs = {
       kitty.enable = true;
