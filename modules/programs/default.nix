@@ -1,19 +1,25 @@
-{ ...
+{ pkgs
+, ...
 }:
 {
   imports = [
     ./options.nix
+    ./aliases.nix
     ./direnv.nix
-    ./fish.nix
-    ./git.nix
-    ./hyprlock.nix
     ./spicetify.nix
     ./starship.nix
     ./tmux.nix
-    ./vscodium.nix
-    ./waybar.nix
     ./zed.nix
     ./nixvim
-    ./rofi
   ];
+
+  # These are core packages I always want to have installed
+  packages = with pkgs; [
+    vim
+    git
+    base16-schemes
+    fastfetch
+    comma
+  ];
+
 }

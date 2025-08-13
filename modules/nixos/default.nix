@@ -21,6 +21,7 @@
     inputs.sops-nix.nixosModules.sops
     inputs.spicetify-nix.nixosModules.spicetify
     inputs.stylix.nixosModules.stylix
+    inputs.nixvim.nixosModules.nixvim
   ];
 
   modules.nixos = lib.mkIf (!config.minimal) {

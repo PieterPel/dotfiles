@@ -13,22 +13,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages =
-      with pkgs;
-      (
-        if cfg.enable then
-          [
-            # There is a home-manager module but it sucks
-            zed-editor
+    packages = with pkgs; ([
+      # There is a home-manager module but it sucks
+      zed-editor
 
-            # These are to get LSPs workihg nicely
-            rust-analyzer
-            ruff
-            nil
-            basedpyright
-          ]
-        else
-          [ ]
-      );
+      # These are to get LSPs workihg nicely
+      rust-analyzer
+      ruff
+      nil
+      basedpyright
+    ]);
   };
 }

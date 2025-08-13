@@ -15,12 +15,12 @@ in
 
   config = lib.mkIf cfg.enable {
 
-    home.packages = with pkgs; [
+    packages = with pkgs; [
       fd
       rust-analyzer
     ];
 
-    home.sessionVariables = {
+    envVars = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
     };
 

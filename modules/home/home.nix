@@ -4,17 +4,20 @@
 
 {
   imports = [
-    ./terminal-apps.nix
-    ./desktop-apps.nix
   ];
 
   config = {
-
-    home.stateVersion = config.stateVersion;
+    # NOTE: let apps by default be done by user
+    enableTerminalApps = !config.minimal;
+    home.packages = config.packages;
+    home.shellAliases = config.aliases;
 
     home.sessionVariables = {
       EDITOR = config.editor;
-    };
+    }
+    // config.envVars;
+
+    home.stateVersion = config.stateVersion;
 
     # Enable home-manager to govern programs..
     programs.home-manager = {

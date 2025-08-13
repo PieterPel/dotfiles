@@ -5,10 +5,25 @@
 {
   imports = [
     ../common-options.nix
+    ../programs
     ./options.nix
     ./home.nix
-    ../programs
+    ./kitty.nix
+    ./hyprland
+    ./stylix.nix
+    ./flatpaks.nix
+    ./fish.nix
+    ./git.nix
+    ./vscodium.nix
+    ./waybar.nix
+    ./hyprlock.nix
+    ./wlogout
+    ./rofi
+
+    ./desktop-apps.nix
 
     inputs.nixvim.homeManagerModules.nixvim
+    inputs.spicetify-nix.homeManagerModules.spicetify
+    inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
 }

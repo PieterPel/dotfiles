@@ -13,6 +13,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    environment.sessionVariables = config.envVars;
     # Enable touchpad support (enabled default in most desktopManager).
     # services.xserver.libinput.enable = true;
 
