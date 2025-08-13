@@ -11,6 +11,8 @@
     ./tmux.nix
     ./zed.nix
     ./nixvim
+    ./terminal-apps.nix
+    ./desktop-apps.nix
   ];
 
   # These are core packages I always want to have installed
