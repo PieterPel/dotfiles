@@ -12,5 +12,7 @@
     };
 
     programs.tmux.shell = "${pkgs.fish}/bin/fish";
+
+    programs.btop.enable = true;
   };
 }

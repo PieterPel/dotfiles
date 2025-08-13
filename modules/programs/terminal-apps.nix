@@ -65,6 +65,9 @@
       jujutsu
       lazyjj
       jjui
+
+      # Monitoring
+      btop
     ];
 
     programs.zoxide = {
@@ -74,7 +77,6 @@
       ];
     };
 
-    programs.btop.enable = true;
 
     programs.lazygit.enable = true;
   };
