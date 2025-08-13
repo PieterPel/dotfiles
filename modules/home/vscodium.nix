@@ -1,72 +1,85 @@
-{ config, pkgs, ... }:
+{ config
+, pkgs
+, lib
+, ...
+}:
 
+let
+  cfg = config.modules.programs.vscodium;
+in
 {
-  home.packages = with pkgs; [
-    vscodium
-  ];
+  options.modules.programs.vscodium = {
+    enable = lib.mkEnableOption "Enable VSCode/VSCodium configuration.";
+  };
 
-  programs.vscode = {
-    enable = config.enableDesktopApps;
-    package = pkgs.vscode.fhs;
-    profiles.pieterp.extensions =
-      with pkgs.vscode-extensions;
-      [
-        # General
-        usernamehw.errorlens
-        tomoki1207.pdf
-        tal7aouy.icons
-        github.copilot
-        github.copilot-chat
-        eamodio.gitlens
-        mhutchie.git-graph
-        aaron-bond.better-comments
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      vscodium
+    ];
 
-        # Python
-        ms-python.python
-        ms-python.vscode-pylance
-        charliermarsh.ruff
-        ms-python.debugpy
-        ms-toolsai.jupyter
+    programs.vscode = {
+      enable = true;
+      package = pkgs.vscode.fhs;
+      profiles.pieterp.extensions =
+        with pkgs.vscode-extensions;
+        [
+          # General
+          usernamehw.errorlens
+          tomoki1207.pdf
+          tal7aouy.icons
+          github.copilot
+          github.copilot-chat
+          eamodio.gitlens
+          mhutchie.git-graph
+          aaron-bond.better-comments
 
-        # Rust
-        rust-lang.rust-analyzer
+          # Python
+          ms-python.python
+          ms-python.vscode-pylance
+          charliermarsh.ruff
+          ms-python.debugpy
+          ms-toolsai.jupyter
 
-        # Nix
-        jnoortheen.nix-ide
+          # Rust
+          rust-lang.rust-analyzer
 
-        # Haskell
-        haskell.haskell
+          # Nix
+          jnoortheen.nix-ide
 
-        # Direnv
-        mkhl.direnv
+          # Haskell
+          haskell.haskell
 
-        # Toml
-        tamasfe.even-better-toml
+          # Direnv
+          mkhl.direnv
 
-        # Yaml
-        redhat.vscode-yaml
+          # Toml
+          tamasfe.even-better-toml
 
-        #.env
-        irongeek.vscode-env
+          # Yaml
+          redhat.vscode-yaml
 
-        # Markdown
-        dendron.dendron-markdown-preview-enhanced
-        bierner.markdown-mermaid
+          #.env
+          irongeek.vscode-env
 
-        # Themes
-        hiukky.flate
-        dracula-theme.theme-dracula
-        emroussel.atomize-atom-one-dark-theme
-        enkia.tokyo-night
-        viktorqvarfordt.vscode-pitch-black-theme
-      ]
-      ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-        {
-          name = "pyrefly";
-          publisher = "meta";
-          version = "0.16.2";
-          sha256 = "z6JNY8DWWyn8J/6HG2WH76Yrv+saqxzJ35RAnUx8N2c=";
-        }
-      ];
+          # Markdown
+          dendron.dendron-markdown-preview-enhanced
+          bierner.markdown-mermaid
+
+          # Themes
+          hiukky.flate
+          dracula-theme.theme-dracula
+          emroussel.atomize-atom-one-dark-theme
+          enkia.tokyo-night
+          viktorqvarfordt.vscode-pitch-black-theme
+        ]
+        ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+          {
+            name = "pyrefly";
+            publisher = "meta";
+            version = "0.16.2";
+            sha256 = "z6JNY8DWWyn8J/6HG2WH76Yrv+saqxzJ35RAnUx8N2c=";
+          }
+        ];
+    };
   };
 }

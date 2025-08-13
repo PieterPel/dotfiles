@@ -1,11 +1,12 @@
-{ pkgs
+{ config
+, lib
+, pkgs
 , inputs
 , ...
 }:
-
 {
   imports = [
-    ./nixvim/default.nix
+    ./nixvim
     ./direnv.nix
     ./fish.nix
     ./tmux.nix
@@ -14,67 +15,78 @@
     inputs.nixvim.homeManagerModules.nixvim
   ];
 
-  home.packages = with pkgs; [
-    # Nix
-    nh
+  config = lib.mkIf config.enableTerminalApps {
+    modules.programs = {
+      direnv.enable = true;
+      fish.enable = true;
+      tmux.enable = true;
+      git.enable = true;
+      starship.enable = true;
+      nixvim.enable = true;
+    };
 
-    # Languages
-    python3
-    cargo
-    gcc
-    nodejs_22
-    cabal-install
-    ghc
+    home.packages = with pkgs; [
+      # Nix
+      nh
 
-    # shell
-    fish
-    oh-my-fish
+      # Languages
+      python3
+      cargo
+      gcc
+      nodejs_22
+      cabal-install
+      ghc
 
-    # Developing
-    tmux
-    helix
-    devenv
+      # shell
+      fish
+      oh-my-fish
 
-    # File management
-    yazi
+      # Developing
+      tmux
+      helix
+      devenv
 
-    # Utilities
-    unzip
-    viu
+      # File management
+      yazi
 
-    # CLI tools
-    bat
-    ripgrep
-    eza
-    lazysql
-    silver-searcher
-    curlie
+      # Utilities
+      unzip
+      viu
 
-    # AI
-    gemini-cli
-    opencode
+      # CLI tools
+      bat
+      ripgrep
+      eza
+      lazysql
+      silver-searcher
+      curlie
 
-    # Containers
-    podman-tui
-    podman-compose
-    dive
-    lazydocker
+      # AI
+      gemini-cli
+      opencode
 
-    # Misc
-    spotify-player
+      # Containers
+      podman-tui
+      podman-compose
+      dive
+      lazydocker
 
-    # Jujutsu
-    jujutsu
-    lazyjj
-    jjui
-  ];
+      # Misc
+      spotify-player
 
-  programs.zoxide = {
-    enable = true;
-    options = [
-      "--cmd cd"
+      # Jujutsu
+      jujutsu
+      lazyjj
+      jjui
     ];
-  };
 
-  programs.btop.enable = true;
+    programs.zoxide = {
+      enable = true;
+      options = [
+        "--cmd cd"
+      ];
+    };
+
+    programs.btop.enable = true;
+  };
 }

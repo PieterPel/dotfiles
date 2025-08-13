@@ -1,21 +1,35 @@
-{ config, pkgs, ... }:
+{ config
+, pkgs
+, lib
+, ...
+}:
+
+let
+  cfg = config.modules.programs.zed;
+in
 {
-  home.packages =
-    with pkgs;
-    (
-      if config.enableDesktopApps then
-        [
-          # There is a home-manager module but it sucks
-          zed-editor
+  options.modules.programs.zed = {
+    enable = lib.mkEnableOption "Enable Zed editor configuration.";
+  };
 
-          # These are to get LSPs workihg nicely
-          rust-analyzer
-          ruff
-          nil
-          basedpyright
-        ]
-      else
-        [ ]
-    );
+  config = lib.mkIf cfg.enable {
+    home.packages =
+      with pkgs;
+      (
+        if cfg.enable then
+          [
+            # There is a home-manager module but it sucks
+            zed-editor
 
+            # These are to get LSPs workihg nicely
+            rust-analyzer
+            ruff
+            nil
+            basedpyright
+          ]
+        else
+          [ ]
+      );
+  };
 }
+

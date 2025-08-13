@@ -1,6 +1,12 @@
 { lib, ... }:
 
 {
+  options.enableTerminalApps = lib.mkOption {
+    type = lib.types.bool;
+    default = true;
+    description = "Enable terminal applications";
+  };
+
   options.enableDesktopApps = lib.mkOption {
     type = lib.types.bool;
     default = false;

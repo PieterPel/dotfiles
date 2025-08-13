@@ -1,16 +1,30 @@
-{ pkgs, ... }:
+{ pkgs
+, lib
+, config
+, ...
+}:
 
+let
+  cfg = config.modules.programs.git;
+in
 {
-  home.packages = with pkgs; [
-    pre-commit
-    gh
-  ];
+  options.modules.programs.git = {
+    enable = lib.mkEnableOption "Enable Git configuration.";
+  };
 
-  programs.lazygit.enable = true;
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      pre-commit
+      gh
+    ];
 
-  programs.git = {
-    enable = true;
-    userName = "Pieter Pel";
-    userEmail = "pelpieter@gmail.com";
+    programs.lazygit.enable = true;
+
+    programs.git = {
+      enable = true;
+      userName = "Pieter Pel";
+      userEmail = "pelpieter@gmail.com";
+    };
   };
 }
+

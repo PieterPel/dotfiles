@@ -1,57 +1,69 @@
 { pkgs
+, config
+, lib
 , ...
 }:
 
+let
+  cfg = config.modules.programs.tmux;
+in
 {
-  programs.tmux = {
-    enable = true;
-    shell = "${pkgs.fish}/bin/fish";
-    terminal = "tmux-256color";
-    baseIndex = 1;
-    disableConfirmationPrompt = true;
-    keyMode = "vi";
-    historyLimit = 10000;
-    mouse = true;
-    prefix = "C-a";
-    plugins = with pkgs.tmuxPlugins; [
-      better-mouse-mode
-      prefix-highlight
-      continuum
-      {
-        # https://github.com/nix-community/home-manager/issues/4894
-        plugin = power-theme;
-        extraConfig = ''
-          set -g @tmux_power_theme 'violet'
-        '';
-      }
-    ];
-    extraConfig = ''
-      # General 
-      set -gu default-command
-      set -g default-shell "$SHELL"
-      set -g mouse on
-      set-option -g allow-rename off # Don't rename self-named windows
-      set-option -g wrap-search on # Go from window N to window 1 
+  options.modules.programs.tmux = {
+    enable = lib.mkEnableOption "Enable Tmux configuration.";
+  };
 
-      ## Keybinds
-      # Source conf file
-      bind r source-file ~/tmux/tmux.conf
+  config = lib.mkIf cfg.enable {
+    programs.tmux = {
+      enable = true;
+      shell = "${pkgs.fish}/bin/fish";
+      terminal = "tmux-256color";
+      baseIndex = 1;
+      disableConfirmationPrompt = true;
+      keyMode = "vi";
+      historyLimit = 10000;
+      mouse = true;
+      prefix = "C-a";
+      plugins = with pkgs.tmuxPlugins; [
+        better-mouse-mode
+        prefix-highlight
+        continuum
+        {
+          # https://github.com/nix-community/home-manager/issues/4894
+          plugin = power-theme;
+          extraConfig = ''
+            set -g @tmux_power_theme 'violet'
+          '';
+        }
+      ];
+      extraConfig = ''
+        # General 
+        set -gu default-command
+        set -g default-shell "$SHELL"
+        set -g mouse on
+        set-option -g allow-rename off # Don't rename self-named windows
+        set-option -g wrap-search on # Go from window N to window 1 
 
-      # Navigation between panes
-      bind -n M-h select-pane -L
-      bind -n M-l select-pane -R
-      bind -n M-k select-pane -U
-      bind -n M-j select-pane -D
+        ## Keybinds
+        # Source conf file
+        bind r source-file ~/tmux/tmux.conf
 
-      # Navigation between windows
-      bind -n M-[ previous-window
-      bind -n M-] next-window
+        # Navigation between panes
+        bind -n M-h select-pane -L
+        bind -n M-l select-pane -R
+        bind -n M-k select-pane -U
+        bind -n M-j select-pane -D
 
-      # Split panes using | and -
-      bind | split-window -h
-      bind - split-window -v
-      unbind '"'
-      unbind %
-    '';
+        # Navigation between windows
+        bind -n M-[ previous-window
+        bind -n M-] next-window
+
+        # Split panes using | and -
+        bind | split-window -h
+        bind - split-window -v
+        unbind '"'
+        unbind %
+      '';
+    };
   };
 }
+

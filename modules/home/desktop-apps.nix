@@ -1,10 +1,9 @@
-# Source: ZaneyOS
-{ config
-, pkgs
+{ pkgs
+, config
 , inputs
+, lib
 , ...
 }:
-
 {
   imports = [
     ./kitty.nix
@@ -22,34 +21,44 @@
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
 
-  home.packages =
-    with pkgs;
-    if config.enableDesktopApps then
-      [
-        # Screenshots
-        grim
-        slurp
-        swappy
+  config = lib.mkIf config.enableDesktopApps {
+    modules.programs = {
+      kitty.enable = true;
+      hyprland.enable = true;
+      vscodium.enable = true;
+      waybar.enable = true;
+      wlogout.enable = true;
+      rofi.enable = true;
+      spicetify.enable = true;
+      zed.enable = true;
+      hyprlock.enable = true;
+    };
+    modules.stylix.enable = true;
 
-        # Photoshop
-        gimp
+    home.packages = with pkgs; [
+      # Screenshots
+      grim
+      slurp
+      swappy
 
-        # Font
-        montserrat
+      # Photoshop
+      gimp
 
-        # Browser
-        brave
-        chromium
+      # Font
+      montserrat
 
-        # Editor
-        libreoffice-qt6-fresh
+      # Browser
+      brave
+      chromium
 
-        # Notes
-        logseq
+      # Editor
+      libreoffice-qt6-fresh
 
-        # Messaging
-        legcord
-      ]
-    else
-      [ ];
+      # Notes
+      logseq
+
+      # Messaging
+      legcord
+    ];
+  };
 }
