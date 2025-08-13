@@ -7,7 +7,6 @@
   config = lib.mkIf config.enableTerminalApps {
     modules.programs = {
       direnv.enable = true;
-      fish.enable = true;
       tmux.enable = true;
       git.enable = true;
       starship.enable = true;
