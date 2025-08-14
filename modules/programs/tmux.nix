@@ -60,7 +60,8 @@ in
 
         ## These have home-manager settings, but no NixOS settings for some reason
         # Disable confirmation prompts (e.g., for killing panes)
-        set -g confirm-before off
+        bind-key x kill-pane
+        bind-key & kill-window
 
         # Enable mouse support
         set -g mouse on
