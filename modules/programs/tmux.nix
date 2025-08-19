@@ -6,6 +6,7 @@
 
 let
   cfg = config.modules.programs.tmux;
+  fish = lib.getExe pkgs.fish;
 in
 {
   options.modules.programs.tmux = {
@@ -52,11 +53,17 @@ in
         bind -n M-[ previous-window
         bind -n M-] next-window
 
+        # Open new windows in current directory
+        bind c new-window -c "#{pane_current_path}"
+
         # Split panes using | and -
-        bind | split-window -h
-        bind - split-window -v
+        bind | split-window -h -c "#{pane_current_path}"
+        bind - split-window -v -c "#{pane_current_path}"
         unbind '"'
         unbind %
+
+        # Set shell to fish
+        set-option -g default-shell ${fish}
 
         ## These have home-manager settings, but no NixOS settings for some reason
         # Disable confirmation prompts (e.g., for killing panes)
