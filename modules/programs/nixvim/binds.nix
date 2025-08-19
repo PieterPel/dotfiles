@@ -144,6 +144,16 @@
       action = "<cmd>lua vim.diagnostic.open_float()<CR>";
     }
 
+    # Jump to errors
+    {
+      key = "<leader>ge";
+      action = "<cmd>lua vim.diagnostic.goto_next()<CR>";
+    }
+    {
+      key = "<leader>gE";
+      action = "<cmd>lua vim.diagnostic.goto_prev()<CR>";
+    }
+
     # Flash
     {
       key = "s";
