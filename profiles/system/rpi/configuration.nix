@@ -19,7 +19,6 @@
     wheelNeedsPassword = false; # members of wheel group don't need password
   };
 
-  # Enable modules conditionally based on `minimal`
   modules.core = {
     configuration.enable = true;
     nix.enable = true;
@@ -27,9 +26,14 @@
   };
 
   modules.nixos = {
+    configuration.enable = true;
     internationalization.enable = true;
     networking.enable = true;
     updating.enable = true;
     virtualization.enable = true;
+  };
+
+  modules.programs = {
+    starship.enable = true;
   };
 }

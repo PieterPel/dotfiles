@@ -22,11 +22,26 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/2dc5aaab-9589-497e-910e-a700b8c80f8b";
+    device = "/dev/disk/by-label/nixos-root";
     fsType = "ext4";
+    options = [ "noatime" ];
   };
 
-  swapDevices = [ ];
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/BOOT";
+    fsType = "vfat";
+    options = [ "noatime" ];
+  };
+
+  fileSystems."/nix" = {
+    device = "/dev/disk/by-label/nixos-nix";
+    fsType = "ext4";
+    options = [ "noatime" ];
+  };
+
+  swapDevices = [
+    { device = "/dev/disk/by-label/nixos-swap"; }
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }
