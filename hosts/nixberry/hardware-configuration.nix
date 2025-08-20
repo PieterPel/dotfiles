@@ -27,20 +27,25 @@
     options = [ "noatime" ];
   };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-label/BOOT";
-    fsType = "vfat";
-    options = [ "noatime" ];
-  };
 
-  fileSystems."/nix" = {
-    device = "/dev/disk/by-label/nixos-nix";
-    fsType = "ext4";
-    options = [ "noatime" ];
-  };
+  # NOTE: wanted to do this:
+  #
+  # fileSystems."/boot" = {
+  #   device = "/dev/disk/by-label/BOOT";
+  #   fsType = "vfat";
+  #   options = [ "noatime" ];
+  # };
+  #
+  # fileSystems."/nix" = {
+  #   device = "/dev/disk/by-label/nixos-nix";
+  #   fsType = "ext4";
+  #   options = [ "noatime" ];
+  # };
 
   swapDevices = [
-    { device = "/dev/disk/by-label/nixos-swap"; }
+    # NOTE: wanted to do this
+    #
+    # { device = "/dev/disk/by-label/nixos-swap"; }
   ];
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
