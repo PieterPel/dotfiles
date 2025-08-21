@@ -28,7 +28,6 @@
   modules.nixos = {
     configuration.enable = true;
     internationalization.enable = true;
-    networking.enable = true;
     updating.enable = true;
     virtualization.enable = true;
   };
