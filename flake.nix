@@ -57,43 +57,65 @@
   };
 
   outputs =
-    { self, nixpkgs, flake-parts, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } (top@{ config, withSystem, moduleWithSystem, ... }:
-    let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-    in
-    {
-      imports = [
-        # My modules are set up in a way that you can create outputs for
-        # 1) NixOS
-        # 2) Nix-darwin
-        # 3) Home-manager standalone
-        ./hosts
-      ];
-      systems = supportedSystems;
-      flake = {
-        # Define checks
-        checks = forAllSystems (system: {
-          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixpkgs-fmt.enable = true;
+    { self
+    , nixpkgs
+    , flake-parts
+    , ...
+    }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      top@{ config
+      , withSystem
+      , moduleWithSystem
+      , ...
+      }:
+      let
+        supportedSystems = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "x86_64-darwin"
+          "aarch64-darwin"
+        ];
+        forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      in
+      {
+        imports = [
+          # My modules are set up in a way that you can create outputs for
+          # 1) NixOS
+          # 2) Nix-darwin
+          # 3) Home-manager standalone
+          ./hosts
+        ];
+        systems = supportedSystems;
+        flake = {
+          # Define checks
+          checks = forAllSystems (system: {
+            pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                nixpkgs-fmt.enable = true;
+              };
             };
-          };
-        });
-        # Define dev shells
-        devShells = forAllSystems (system: {
-          default = nixpkgs.legacyPackages.${system}.mkShell {
-            inherit (self.checks.${system}.pre-commit-check) shellHook;
-            buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-          };
-        });
-      };
-    });
+          });
+          # Define dev shells
+          devShells = forAllSystems (system: {
+            default = nixpkgs.legacyPackages.${system}.mkShell {
+              inherit (self.checks.${system}.pre-commit-check) shellHook;
+              buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+            };
+          });
+        };
+      }
+    );
+
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.nixos.org/"
+      "https://nixos-raspberrypi.cachix.org"
+    ];
+
+    extra-trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
 }
