@@ -26,7 +26,6 @@ in
     # };
 
     # List services that you want to enable:
-
     # Onedrive
     # See https://nixos.wiki/wiki/OneDrive for what steps to take
     services.onedrive.enable = false; # enable onedrive in future, now there is a notifcation bug
@@ -36,6 +35,9 @@ in
     # networking.firewall.allowedUDPPorts = [ ... ];
     # Or disable the firewall altogether.
     # networking.firewall.enable = false;
+
+    # Polkit
+    security.polkit.enable = true;
 
   };
 }

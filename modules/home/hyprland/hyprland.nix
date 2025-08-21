@@ -7,8 +7,9 @@
 let
   cfg = config.modules.programs.hyprland;
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-    ${pkgs.waybar}/bin/waybar &
-    ${pkgs.swww}/bin/swww init &
+    ${lib.getExe pkgs.waybar} &
+    ${lib.getExe pkgs.swww} init &
+    systemctl --user start hyprpolkitagent &
   '';
 in
 {

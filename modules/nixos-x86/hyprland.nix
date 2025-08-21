@@ -80,6 +80,9 @@ in
 
       # Blue light filter
       hyprshade
+
+      # Polkit
+      hyprpolkitagent
     ];
 
     xdg.portal = {

@@ -34,6 +34,9 @@
 
       # Messaging
       legcord
+
+      # Partitioning
+      gparted
     ];
   };
 }
