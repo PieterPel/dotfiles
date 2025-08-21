@@ -18,6 +18,8 @@ in
     packages = with pkgs; [
       fd
       rust-analyzer
+      the_silver_searcher  # ag - The Silver Searcher for fast text searching
+      ripgrep  # rg - Alternative fast searcher as fallback
     ];
 
     envVars = {
@@ -85,6 +87,13 @@ in
 
         textwidth = 0;
 
+        # Folding configuration
+        foldenable = true;
+        foldmethod = "expr";
+        foldexpr = "nvim_treesitter#foldexpr()";
+        foldlevel = 99;  # Start with all folds open
+        foldlevelstart = 99;  # Start with all folds open
+
       };
 
       globals = {
@@ -134,6 +143,49 @@ in
         })
 
         require("gemini_cli").setup()
+
+        -- Configure folding to exclude function arguments
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = "*",
+          callback = function()
+            -- Set custom fold text to show function signatures without folding arguments
+            vim.opt_local.foldtext = [[substitute(getline(v:foldstart),'\\t',repeat('\ ',&tabstop),'g').'...'.trim(getline(v:foldend))]]
+          end,
+        })
+
+        -- Custom folding function to avoid folding function arguments
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = {"python", "javascript", "typescript", "rust", "lua", "nix"},
+          callback = function()
+            vim.wo.foldmethod = "expr"
+            vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
+            -- Prevent folding of function arguments by setting minimum fold level
+            vim.wo.foldminlines = 3  -- Only fold blocks with 3+ lines
+          end,
+        })
+
+        -- Configure Telescope to use Silver Searcher for specific searches
+        local telescope = require('telescope')
+        local actions = require('telescope.actions')
+        
+        -- Custom live_grep function using ag (silver searcher)
+        local function live_grep_ag()
+          require('telescope.builtin').live_grep({
+            vimgrep_arguments = {
+              'ag',
+              '--nocolor',
+              '--noheading',
+              '--filename',
+              '--numbers',
+              '--column',
+              '--smart-case',
+              '--hidden'
+            }
+          })
+        end
+
+        -- Make the custom function available globally
+        vim.api.nvim_create_user_command('TelescopeLiveGrepAg', live_grep_ag, {})
       '';
     };
   };
