@@ -27,6 +27,12 @@
     options = [ "noatime" ];
   };
 
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/FIRMWARE";
+    fsType = "vfat";
+    options = [ "noatime" ];
+  };
+
 
   # NOTE: wanted to do this:
   #
