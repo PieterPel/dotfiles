@@ -19,7 +19,41 @@
       todo-comments.enable = true; # See notes/todos better
 
       # Extension
-      telescope.enable = true; # Fuzzy finder
+      telescope = {
+        enable = true; # Fuzzy finder
+        settings = {
+          defaults = {
+            # Use ag (the_silver_searcher) for better search performance
+            # Fallback to ripgrep if ag is not available
+            vimgrep_arguments = [
+              "rg"
+              "--color=never"
+              "--no-heading"
+              "--with-filename"
+              "--line-number"
+              "--column"
+              "--smart-case"
+            ];
+          };
+          pickers = {
+            live_grep = {
+              additional_args = {
+                "--hidden";
+              };
+            };
+            grep_string = {
+              additional_args = {
+                "--hidden";
+              };
+            };
+          };
+        };
+        extensions = {
+          fzf-native = {
+            enable = true;
+          };
+        };
+      };
       nvim-tree.enable = true; # File explorer
       harpoon.enable = true; # Mark files to go back to
       trouble.enable = true; # Give diagnostics overview

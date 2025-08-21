@@ -58,6 +58,11 @@
       key = "<leader>fh";
       action = "<cmd>Telescope help_tags<CR>";
     }
+    {
+      key = "<leader>fs";
+      action = "<cmd>Telescope grep_string<CR>";
+      desc = "Search current word with Silver Searcher";
+    }
 
     # Nvimtree
     {
@@ -142,6 +147,40 @@
     {
       key = "<C-e";
       action = "<cmd>lua vim.diagnostic.open_float()<CR>";
+    }
+
+    # LSP Navigation - Go to definition and references across files
+    {
+      key = "gd";
+      action = "<cmd>lua vim.lsp.buf.definition()<CR>";
+      desc = "Go to definition";
+    }
+    {
+      key = "gD";
+      action = "<cmd>lua vim.lsp.buf.declaration()<CR>";
+      desc = "Go to declaration";
+    }
+    {
+      key = "gr";
+      action = "<cmd>Telescope lsp_references<CR>";
+      desc = "Find references";
+    }
+    {
+      key = "gi";
+      action = "<cmd>Telescope lsp_implementations<CR>";
+      desc = "Go to implementation";
+    }
+    {
+      key = "<leader>gt";
+      action = "<cmd>lua vim.lsp.buf.type_definition()<CR>";
+      desc = "Go to type definition";
+    }
+
+    # Silver searcher keybindings
+    {
+      key = "<leader>fa";
+      action = "<cmd>TelescopeLiveGrepAg<CR>";
+      desc = "Search with Silver Searcher (ag)";
     }
 
     # Jump to errors
