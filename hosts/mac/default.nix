@@ -13,8 +13,8 @@ in
       ../../modules/darwin
       {
         inherit hostname;
-        system.stateVersion = 6 # Do not change this !
-          }
-          ];
-      };
+        system.stateVersion = 6; # Do not change this !
       }
+    ];
+  };
+}
