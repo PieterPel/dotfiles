@@ -116,6 +116,56 @@
       action = "<cmd>Gemini toggle<CR>";
     }
 
+    # Opencode
+    {
+      key = "<leader>oA";
+      action.__raw = "function() require('opencode').ask() end";
+      options.desc = "Ask opencode";
+    }
+    {
+      key = "<leader>oa";
+      action.__raw = "function() require('opencode').ask('@cursor: ') end";
+      options.desc = "Ask opencode about this";
+      mode = "n";
+    }
+    {
+      key = "<leader>oa";
+      action.__raw = "function() require('opencode').ask('@selection: ') end";
+      options.desc = "Ask opencode about selection";
+      mode = "v";
+    }
+    {
+      key = "<leader>ot";
+      action.__raw = "function() require('opencode').toggle() end";
+      options.desc = "Toggle embedded opencode";
+    }
+    {
+      key = "<leader>on";
+      action.__raw = "function() require('opencode').command('session_new') end";
+      options.desc = "New session";
+    }
+    {
+      key = "<leader>oy";
+      action.__raw = "function() require('opencode').command('messages_copy') end";
+      options.desc = "Copy last message";
+    }
+    {
+      key = "<S-C-u>";
+      action.__raw = "function() require('opencode').command('messages_half_page_up') end";
+      options.desc = "Scroll messages up";
+    }
+    {
+      key = "<S-C-d>";
+      action.__raw = "function() require('opencode').command('messages_half_page_down') end";
+      options.desc = "Scroll messages down";
+    }
+    {
+      key = "<leader>op";
+      action.__raw = "function() require('opencode').select_prompt() end";
+      options.desc = "Select prompt";
+      mode = [ "n" "v" ];
+    }
+
     # LazyGit
     {
       key = "<leader>lg";

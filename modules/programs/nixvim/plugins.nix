@@ -50,7 +50,9 @@
       };
 
       # Treesitter
-      treesitter-context.enable = true;
+      treesitter-context = {
+        enable = true;
+      };
       treesitter-textobjects.enable = true;
       treesitter = {
         autoLoad = true;
@@ -203,6 +205,17 @@
           # 18-07-2025
           rev = "c9fd62adda823628f5131a939d9c56ef7a898600";
           hash = "sha256-C4OI6NM+Bpa5WffmXY+tNLfuYyX0LNbmsAe9GDBRVCQ=";
+        };
+      })
+
+      (vimUtils.buildVimPlugin {
+        name = "opencode";
+        src = pkgs.fetchFromGitHub {
+          owner = "NIckvanDyke";
+          repo = "opencode.nvim";
+          # 02-09-2025
+          rev = "a7142e20a96becf09ee1dd70a80396ca2ab7c66f";
+          hash = "sha256-p02EXhbaawxX4xYC9fxXRD/klPxXpv1d2obUw5G8N3g=";
         };
       })
 
