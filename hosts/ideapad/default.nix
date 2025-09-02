@@ -22,8 +22,6 @@ in
           enable = true;
         };
 
-        powerManagement.enable = true;
-
         system.stateVersion = "24.11"; # Do not change this !
       }
     ];
