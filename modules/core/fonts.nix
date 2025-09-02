@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config
+, lib
+, pkgs
+, ...
+}:
 
 let
   cfg = config.modules.core.fonts;
@@ -9,7 +13,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [
+    packages = with pkgs; [
       nerd-fonts.jetbrains-mono
       font-awesome
     ];

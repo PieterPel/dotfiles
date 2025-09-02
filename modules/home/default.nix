@@ -23,7 +23,7 @@
     ./terminal-apps.nix
     ./desktop-apps.nix
 
-    inputs.nixvim.homeManagerModules.nixvim
+    inputs.nixvim.homeModules.nixvim
     inputs.spicetify-nix.homeManagerModules.spicetify
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
   ];
