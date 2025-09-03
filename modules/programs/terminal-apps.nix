@@ -69,7 +69,5 @@
       # Monitoring
       btop
     ];
-
-    programs.lazygit.enable = true;
   };
 }

@@ -11,7 +11,7 @@ in
   options.modules.programs.rofi = {
     enable = lib.mkEnableOption "Enable Rofi configuration.";
   };
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     programs.rofi = {
       enable = config.enableDesktopApps;
       package = pkgs.rofi-wayland;

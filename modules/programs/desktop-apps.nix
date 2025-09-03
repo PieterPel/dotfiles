@@ -11,11 +11,6 @@
     };
 
     packages = with pkgs; [
-      # Screenshots
-      grim
-      slurp
-      swappy
-
       # Photoshop
       gimp
 
@@ -24,19 +19,24 @@
 
       # Browser
       brave
-      chromium
+      # chromium
 
       # Editor
-      libreoffice-qt6-fresh
+      #libreoffice-qt6-fresh
 
       # Notes
       logseq
 
       # Messaging
-      legcord
+      # legcord
 
       # Partitioning
-      gparted
+      #gparted
+    ] ++ lib.optionals pkgs.stdenv.isLinux [
+      # Screenshots
+      grim
+      slurp
+      swappy
     ];
   };
 }

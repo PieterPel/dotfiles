@@ -17,6 +17,9 @@ in
     # Home-manager
     hms = "${nh} home switch ~/dotfiles/";
 
+    # Nix-darwin
+    drs = "${nh} darwin switch ~/dotfiles";
+
     # Devenv
     dev-init = "nix flake init --template github:cachix/devenv";
 

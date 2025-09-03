@@ -7,6 +7,7 @@
 
 let
   cfg = config.modules.programs.kitty;
+  shellCommand = if pkgs.stendv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
 in
 {
   options.modules.programs.kitty = {
@@ -24,7 +25,7 @@ in
         scrollback_lines = 10000;
         enable_audio_bell = false;
         mouse_hide_wait = 60;
-        shell = ''fish'';
+        shell = shellCommand;
       };
       extraConfig = ''
         tab_bar_style fade

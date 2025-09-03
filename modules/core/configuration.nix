@@ -16,7 +16,7 @@ in
     environment.systemPackages = config.packages;
     environment.shellAliases = config.aliases;
 
-    programs.firefox.enable = true;
+    # programs.firefox.enable = true; # TODO: move to nixos
 
     # Enable fish so it can be used as the default shell.
     programs.fish.enable = true;

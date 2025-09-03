@@ -1,5 +1,6 @@
 { config
 , lib
+, pkgs
 , ...
 }:
 
@@ -13,7 +14,7 @@ in
     enable = lib.mkEnableOption "Enable Hyprlock configuration.";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     programs.hyprlock = {
       enable = true;
       settings = {

@@ -1,6 +1,7 @@
 # Source: ZaneyOS
 { config
 , lib
+, pkgs
 , ...
 }:
 
@@ -12,7 +13,7 @@ in
     enable = lib.mkEnableOption "Enable wlogout configuration.";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     programs.wlogout = {
       enable = true;
       layout = [

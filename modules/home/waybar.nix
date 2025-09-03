@@ -2,6 +2,7 @@
 
 { config
 , lib
+, pkgs
 , ...
 }:
 
@@ -14,7 +15,7 @@ in
     enable = lib.mkEnableOption "Enable Waybar configuration.";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     # Configure & Theme Waybar
     programs.waybar = {
       enable = true;

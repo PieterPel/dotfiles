@@ -1,8 +1,12 @@
 { config, lib, ... }:
+
 let
   cfg = config.modules.darwin.homebrew;
 in
 {
+  options.modules.darwin.homebrew = {
+    enable = lib.mkEnableOption "Enable homebrew  configuration";
+  };
 
   # The packages installed though normal packages are available to all users, and are reproducible across machines, and are rollbackable.
   # But on macOS, it's less stable than homebrew.
@@ -25,19 +29,16 @@ in
       };
 
       taps = [
-        "homebrew/services"
       ];
 
       # `brew install`
-      # TODO Feel free to add your favorite apps here.
       brews = [
-        # "aria2"  # download tool
       ];
 
       # `brew install --cask`
-      # TODO Feel free to add your favorite apps here.
       casks = [
-        # "google-chrome"
+        "raycast"
+        "ghostty"
       ];
     };
   };

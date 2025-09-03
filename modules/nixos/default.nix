@@ -6,6 +6,7 @@
 {
   imports = [
     ../core
+    ../programs
     ./configuration.nix
     ./steam.nix
     ./internationalization.nix

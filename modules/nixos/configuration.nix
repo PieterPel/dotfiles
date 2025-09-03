@@ -39,5 +39,8 @@ in
     # Polkit
     security.polkit.enable = true;
 
+    # Firefox
+    programs.firefox.enable = true;
+
   };
 }

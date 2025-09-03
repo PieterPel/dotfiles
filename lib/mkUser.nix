@@ -1,12 +1,8 @@
 { pkgs, ... }:
 
 username: {
-  isNormalUser = true;
   description = username;
-  extraGroups = [
-    "networkmanager"
-    "wheel"
-    "input"
-  ];
+  name = username;
+  home = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
   shell = pkgs.fish;
 }

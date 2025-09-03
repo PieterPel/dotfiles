@@ -15,6 +15,8 @@
 
     programs.btop.enable = true;
 
+    programs.lazygit.enable = true;
+
     programs.zoxide = {
       enable = true;
       options = [

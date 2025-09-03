@@ -19,20 +19,38 @@ in
     # Add ability to used TouchID for sudo authentication
     security.pam.services.sudo_local.touchIdAuth = true;
 
+    system.defaults = {
+      # Make all displays have the same space
+      spaces.spans-displays = true;
+
+      # Hide the dock
+      dock.autohide = true;
+    };
+
     services = {
       sketchybar = {
-        enable = true;
+        # NOTE: nomen est omen
+        enable = false;
       };
       aerospace = {
         enable = true;
+        settings = builtins.fromTOML (builtins.readFile ./aerospace.toml);
       };
       jankyborders = {
-        enable = true;
+        # NOTE: ugly, laggy and unneccesary; maybe try configuring in future
+        enable = false;
       };
     };
 
+    programs.zsh.enable = true;
+
+    launchd.user.envVariables = {
+      # Make sure GUI apps launched from Spotlight/Dock
+      # also get the nix-darwin environment
+      PATH = "${config.environment.systemPath}";
+    };
+
     packages = with pkgs; [
-      raycast
     ];
   };
 }

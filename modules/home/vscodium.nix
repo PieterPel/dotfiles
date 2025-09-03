@@ -12,7 +12,7 @@ in
     enable = lib.mkEnableOption "Enable VSCode/VSCodium configuration.";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     packages = with pkgs; [
       vscodium
     ];
