@@ -15,6 +15,7 @@ in
 
   config = lib.mkIf cfg.enable {
 
+    # TODO: having rust analyzer setup like this is not ideal, should be per dev flake
     packages = with pkgs; [
       fd
       rust-analyzer
@@ -106,9 +107,6 @@ in
           \ 'colorscheme': 'rosepine',
           \ }
 
-        " Autoreload files when changed externally
-        set autoread
-
         " Fix slow exiting of terminal mode
         set ttimeoutlen=10
       '';
@@ -134,6 +132,13 @@ in
         })
 
         require("gemini_cli").setup()
+
+        -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
+        vim.o.autoread = true
+        vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+          command = "if mode() != 'c' | checktime | endif",
+          pattern = { "*" },
+        })
       '';
     };
   };

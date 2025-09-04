@@ -38,9 +38,9 @@ in
     # Automatic cleanup
     nix.gc = {
       automatic = true;
-      dates = "daily";
+      interval = { Weekday = 0; Hour = 0; Minute = 0; };
       options = "--delete-older-than 10d";
     };
-    nix.settings.auto-optimise-store = true;
+    nix.optimise.automatic = true;
   };
 }

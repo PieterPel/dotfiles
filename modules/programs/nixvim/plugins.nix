@@ -17,6 +17,7 @@
       colorizer.enable = true; # Inline colors
       twilight.enable = true; # Dim inactive code
       todo-comments.enable = true; # See notes/todos better
+      gitblame.enable = true; # Show git blame
 
       # Extension
       telescope.enable = true; # Fuzzy finder
@@ -25,6 +26,7 @@
       trouble.enable = true; # Give diagnostics overview
       lazygit.enable = true; # Lazygit from within nvim
       flash.enable = true; # Jump to anywhere
+      claude-code.enable = true; # Claude-code support
 
       # Language specific
       /*

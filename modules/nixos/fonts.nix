@@ -5,10 +5,10 @@
 }:
 
 let
-  cfg = config.modules.core.fonts;
+  cfg = config.modules.nixos.fonts;
 in
 {
-  options.modules.core.fonts = {
+  options.modules.nixos.fonts = {
     enable = lib.mkEnableOption "Enable fonts module";
   };
 

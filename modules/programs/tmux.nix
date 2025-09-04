@@ -32,6 +32,7 @@ in
           '';
         }
       ];
+      # TODO: some of these alt bindings conflict with aerospace now
       extraConfig = ''
         # General 
         set -gu default-command

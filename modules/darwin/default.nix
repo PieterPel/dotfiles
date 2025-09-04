@@ -8,6 +8,8 @@
     ../programs/options.nix
     ./configuration.nix
     ./homebrew.nix
+    ./fonts.nix
+
     inputs.home-manager.darwinModules.home-manager
     inputs.spicetify-nix.darwinModules.spicetify
     inputs.sops-nix.darwinModules.sops
@@ -18,5 +20,6 @@
   modules.darwin = {
     configuration.enable = true;
     homebrew.enable = true;
+    fonts.enable = true;
   };
 }

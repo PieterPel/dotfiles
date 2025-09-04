@@ -7,12 +7,14 @@
 
 let
   cfg = config.modules.programs.kitty;
-  shellCommand = if pkgs.stendv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
+  shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
 in
 {
   options.modules.programs.kitty = {
     enable = lib.mkEnableOption "Enable Kitty terminal configuration.";
   };
+
+  # TODO: set font for nix-darwin
 
   config = lib.mkIf cfg.enable {
     programs.kitty = {

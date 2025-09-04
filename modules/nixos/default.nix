@@ -17,6 +17,7 @@
     ./printing.nix
     ./networking.nix
     ./updating.nix
+    ./fonts.nix
 
     inputs.home-manager.nixosModules.default
     inputs.sops-nix.nixosModules.sops
@@ -36,5 +37,6 @@
     thunar.enable = true;
     updating.enable = true;
     virtualization.enable = true;
+    fonts.enable = true;
   };
 }

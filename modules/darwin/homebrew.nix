@@ -39,6 +39,8 @@ in
       casks = [
         "raycast"
         "ghostty"
+        "notion"
+        "bitwarden"
       ];
     };
   };

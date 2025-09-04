@@ -18,6 +18,10 @@ in
         inherit hostname;
         system.stateVersion = 6; # Do not change this !
         system.primaryUser = "pieterpel";
+
+        nix.settings.trusted-users = [
+          "pieterpel"
+        ];
       }
     ];
   };
