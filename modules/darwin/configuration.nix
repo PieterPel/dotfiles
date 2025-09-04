@@ -19,6 +19,8 @@ in
     # Add ability to used TouchID for sudo authentication
     security.pam.services.sudo_local.touchIdAuth = true;
 
+    nix.gc.interval = { Weekday = 0; Hour = 0; Minute = 0; };
+
     system.defaults = {
       # Make all displays have the same space
       spaces.spans-displays = true;

@@ -17,7 +17,7 @@
       colorizer.enable = true; # Inline colors
       twilight.enable = true; # Dim inactive code
       todo-comments.enable = true; # See notes/todos better
-      gitblame.enable = true; # Show git blame
+      gitblame.enable = false; # Show git blame
 
       # Extension
       telescope.enable = true; # Fuzzy finder

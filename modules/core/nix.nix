@@ -38,7 +38,6 @@ in
     # Automatic cleanup
     nix.gc = {
       automatic = true;
-      interval = { Weekday = 0; Hour = 0; Minute = 0; };
       options = "--delete-older-than 10d";
     };
     nix.optimise.automatic = true;

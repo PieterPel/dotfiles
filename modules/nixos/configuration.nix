@@ -42,5 +42,7 @@ in
     # Firefox
     programs.firefox.enable = true;
 
+    nix.gc.dates = "daily";
+
   };
 }
