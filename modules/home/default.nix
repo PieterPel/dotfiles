@@ -12,6 +12,7 @@
     ./fish.nix
     ./git.nix
     ./vscodium.nix
+    ./ai.nix
 
     ./terminal-apps.nix
     ./desktop-apps.nix
