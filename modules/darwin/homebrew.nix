@@ -41,6 +41,9 @@ in
         "ghostty"
         "notion"
         "bitwarden"
+        "cursor-cli"
+        "cursor"
+        "slack"
       ];
     };
   };
