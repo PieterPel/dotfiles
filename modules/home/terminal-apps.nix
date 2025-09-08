@@ -8,6 +8,7 @@
     modules.programs = {
       fish.enable = true;
       git.enable = true;
+      ai.enable = true;
     };
     modules.stylix.enable = true;
 

@@ -25,21 +25,39 @@ in
 
       # Define fish functions
       functions = {
-        dev = {
+
+        devs = {
+          # NOTE: I assume that your tmux windows start at 1 rather than 0
+          body = ''
+            if not tmux has-session -t dev >/dev/null 2>&1
+              echo "Creating new tmux session: dev"
+              
+              tmux new-session -d -s dev
+
+              devw dev:1
+            end
+
+            # Always attach, whether it was new or already running
+            tmux attach-session -t dev
+          '';
+        };
+
+        devw = {
           # NOTE: this is optimized for 21:9
           body = ''
-            tmux new-session -d -s dev
+            set -l target $argv[1]
+            if test -z "$target"
+              set target (tmux display-message -p -F '#{session_name}:#{window_index}')
+            end
 
-            # Middle pane gets 80% → left pane keeps 20%
-            tmux split-window -h -p 80 -t dev:1 'nvim'
+            # Middle pane gets 75% of the horizontal space
+            tmux split-window -h -p 75 -t $target 'nvim'
 
-            # From middle pane, make left pane of 25% of 80 % = 20%
-            tmux split-window -h -p 25 -t dev:1 'gemini'
+            # From middle pane, make left pane of 33% of 75% which is 25%
+            tmux split-window -h -p 33 -t "$target" 'gemini'
 
-            # Focus back on left shell
-            tmux select-pane -t dev:1
-
-            tmux attach-session -t dev
+            # Focus back on the initial left shell pane
+            tmux select-pane -t "$target"
           '';
         };
       };
