@@ -44,7 +44,18 @@ in
       };
     };
 
-    programs.zsh.enable = true;
+    programs.zsh = {
+      shellInit = ''
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      '';
+      enable = true;
+    };
+    programs.fish = {
+      enable = true;
+      interactiveShellInit = ''
+        /opt/homebrew/bin/brew shellenv | source
+      '';
+    };
 
     launchd.user.envVariables = {
       # Make sure GUI apps launched from Spotlight/Dock
