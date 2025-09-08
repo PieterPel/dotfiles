@@ -1,4 +1,5 @@
 { pkgs
+, lib
 , ...
 }:
 
@@ -17,11 +18,20 @@
       colorizer.enable = true; # Inline colors
       twilight.enable = true; # Dim inactive code
       todo-comments.enable = true; # See notes/todos better
-      gitblame.enable = false; # Show git blame
+      gitblame.enable = true; # Show git blame
+      diffview.enable = true; # Show git diff
 
       # Extension
       telescope.enable = true; # Fuzzy finder
-      nvim-tree.enable = true; # File explorer
+      nvim-tree = {
+        enable = true; # File explorer
+        settings = {
+          diagnostics = {
+            enable = true;
+            show_on_dirs = true;
+          };
+        };
+      };
       harpoon.enable = true; # Mark files to go back to
       trouble.enable = true; # Give diagnostics overview
       lazygit.enable = true; # Lazygit from within nvim
@@ -147,6 +157,19 @@
       };
 
       # AI suggestions
+      avante = {
+        enable = true;
+        settings = {
+          provider = "copilot";
+          acp_providers = {
+            gemini-cli = {
+              command = lib.getExe pkgs.gemini-cli;
+              # auth_method = null;
+            };
+          };
+        };
+      };
+
       copilot-chat.enable = true;
       windsurf-nvim = {
         enable = true;

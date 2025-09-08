@@ -225,5 +225,15 @@
       '';
       options.remap = true;
     }
+
+    # Git-blame
+    {
+      key = "<leader>bt";
+      action = "<cmd>GitBlameToggle<CR>";
+    }
+    {
+      key = "<leader>bo";
+      action = "<cmd>GitBlameOpenFileURL<CR>";
+    }
   ];
 }

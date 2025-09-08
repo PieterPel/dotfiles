@@ -131,6 +131,7 @@ in
           }  
         })
 
+
         require("gemini_cli").setup()
 
         -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
