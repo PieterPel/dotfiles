@@ -56,7 +56,7 @@
 
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # WARNING: do not follow nixpkgs here!
     };
 
     flake-parts = {
