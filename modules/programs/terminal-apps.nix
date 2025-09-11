@@ -63,7 +63,6 @@
 
       # Jujutsu
       jujutsu
-      lazyjj
       jjui
 
       # Monitoring

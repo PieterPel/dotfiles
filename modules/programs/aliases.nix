@@ -30,9 +30,6 @@ in
     # LazyGit
     lg = lib.getExe pkgs.lazygit;
 
-    # Lazyjj
-    lj = lib.getExe pkgs.lazyjj;
-
     # eza
     ls = "${eza} --color=always --group-directories-first --icons";
     ll = "${eza} -la --icons --octal-permissions --group-directories-first";
