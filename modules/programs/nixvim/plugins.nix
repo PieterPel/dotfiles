@@ -30,6 +30,9 @@
             enable = true;
             show_on_dirs = true;
           };
+          git = {
+            ignore = false;
+          };
         };
       };
       harpoon.enable = true; # Mark files to go back to
@@ -91,7 +94,14 @@
         servers = {
           nil_ls.enable = true;
           dockerls.enable = true;
-          pyright.enable = true;
+          basedpyright = {
+            enable = true;
+            packageFallback = true; # Devshell basedpyright overrides global one
+            cmd = [
+              "basedpyright-langserver"
+              "--stdio"
+            ];
+          };
           ruff.enable = true;
           bashls.enable = true;
           yamlls.enable = true;
@@ -99,6 +109,8 @@
           ts_ls.enable = true;
           lua_ls.enable = true;
           gleam.enable = true;
+          bicep.enable = false; # Requires manual stuff to get working https://nix-community.github.io/nixvim/plugins/lsp/servers/bicep/index.html
+          terraformls.enable = true;
           rust_analyzer = {
             enable = true;
             installRustc = true;

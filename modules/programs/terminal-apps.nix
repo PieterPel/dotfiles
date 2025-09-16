@@ -59,7 +59,7 @@
       lazydocker
 
       # Misc
-      spotify-player
+      # spotify-player
 
       # Jujutsu
       jujutsu

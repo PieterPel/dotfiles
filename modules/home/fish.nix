@@ -1,5 +1,4 @@
-{ pkgs
-, lib
+{ lib
 , config
 , ...
 }:
@@ -20,7 +19,7 @@ in
       '';
 
       # Define plugins
-      plugins = with pkgs.fishPlugins; [
+      plugins = [
       ];
 
       # Define fish functions

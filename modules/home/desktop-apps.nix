@@ -16,6 +16,7 @@ in
       rofi.enable = true;
       hyprlock.enable = true;
       waybar.enable = true;
+      sketchybar.enable = false; # WARNING: very sketchy/broken
     };
     modules.stylix.enable = true;
 

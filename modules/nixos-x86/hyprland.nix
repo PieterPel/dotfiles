@@ -57,7 +57,7 @@ in
       kitty
 
       # App launcher
-      rofi-wayland
+      rofi
 
       # Logout menu
       wlogout

@@ -9,6 +9,7 @@
     ./configuration.nix
     ./homebrew.nix
     ./fonts.nix
+    ./aerospace.nix
 
     inputs.home-manager.darwinModules.home-manager
     inputs.spicetify-nix.darwinModules.spicetify
@@ -21,5 +22,6 @@
     configuration.enable = true;
     homebrew.enable = true;
     fonts.enable = true;
+    aerospace.enable = true;
   };
 }

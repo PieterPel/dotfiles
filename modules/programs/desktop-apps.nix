@@ -6,37 +6,38 @@
 {
   config = lib.mkIf config.enableDesktopApps {
     modules.programs = {
-      spicetify.enable = true;
+      spicetify.enable = false;
       zed.enable = true;
     };
 
-    packages = with pkgs; [
-      # Photoshop
-      gimp
+    packages =
+      with pkgs;
+      [
+        # Photoshop
+        gimp
 
-      # Font
-      montserrat
+        # Font
+        montserrat
 
-      # Browser
-      brave
-      # chromium
+        # Browser
+        brave
 
-      # Editor
-      #libreoffice-qt6-fresh
+      ]
+      ++ lib.optionals pkgs.stdenv.isLinux [
+        chromium
+        # Screenshots
+        grim
+        slurp
+        swappy
 
-      # Notes
-      logseq
+        # Editor
+        libreoffice-qt6-fresh
 
-      # Messaging
-      # legcord
+        # Partitioning
+        gparted
 
-      # Partitioning
-      #gparted
-    ] ++ lib.optionals pkgs.stdenv.isLinux [
-      # Screenshots
-      grim
-      slurp
-      swappy
-    ];
+        # Messaging
+        legcord
+      ];
   };
 }

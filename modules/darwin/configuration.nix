@@ -19,7 +19,11 @@ in
     # Add ability to used TouchID for sudo authentication
     security.pam.services.sudo_local.touchIdAuth = true;
 
-    nix.gc.interval = { Weekday = 0; Hour = 0; Minute = 0; };
+    nix.gc.interval = {
+      Weekday = 0;
+      Hour = 0;
+      Minute = 0;
+    };
 
     system.defaults = {
       # Make all displays have the same space
@@ -31,18 +35,19 @@ in
 
     services = {
       sketchybar = {
-        # NOTE: nomen est omen
+        # NOTE: Nomen est omen
         enable = false;
       };
-      aerospace = {
-        enable = true;
-        settings = builtins.fromTOML (builtins.readFile ./aerospace.toml);
-      };
+
       jankyborders = {
         # NOTE: ugly, laggy and unneccesary; maybe try configuring in future
         enable = false;
       };
     };
+
+    modules.darwin.aerospace.profile = "numbered"; # NOTE: apped will require some tweaking
+
+    system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
     programs.zsh = {
       shellInit = ''
@@ -63,7 +68,7 @@ in
       PATH = "${config.environment.systemPath}";
     };
 
-    packages = with pkgs; [
+    packages = [
     ];
   };
 }

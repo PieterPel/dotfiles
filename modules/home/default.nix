@@ -1,4 +1,6 @@
-{ inputs, pkgs, lib, ... }:
+{ inputs
+, ...
+}:
 
 {
   imports = [
@@ -13,6 +15,7 @@
     ./git.nix
     ./vscodium.nix
     ./ai.nix
+    ./sketchybar.nix
 
     ./terminal-apps.nix
     ./desktop-apps.nix

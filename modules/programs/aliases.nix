@@ -23,12 +23,18 @@ in
     # Devenv
     dev-init = "nix flake init --template github:cachix/devenv";
 
+    # Direnv
+    da = "${lib.getExe pkgs.direnv} allow .";
+
     # CLI dropins
     cat = lib.getExe pkgs.bat;
     curl = lib.getExe pkgs.curlie;
 
     # LazyGit
     lg = lib.getExe pkgs.lazygit;
+
+    # Lazyjj
+    # lj = lib.getExe pkgs.lazyjj; # Broken build
 
     # eza
     ls = "${eza} --color=always --group-directories-first --icons";

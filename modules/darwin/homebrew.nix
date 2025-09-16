@@ -38,12 +38,17 @@ in
       # `brew install --cask`
       casks = [
         "raycast"
-        "ghostty"
         "notion"
         "bitwarden"
         "cursor-cli"
         "cursor"
         "slack"
+
+        # Empty package trick (broken on nixpkgs)
+        "ghostty"
+
+        # Sometimes Broken on nixpkgs due to hash mistmatch
+        "spotify"
       ];
     };
   };

@@ -14,7 +14,6 @@ in
   config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     programs.rofi = {
       enable = config.enableDesktopApps;
-      package = pkgs.rofi-wayland;
       extraConfig = {
         modi = "drun,filebrowser,run";
         show-icons = true;

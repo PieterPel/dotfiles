@@ -6,9 +6,11 @@
   # Maybe also a seperate .nix file for nixos and home-manager
   # enableDesktopApps = true; # This needs to be done in the home-manager block in home-manager.nix
 
-  services.logind.lidSwitch = "poweroff";
-  services.logind.lidSwitchExternalPower = "lock";
-  services.logind.lidSwitchDocked = "ignore";
+  services.logind.settings.Login = {
+    HandleLidSwitch = "poweroff";
+    HandleLidSwitchExternalPower = "lock";
+    HandleLidSwitchDocked = "ignore";
+  };
 
   powerManagement.enable = true;
 }
