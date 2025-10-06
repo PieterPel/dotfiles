@@ -1,10 +1,11 @@
-{ ...
-}:
-
+{ config, lib, ... }:
 {
-  config.services.flatpak = {
-    packages = [
-      #"org.onlyoffice.desktopeditors"
-    ];
-  };
+  flake.homeModules.flatpaks = { ... }:
+    {
+      config.services.flatpak = {
+        packages = [
+          #"org.onlyoffice.desktopeditors"
+        ];
+      };
+    };
 }

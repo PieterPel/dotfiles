@@ -1,18 +1,15 @@
-{ pkgs
-, config
-, lib
-, ...
-}:
-
-let
-  cfg = config.modules.nixos-x86.hyprland;
-in
+{ config, lib, ... }:
 {
-  options.modules.nixos-x86.hyprland = {
-    enable = lib.mkEnableOption "Enable hyprland module";
-  };
+  flake.nixosModules.hyprland = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.nixos-x86.hyprland;
+    in
+    {
+      options.modules.nixos-x86.hyprland = {
+        enable = lib.mkEnableOption "Enable hyprland module";
+      };
 
-  config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable {
     services.displayManager.gdm.wayland = true;
 
     programs.hyprland = {
@@ -93,5 +90,6 @@ in
     # Set up hyprlock
     security.pam.services.hyprlock = { };
     programs.hyprlock.enable = true;
-  };
+      };
+    };
 }

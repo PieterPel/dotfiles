@@ -1,18 +1,15 @@
-{ config
-, pkgs
-, lib
-, ...
-}:
-
-let
-  cfg = config.modules.programs.vscodium;
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.vscodium = {
-    enable = lib.mkEnableOption "Enable VSCode/VSCodium configuration.";
-  };
+  flake.homeModules.vscodium = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.vscodium;
+    in
+    {
+      options.modules.programs.vscodium = {
+        enable = lib.mkEnableOption "Enable VSCode/VSCodium configuration.";
+      };
 
-  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
+      config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     packages = with pkgs; [
       vscodium
     ];
@@ -81,5 +78,6 @@ in
           }
         ];
     };
-  };
+      };
+    };
 }

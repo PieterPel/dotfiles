@@ -1,17 +1,16 @@
-{ config
-, lib
-, ...
-}:
-let
-  cfg = config.modules.programs.starship;
-  firstColor = "#741D83";
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.starship = {
-    enable = lib.mkEnableOption "Enable Starship configuration.";
-  };
+  flake.homeModules.starship = { config, lib, ... }:
+    let
+      cfg = config.modules.programs.starship;
+      firstColor = "#741D83";
+    in
+    {
+      options.modules.programs.starship = {
+        enable = lib.mkEnableOption "Enable Starship configuration.";
+      };
 
-  config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable {
     programs.starship = {
       enable = true;
       settings = {
@@ -117,6 +116,7 @@ in
             Windows = "󰍲 ";
           };
         };
+      };
       };
     };
   };

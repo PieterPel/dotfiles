@@ -1,40 +1,38 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-
-let
-  cfg = config.modules.nixos.fonts;
-in
+{ config, lib, ... }:
 {
-  options.modules.nixos.fonts = {
-    enable = lib.mkEnableOption "Enable fonts module";
-  };
+  flake.nixosModules.fonts = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.nixos.fonts;
+    in
+    {
+      options.modules.nixos.fonts = {
+        enable = lib.mkEnableOption "Enable fonts module";
+      };
 
-  config = lib.mkIf cfg.enable {
-    packages = with pkgs; [
-      nerd-fonts.jetbrains-mono
-      font-awesome
-    ];
+      config = lib.mkIf cfg.enable {
+        packages = with pkgs; [
+          nerd-fonts.jetbrains-mono
+          font-awesome
+        ];
 
-    fonts = {
-      fontconfig = {
-        antialias = true;
+        fonts = {
+          fontconfig = {
+            antialias = true;
 
-        # Fixes antialiasing blur
-        hinting = {
-          enable = true;
-          style = "full"; # no difference
-          autohint = true; # no difference
-        };
+            # Fixes antialiasing blur
+            hinting = {
+              enable = true;
+              style = "full"; # no difference
+              autohint = true; # no difference
+            };
 
-        subpixel = {
-          # Makes it bolder
-          rgba = "rgb";
-          lcdfilter = "default"; # no difference
+            subpixel = {
+              # Makes it bolder
+              rgba = "rgb";
+              lcdfilter = "default"; # no difference
+            };
+          };
         };
       };
     };
-  };
 }

@@ -1,19 +1,16 @@
 # Source: ZaneyOS
-{ config
-, lib
-, pkgs
-, ...
-}:
-
-let
-  cfg = config.modules.programs.wlogout;
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.wlogout = {
-    enable = lib.mkEnableOption "Enable wlogout configuration.";
-  };
+  flake.homeModules.wlogout = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.wlogout;
+    in
+    {
+      options.modules.programs.wlogout = {
+        enable = lib.mkEnableOption "Enable wlogout configuration.";
+      };
 
-  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
+      config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     programs.wlogout = {
       enable = true;
       layout = [
@@ -117,5 +114,6 @@ in
       source = ./icons;
       recursive = true;
     };
-  };
+      };
+    };
 }

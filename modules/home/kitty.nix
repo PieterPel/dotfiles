@@ -1,22 +1,19 @@
 # Source: ZaneyOS
-{ pkgs
-, config
-, lib
-, ...
-}:
-
-let
-  cfg = config.modules.programs.kitty;
-  shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.kitty = {
-    enable = lib.mkEnableOption "Enable Kitty terminal configuration.";
-  };
+  flake.homeModules.kitty = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.kitty;
+      shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
+    in
+    {
+      options.modules.programs.kitty = {
+        enable = lib.mkEnableOption "Enable Kitty terminal configuration.";
+      };
 
-  # TODO: set font for nix-darwin
+      # TODO: set font for nix-darwin
 
-  config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable {
     programs.kitty = {
       enable = true;
       settings = {
@@ -89,5 +86,6 @@ in
         map ctrl+shift+backspace restore_font_size
       '';
     };
-  };
+      };
+    };
 }

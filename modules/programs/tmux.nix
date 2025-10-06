@@ -1,19 +1,16 @@
-{ pkgs
-, config
-, lib
-, ...
-}:
-
-let
-  cfg = config.modules.programs.tmux;
-  fish = lib.getExe pkgs.fish;
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.tmux = {
-    enable = lib.mkEnableOption "Enable Tmux configuration.";
-  };
+  flake.homeModules.tmux = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.tmux;
+      fish = lib.getExe pkgs.fish;
+    in
+    {
+      options.modules.programs.tmux = {
+        enable = lib.mkEnableOption "Enable Tmux configuration.";
+      };
 
-  config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable {
     programs.tmux = {
       enable = true;
       terminal = "tmux-256color";
@@ -80,5 +77,6 @@ in
         bind C-a send-prefix
       '';
     };
-  };
+      };
+    };
 }

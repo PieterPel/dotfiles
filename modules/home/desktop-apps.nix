@@ -1,33 +1,32 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
-  ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
-in
+{ config, lib, ... }:
 {
-  config = lib.mkIf config.enableDesktopApps {
-    modules.programs = {
-      kitty.enable = true;
-      hyprland.enable = true;
-      vscodium.enable = true;
-      wlogout.enable = true;
-      rofi.enable = true;
-      hyprlock.enable = true;
-      waybar.enable = true;
-      sketchybar.enable = false; # WARNING: very sketchy/broken
-    };
-    modules.stylix.enable = true;
+  flake.homeModules.desktop-apps = { config, lib, pkgs, ... }:
+    let
+      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
+    in
+    {
+      config = lib.mkIf config.enableDesktopApps {
+        modules.programs = {
+          kitty.enable = true;
+          hyprland.enable = true;
+          vscodium.enable = true;
+          wlogout.enable = true;
+          rofi.enable = true;
+          hyprlock.enable = true;
+          waybar.enable = true;
+          sketchybar.enable = false; # WARNING: very sketchy/broken
+        };
+        modules.stylix.enable = true;
 
-    programs.ghostty = {
-      enable = true;
-      package = ghosttyPackage;
-      enableFishIntegration = true;
-      enableZshIntegration = true;
-      settings = {
-        command = lib.getExe pkgs.fish;
+        programs.ghostty = {
+          enable = true;
+          package = ghosttyPackage;
+          enableFishIntegration = true;
+          enableZshIntegration = true;
+          settings = {
+            command = lib.getExe pkgs.fish;
+          };
+        };
       };
     };
-  };
 }

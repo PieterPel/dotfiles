@@ -1,7 +1,10 @@
-{ ... }:
+{ config, lib, ... }:
 {
-  imports = [
-    ./binds.nix
-    ./hyprland.nix
-  ];
+  flake.homeModules.hyprland = { ... }:
+    {
+      imports = [
+        ./_binds.nix
+        ./_hyprland.nix
+      ];
+    };
 }

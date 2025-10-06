@@ -1,20 +1,17 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-
-let
-  cfg = config.modules.programs.sketchybar;
-  sketchybar = lib.getExe pkgs.sketchybar;
-  aerospace = lib.getExe pkgs.aerospace;
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.sketchybar = {
-    enable = lib.mkEnableOption "Enable sketchybar configuration.";
-  };
+  flake.homeModules.sketchybar = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.sketchybar;
+      sketchybar = lib.getExe pkgs.sketchybar;
+      aerospace = lib.getExe pkgs.aerospace;
+    in
+    {
+      options.modules.programs.sketchybar = {
+        enable = lib.mkEnableOption "Enable sketchybar configuration.";
+      };
 
-  config = lib.mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
+      config = lib.mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     home.file.".config/sketchybar/sketchybarrc".text = ''
       ${sketchybar} --add event aerospace_workspace_change
 
@@ -45,5 +42,6 @@ in
     home.activation.makeSketchyPluginsExecutable = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       chmod +x $HOME/.config/sketchybar/plugins/aerospace.sh
     '';
-  };
+      };
+    };
 }

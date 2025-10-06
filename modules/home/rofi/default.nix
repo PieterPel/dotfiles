@@ -1,8 +1,10 @@
-{ ...
-}:
+{ config, lib, ... }:
 {
-  imports = [
-    ./config-long.nix
-    ./rofi.nix
-  ];
+  flake.homeModules.rofi = { ... }:
+    {
+      imports = [
+        ./_config-long.nix
+        ./_rofi.nix
+      ];
+    };
 }

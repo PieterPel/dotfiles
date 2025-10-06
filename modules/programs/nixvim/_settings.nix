@@ -16,12 +16,12 @@ in
   config = lib.mkIf cfg.enable {
 
     # TODO: having rust analyzer setup like this is not ideal, should be per dev flake
-    packages = with pkgs; [
+    home.packages = with pkgs; [
       fd
       rust-analyzer
     ];
 
-    envVars = {
+    home.sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
     };
 

@@ -1,28 +1,27 @@
-{ lib
-, pkgs
-, config
-, ...
-}:
+{ config, lib, ... }:
 {
-  config = lib.mkIf config.enableTerminalApps {
-    modules.programs = {
-      fish.enable = true;
-      git.enable = true;
-      ai.enable = true;
+  flake.homeModules.terminal-apps = { config, lib, pkgs, ... }:
+    {
+      config = lib.mkIf config.enableTerminalApps {
+        modules.programs = {
+          fish.enable = true;
+          git.enable = true;
+          ai.enable = true;
+        };
+        modules.stylix.enable = true;
+
+        programs.tmux.shell = "${pkgs.fish}/bin/fish";
+
+        programs.btop.enable = true;
+
+        programs.lazygit.enable = true;
+
+        programs.zoxide = {
+          enable = true;
+          options = [
+            "--cmd cd"
+          ];
+        };
+      };
     };
-    modules.stylix.enable = true;
-
-    programs.tmux.shell = "${pkgs.fish}/bin/fish";
-
-    programs.btop.enable = true;
-
-    programs.lazygit.enable = true;
-
-    programs.zoxide = {
-      enable = true;
-      options = [
-        "--cmd cd"
-      ];
-    };
-  };
 }

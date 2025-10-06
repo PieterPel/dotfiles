@@ -1,6 +1,6 @@
 { config, lib, ... }:
 {
-  flake.homeModules.git = { config, lib, pkgs, ... }:
+  flake.homeModules.git = { pkgs, lib, config, ... }:
     let
       cfg = config.modules.programs.git;
     in
@@ -10,7 +10,7 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = with pkgs; [
+        home.packages = with pkgs; [
           pre-commit
           gh
         ];

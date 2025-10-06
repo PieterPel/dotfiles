@@ -1,10 +1,12 @@
-{ ...
-}:
+{ config, lib, ... }:
 {
-  imports = [
-    ./binds.nix
-    ./plugins.nix
-    ./settings.nix
-  ];
+  flake.homeModules.nixvim = { ... }:
+    {
+      imports = [
+        ./_binds.nix
+        ./_plugins.nix
+        ./_settings.nix
+      ];
+    };
 }
 

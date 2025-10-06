@@ -1,18 +1,15 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-
-let
-  cfg = config.modules.darwin.configuration;
-in
+{ config, lib, ... }:
 {
-  options.modules.darwin.configuration = {
-    enable = lib.mkEnableOption "Enable darwin configuration";
-  };
+  flake.darwinModules.configuration = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.darwin.configuration;
+    in
+    {
+      options.modules.darwin.configuration = {
+        enable = lib.mkEnableOption "Enable darwin configuration";
+      };
 
-  config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable {
     #  NOTE: Your can find all available options in:
     #    https://daiderd.com/nix-darwin/manual/index.html
 
@@ -70,5 +67,6 @@ in
 
     packages = [
     ];
-  };
+      };
+    };
 }

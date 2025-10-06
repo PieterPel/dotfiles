@@ -1,15 +1,12 @@
-{ pkgs
-, lib
-, config
-, ...
-}:
-
-let
-  eza = lib.getExe pkgs.eza;
-  nh = lib.getExe pkgs.nh;
-in
+{ config, lib, ... }:
 {
-  aliases = {
+  flake.homeModules.aliases = { config, lib, pkgs, ... }:
+    let
+      eza = lib.getExe pkgs.eza;
+      nh = lib.getExe pkgs.nh;
+    in
+    {
+      aliases = {
     # NixOS
     nos = "${nh} os switch --hostname ${config.hostname} ~/dotfiles";
     noe = "${lib.getExe pkgs.neovim} ~/dotfiles/";
@@ -56,5 +53,6 @@ in
     # Git
     gs = "git status";
     ga = "git add";
-  };
+      };
+    };
 }

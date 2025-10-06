@@ -1,33 +1,35 @@
-{ inputs
-, config
-, lib
-, ...
-}:
-
+{ config, lib, ... }:
 let
-  cfg = config.modules.core.home-manager;
-in
-{
-  options.modules.core.home-manager = {
-    enable = lib.mkEnableOption "Enable home-manager module";
-  };
-
-  config = lib.mkIf cfg.enable {
-    home-manager = {
-      extraSpecialArgs = {
-        inherit inputs;
+  mkHomeManagerModule = { inputs, config, lib, ... }:
+    let
+      cfg = config.modules.core.home-manager;
+    in
+    {
+      options.modules.core.home-manager = {
+        enable = lib.mkEnableOption "Enable home-manager module";
       };
 
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      backupFileExtension = "backup";
+      config = lib.mkIf cfg.enable {
+        home-manager = {
+          extraSpecialArgs = {
+            inherit inputs;
+          };
 
-      # NOTE: Set the correct hostname for all users
-      sharedModules = [
-        {
-          hostname = config.hostname;
-        }
-      ];
+          useGlobalPkgs = true;
+          useUserPackages = true;
+          backupFileExtension = "backup";
+
+          # NOTE: Set the correct hostname for all users
+          sharedModules = [
+            {
+              hostname = config.hostname;
+            }
+          ];
+        };
+      };
     };
-  };
+in
+{
+  flake.nixosModules.home-manager = mkHomeManagerModule;
+  flake.darwinModules.home-manager = mkHomeManagerModule;
 }

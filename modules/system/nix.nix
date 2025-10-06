@@ -1,6 +1,6 @@
 { config, lib, ... }:
-let
-  mkNixModule = { config, lib, ... }:
+{
+  flake.nixosModules.nix = { config, lib, ... }:
     let
       cfg = config.modules.core.nix;
     in
@@ -10,6 +10,7 @@ let
       };
 
       config = lib.mkIf cfg.enable {
+
         # Binary caches
         nix.settings = {
           experimental-features = [
@@ -43,8 +44,24 @@ let
         nix.optimise.automatic = true;
       };
     };
-in
-{
-  flake.nixosModules.nix = mkNixModule;
-  flake.darwinModules.nix = mkNixModule;
+
+  # Also create the home-manager version for nix-darwin
+  flake.homeModules.nix = { config, lib, ... }:
+    let
+      cfg = config.modules.core.nix;
+    in
+    {
+      options.modules.core.nix = {
+        enable = lib.mkEnableOption "Enable nix module";
+      };
+
+      config = lib.mkIf cfg.enable {
+        nix.settings = {
+          experimental-features = [
+            "nix-command"
+            "flakes"
+          ];
+        };
+      };
+    };
 }

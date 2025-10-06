@@ -1,21 +1,18 @@
 # Source: ZaneyOS
 
-{ config
-, lib
-, pkgs
-, ...
-}:
-
-let
-  cfg = config.modules.programs.waybar;
-  betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
-in
+{ config, lib, ... }:
 {
-  options.modules.programs.waybar = {
-    enable = lib.mkEnableOption "Enable Waybar configuration.";
-  };
+  flake.homeModules.waybar = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.programs.waybar;
+      betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
+    in
+    {
+      options.modules.programs.waybar = {
+        enable = lib.mkEnableOption "Enable Waybar configuration.";
+      };
 
-  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
+      config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     # Configure & Theme Waybar
     programs.waybar = {
       enable = true;
@@ -289,5 +286,6 @@ in
         ''
       ];
     };
-  };
+      };
+    };
 }
