@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.gnome = { config, lib, ... }:
+  flake.modules.nixos.gnome = { config, lib, ... }:
     let
       cfg = config.modules.nixos-x86.gnome;
     in

@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.flatpaks = { ... }:
+  flake.modules.homeManager.flatpaks = { ... }:
     {
       config.services.flatpak = {
         packages = [

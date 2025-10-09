@@ -1,6 +1,7 @@
 { config, lib, ... }:
 {
-  flake.homeModules.fish = { lib, config, ... }:
+  flake.modules.homeManager.fish =
+    { lib, config, ... }:
     let
       cfg = config.modules.programs.fish;
     in

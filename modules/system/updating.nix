@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.updating = { inputs, config, lib, ... }:
+  flake.modules.nixos.updating = { inputs, config, lib, ... }:
     let
       cfg = config.modules.nixos.updating;
     in

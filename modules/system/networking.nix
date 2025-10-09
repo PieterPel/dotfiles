@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.networking = { config, lib, ... }:
+  flake.modules.nixos.networking = { config, lib, ... }:
     let
       cfg = config.modules.nixos.networking;
     in

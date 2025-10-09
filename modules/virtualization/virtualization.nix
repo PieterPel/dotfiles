@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.virtualization = { config, lib, ... }:
+  flake.modules.nixos.virtualization = { config, lib, ... }:
     let
       cfg = config.modules.nixos.virtualization;
     in

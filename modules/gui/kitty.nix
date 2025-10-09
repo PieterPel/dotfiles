@@ -1,7 +1,6 @@
 # Source: ZaneyOS
-{ config, lib, ... }:
 {
-  flake.homeModules.kitty = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.kitty = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.kitty;
       shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';

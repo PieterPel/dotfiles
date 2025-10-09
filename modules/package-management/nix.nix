@@ -1,4 +1,3 @@
-{ config, lib, ... }:
 let
   mkNixModule = { config, lib, ... }:
     let
@@ -45,6 +44,6 @@ let
     };
 in
 {
-  flake.nixosModules.nix = mkNixModule;
-  flake.darwinModules.nix = mkNixModule;
+  flake.modules.nixos.nix = mkNixModule;
+  flake.modules.darwin.nix = mkNixModule;
 }

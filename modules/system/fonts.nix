@@ -1,38 +1,45 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.fonts = { config, lib, pkgs, ... }:
-    let
-      cfg = config.modules.nixos.fonts;
-    in
-    {
-      options.modules.nixos.fonts = {
-        enable = lib.mkEnableOption "Enable fonts module";
-      };
-
-      config = lib.mkIf cfg.enable {
-        packages = with pkgs; [
-          nerd-fonts.jetbrains-mono
-          font-awesome
-        ];
-
-        fonts = {
-          fontconfig = {
-            antialias = true;
-
-            # Fixes antialiasing blur
-            hinting = {
-              enable = true;
-              style = "full"; # no difference
-              autohint = true; # no difference
-            };
-
-            subpixel = {
-              # Makes it bolder
-              rgba = "rgb";
-              lcdfilter = "default"; # no difference
-            };
-          };
+  ...
+}:
+let
+  nixosModule = { lib, config, pkgs, ... }: {
+    options.modules.nixos.fonts = {
+      enable = lib.mkEnableOption "Enable fonts module";
+    };
+    config = lib.mkIf config.modules.nixos.fonts.enable {
+      fonts.packages = with pkgs; [
+        nerd-fonts.jetbrains-mono
+        font-awesome
+      ];
+      fonts.fontconfig = {
+        antialias = true;
+        hinting = {
+          enable = true;
+          style = "full";
+          autohint = true;
+        };
+        subpixel = {
+          rgba = "rgb";
+          lcdfilter = "default";
         };
       };
     };
+  };
+
+  darwinModule = { lib, config, pkgs, ... }: {
+    options.modules.darwin.fonts = {
+      enable = lib.mkEnableOption "Enable fonts module";
+    };
+    config = lib.mkIf config.modules.darwin.fonts.enable {
+      fonts.packages = with pkgs; [
+        nerd-fonts.jetbrains-mono
+        font-awesome
+        sketchybar-app-font
+      ];
+    };
+  };
+in
+{
+  flake.modules.nixos.fonts = nixosModule;
+  flake.modules.darwin.fonts = darwinModule;
 }

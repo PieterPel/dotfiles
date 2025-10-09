@@ -13,13 +13,13 @@ in
     };
 
     modules = [
-      config.flake.darwinModules.common-options
-      config.flake.darwinModules.configuration
-      config.flake.darwinModules.home-manager
-      config.flake.darwinModules.nix
-      config.flake.darwinModules.aerospace
-      config.flake.darwinModules.fonts
-      config.flake.darwinModules.homebrew
+      config.flake.modules.darwin.common-options
+      # config.flake.modules.darwin.configuration
+      config.flake.modules.darwin.home-manager
+      # config.flake.modules.darwin.nix
+      # config.flake.modules.darwin.aerospace
+      # config.flake.modules.darwin.fonts
+      # config.flake.modules.darwin.homebrew
       ./_users
       {
         inherit hostname;

@@ -84,6 +84,7 @@
       ];
 
       imports = [
+        inputs.flake-parts.flakeModules.modules
         (import-tree ./modules)
         (import-tree ./hosts)
       ];

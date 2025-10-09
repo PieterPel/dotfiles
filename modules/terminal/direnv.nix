@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.direnv = { config, lib, ... }:
+  flake.modules.homeManager.direnv = { config, lib, ... }:
     let
       cfg = config.modules.programs.direnv;
     in

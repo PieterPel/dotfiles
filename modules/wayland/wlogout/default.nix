@@ -1,7 +1,7 @@
 # Source: ZaneyOS
 { config, lib, ... }:
 {
-  flake.homeModules.wlogout = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.wlogout = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.wlogout;
     in

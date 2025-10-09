@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.terminal-apps-programs = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.terminal-apps = { config, lib, pkgs, ... }:
     {
       config = lib.mkIf config.enableTerminalApps {
         modules.programs = {
@@ -8,9 +7,13 @@
           tmux.enable = true;
           starship.enable = true;
           nixvim.enable = true;
+          fish.enable = true;
+          git.enable = true;
+          ai.enable = true;
         };
+        modules.stylix.enable = true;
 
-        packages = with pkgs; [
+        home.packages = with pkgs; [
           # Nix
           nh
 
@@ -23,7 +26,6 @@
           ghc
 
           # shell
-          fish
           oh-my-fish
 
           # Developing
@@ -46,10 +48,6 @@
           silver-searcher
           curlie
 
-          # AI
-          gemini-cli
-          opencode
-
           # Containers
           podman-tui
           podman-compose
@@ -66,6 +64,17 @@
           # Monitoring
           btop
         ];
+
+        programs.btop.enable = true;
+
+        programs.lazygit.enable = true;
+
+        programs.zoxide = {
+          enable = true;
+          options = [
+            "--cmd cd"
+          ];
+        };
       };
     };
 }

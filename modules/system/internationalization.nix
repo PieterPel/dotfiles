@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.internationalization = { config, lib, ... }:
+  flake.modules.nixos.internationalization = { config, lib, ... }:
     let
       cfg = config.modules.nixos.internationalization;
     in

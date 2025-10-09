@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.sound = { config, lib, ... }:
+  flake.modules.nixos.sound = { config, lib, ... }:
     let
       cfg = config.modules.nixos.sound;
     in

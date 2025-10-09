@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.sketchybar = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.sketchybar = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.sketchybar;
       sketchybar = lib.getExe pkgs.sketchybar;

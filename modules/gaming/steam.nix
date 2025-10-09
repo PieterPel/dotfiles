@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.steam = { config, lib, pkgs, ... }:
+  flake.modules.nixos.steam = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.nixos.steam;
     in

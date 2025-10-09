@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.hyprlock = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.hyprlock = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.hyprlock;
       wallpaper = ../../wallpapers/tux-teaching.jpg;

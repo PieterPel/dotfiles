@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.boot = { config, lib, ... }:
+  flake.modules.nixos.boot = { config, lib, ... }:
     let
       cfg = config.modules.nixos.boot;
     in

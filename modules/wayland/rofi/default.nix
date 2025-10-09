@@ -1,10 +1,12 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.rofi = { ... }:
-    {
-      imports = [
-        ./_config-long.nix
-        ./_rofi.nix
-      ];
-    };
+  config,
+  ...
+}:
+{
+  flake.modules.homeManager.rofi = {
+    imports = [
+      config.flake.modules.homeManager."rofi-config-long"
+      config.flake.modules.homeManager."rofi-config"
+    ];
+  };
 }

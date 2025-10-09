@@ -1,4 +1,3 @@
-{ config, lib, ... }:
 let
   mkSopsModule = { config, lib, pkgs, ... }:
     let
@@ -28,6 +27,6 @@ let
     };
 in
 {
-  flake.nixosModules.sops = mkSopsModule;
-  flake.darwinModules.sops = mkSopsModule;
+  flake.modules.nixos.sops = mkSopsModule;
+  flake.modules.darwin.sops = mkSopsModule;
 }

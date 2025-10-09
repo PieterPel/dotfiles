@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.tmux = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.tmux = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.tmux;
       fish = lib.getExe pkgs.fish;
@@ -16,6 +15,7 @@
       terminal = "tmux-256color";
       baseIndex = 1;
       keyMode = "vi";
+      shell = "${pkgs.fish}/bin/fish";
       historyLimit = 10000;
       plugins = with pkgs.tmuxPlugins; [
         better-mouse-mode

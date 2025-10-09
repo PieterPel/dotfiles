@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.zed = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.zed = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.zed;
     in

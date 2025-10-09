@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.darwinModules.aerospace = { config, lib, pkgs, ... }:
+  flake.modules.darwin.aerospace = { config, lib, pkgs, ... }:
     let
       baseConfig = {
         # You can use it to add commands that run after AeroSpace startup.

@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.thunar = { config, lib, pkgs, ... }:
+  flake.modules.nixos.thunar = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.nixos.thunar;
     in

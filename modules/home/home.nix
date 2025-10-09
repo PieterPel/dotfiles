@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.home = { config, ... }:
+  flake.modules.homeManager.home = { config, ... }:
     {
       imports = [
       ];
@@ -67,5 +66,11 @@
         #      };
         #};
       };
+    };
+
+  flake.modules.standaloneHomeManager.home = { config, ... }:
+    {
+      home.username = config.username;
+      home.homeDirectory = "/home/${config.username}";
     };
 }

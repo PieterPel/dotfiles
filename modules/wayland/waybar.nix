@@ -1,8 +1,7 @@
 # Source: ZaneyOS
 
-{ config, lib, ... }:
 {
-  flake.homeModules.waybar = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.waybar = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.waybar;
       betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";

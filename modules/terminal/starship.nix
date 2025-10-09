@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.starship = { config, lib, ... }:
+  flake.modules.homeManager.starship = { config, lib, ... }:
     let
       cfg = config.modules.programs.starship;
       firstColor = "#741D83";

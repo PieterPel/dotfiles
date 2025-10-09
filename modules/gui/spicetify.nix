@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.spicetify = { config, lib, pkgs, inputs, ... }:
+  flake.modules.homeManager.spicetify = { config, lib, pkgs, inputs, ... }:
     let
       cfg = config.modules.programs.spicetify;
       spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.system};

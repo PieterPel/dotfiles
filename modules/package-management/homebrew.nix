@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.darwinModules.homebrew = { config, lib, ... }:
+  flake.modules.darwin.homebrew = { config, lib, ... }:
     let
       cfg = config.modules.darwin.homebrew;
     in

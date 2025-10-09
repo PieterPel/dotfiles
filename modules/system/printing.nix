@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.nixosModules.printing = { config, lib, ... }:
+  flake.modules.nixos.printing = { config, lib, ... }:
     let
       cfg = config.modules.nixos.printing;
     in

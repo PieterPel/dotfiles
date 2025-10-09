@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.vscodium = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.vscodium = { config, lib, pkgs, ... }:
     let
       cfg = config.modules.programs.vscodium;
     in

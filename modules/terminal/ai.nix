@@ -1,6 +1,5 @@
-{ config, lib, ... }:
 {
-  flake.homeModules.ai = { config, lib, ... }:
+  flake.modules.homeManager.ai = { config, lib, ... }:
     let
       cfg = config.modules.programs.ai;
     in
