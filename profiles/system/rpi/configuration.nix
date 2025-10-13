@@ -19,11 +19,9 @@
     wheelNeedsPassword = false; # members of wheel group don't need password
   };
 
-  modules.core = {
-    configuration.enable = true;
-    nix.enable = true;
-    sops.enable = true;
-  };
+  modules.system.configuration.enable = true;
+  modules.package-management.nix.enable = true;
+  modules.security.sops.enable = true;
 
   modules.nixos = {
     configuration.enable = true;

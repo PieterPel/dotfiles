@@ -1,10 +1,10 @@
 {
   flake.modules.darwin.homebrew = { config, lib, ... }:
     let
-      cfg = config.modules.darwin.homebrew;
+      cfg = config.modules.package-management.homebrew;
     in
     {
-      options.modules.darwin.homebrew = {
+      options.modules.package-management.homebrew = {
         enable = lib.mkEnableOption "Enable homebrew  configuration";
       };
 

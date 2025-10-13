@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.boot = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.boot;
+      cfg = config.modules.system.boot;
     in
     {
-      options.modules.nixos.boot = {
+      options.modules.system.boot = {
         enable = lib.mkEnableOption "Enable boot module";
       };
 

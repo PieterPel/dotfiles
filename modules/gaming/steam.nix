@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.steam = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.nixos.steam;
+      cfg = config.modules.gaming.steam;
     in
     {
-      options.modules.nixos.steam = {
+      options.modules.gaming.steam = {
         enable = lib.mkEnableOption "Enable steam module";
       };
 

@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.gnome = { config, lib, ... }:
     let
-      cfg = config.modules.nixos-x86.gnome;
+      cfg = config.modules.de.gnome;
     in
     {
-      options.modules.nixos-x86.gnome = {
+      options.modules.de.gnome = {
         enable = lib.mkEnableOption "Enable gnome module";
       };
 

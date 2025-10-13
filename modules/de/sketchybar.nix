@@ -1,12 +1,12 @@
 {
-  flake.modules.homeManager.sketchybar = { config, lib, pkgs, ... }:
+  flake.modules.homeModules.sketchybar = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.sketchybar;
+      cfg = config.modules.de.sketchybar;
       sketchybar = lib.getExe pkgs.sketchybar;
       aerospace = lib.getExe pkgs.aerospace;
     in
     {
-      options.modules.programs.sketchybar = {
+      options.modules.de.sketchybar = {
         enable = lib.mkEnableOption "Enable sketchybar configuration.";
       };
 

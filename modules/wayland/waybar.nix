@@ -3,11 +3,11 @@
 {
   flake.modules.homeManager.waybar = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.waybar;
+      cfg = config.modules.wayland.waybar;
       betterTransition = "all 0.3s cubic-bezier(.55,-0.68,.48,1.682)";
     in
     {
-      options.modules.programs.waybar = {
+      options.modules.wayland.waybar = {
         enable = lib.mkEnableOption "Enable Waybar configuration.";
       };
 

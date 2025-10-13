@@ -14,34 +14,27 @@ in
 
     modules = [
       config.flake.modules.darwin.common-options
-      # config.flake.modules.darwin.configuration
+      config.flake.modules.darwin.configuration
       config.flake.modules.darwin.home-manager
-      # config.flake.modules.darwin.nix
-      # config.flake.modules.darwin.aerospace
-      # config.flake.modules.darwin.fonts
-      # config.flake.modules.darwin.homebrew
+      config.flake.modules.darwin.nix
+      config.flake.modules.darwin.aerospace
+      config.flake.modules.darwin.fonts
+      config.flake.modules.darwin.homebrew
       ./_users
       {
-        inherit hostname;
-        system.stateVersion = 6; # Do not change this !
-        system.primaryUser = "pieterpel";
+        config = {
+          inherit hostname;
+          system.stateVersion = 6; # Do not change this !
+          system.primaryUser = "pieterpel";
 
-        nix.settings.trusted-users = [
-          "pieterpel"
-        ];
+          nix.settings.trusted-users = [
+            "pieterpel"
+          ];
 
-        # Enable darwin modules
-        modules.darwin = {
-          configuration.enable = true;
-          aerospace.enable = true;
-          fonts.enable = true;
-          homebrew.enable = true;
-        };
-
-        modules.core = {
-          configuration.enable = true;
-          home-manager.enable = true;
-          nix.enable = true;
+          modules.system.configuration.enable = true;
+          modules.wm.aerospace.enable = true;
+          modules.system.fonts.enable = true;
+          modules.package-management.homebrew.enable = true;
         };
       }
     ];

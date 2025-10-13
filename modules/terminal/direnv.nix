@@ -1,10 +1,10 @@
 {
   flake.modules.homeManager.direnv = { config, lib, ... }:
     let
-      cfg = config.modules.programs.direnv;
+      cfg = config.modules.terminal.direnv;
     in
     {
-      options.modules.programs.direnv = {
+      options.modules.terminal.direnv = {
         enable = lib.mkEnableOption "Enable direnv configuration.";
       };
 

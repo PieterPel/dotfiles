@@ -3,10 +3,10 @@
 }:
 let
   nixosModule = { lib, config, pkgs, ... }: {
-    options.modules.nixos.fonts = {
+    options.modules.system.fonts = {
       enable = lib.mkEnableOption "Enable fonts module";
     };
-    config = lib.mkIf config.modules.nixos.fonts.enable {
+    config = lib.mkIf config.modules.system.fonts.enable {
       fonts.packages = with pkgs; [
         nerd-fonts.jetbrains-mono
         font-awesome
@@ -27,10 +27,10 @@ let
   };
 
   darwinModule = { lib, config, pkgs, ... }: {
-    options.modules.darwin.fonts = {
+    options.modules.system.fonts = {
       enable = lib.mkEnableOption "Enable fonts module";
     };
-    config = lib.mkIf config.modules.darwin.fonts.enable {
+    config = lib.mkIf config.modules.system.fonts.enable {
       fonts.packages = with pkgs; [
         nerd-fonts.jetbrains-mono
         font-awesome

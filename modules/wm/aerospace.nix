@@ -449,10 +449,10 @@
         };
       };
 
-      cfg = config.modules.darwin.aerospace;
+      cfg = config.modules.wm.aerospace;
     in
     {
-      options.modules.darwin.aerospace = {
+      options.modules.wm.aerospace = {
         enable = lib.mkEnableOption "Enable aerospace configuration";
         profile = lib.mkOption {
           type = lib.types.enum [

@@ -1,9 +1,7 @@
 {
   flake.modules.homeManager.hyprland-config = { config, pkgs, lib, ... }: {
-    options.modules.programs.hyprland = {
-      enable = lib.mkEnableOption "Enable Hyprland window manager configuration.";
-    };
-    config = lib.mkIf (config.modules.programs.hyprland.enable && pkgs.stdenv.isLinux) (
+
+    config = lib.mkIf (config.modules.wm.hyprland.enable && pkgs.stdenv.isLinux) (
       let
         startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
           ${lib.getExe pkgs.waybar} &

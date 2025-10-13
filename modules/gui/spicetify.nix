@@ -1,11 +1,13 @@
+{inputs, ...}:
 {
-  flake.modules.homeManager.spicetify = { config, lib, pkgs, inputs, ... }:
+  flake.modules.homeManager.spicetify = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.spicetify;
+      cfg = config.modules.gui.spicetify;
       spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.system};
     in
     {
-      options.modules.programs.spicetify = {
+      imports = [ inputs.spicetify-nix.homeManagerModules.spicetify ];
+      options.modules.gui.spicetify = {
         enable = lib.mkEnableOption "Enable Spicetify configuration.";
       };
 

@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.updating = { inputs, config, lib, ... }:
     let
-      cfg = config.modules.nixos.updating;
+      cfg = config.modules.system.updating;
     in
     {
-      options.modules.nixos.updating = {
+      options.modules.system.updating = {
         enable = lib.mkEnableOption "Enable updating module";
       };
 

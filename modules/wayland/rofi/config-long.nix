@@ -1,6 +1,6 @@
 {
-  flake.modules.homeManager."rofi-config-long" = { config, lib, ... }: {
-    config = lib.mkIf config.modules.programs.rofi.enable {
+  flake.modules.homeManager.rofi-config-long = { config, lib, ... }: {
+    config = lib.mkIf config.modules.wayland.rofi.enable {
       home.file.".config/rofi/config-long.rasi".text = ''
         @import "~/.config/rofi/config.rasi"
         window {

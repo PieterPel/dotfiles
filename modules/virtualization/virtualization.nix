@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.virtualization = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.virtualization;
+      cfg = config.modules.virtualization.virtualization;
     in
     {
-      options.modules.nixos.virtualization = {
+      options.modules.virtualization.virtualization = {
         enable = lib.mkEnableOption "Enable virtualization module";
       };
 

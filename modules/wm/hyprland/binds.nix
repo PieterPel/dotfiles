@@ -1,7 +1,7 @@
 { 
   flake.modules.homeManager.hyprland-binds = { config, lib, ... }:
     {
-      config = lib.mkIf config.modules.programs.hyprland.enable {
+      config = lib.mkIf config.modules.wm.hyprland.enable {
         wayland.windowManager.hyprland.settings = {
           bind = [
             "$modifier,Return,exec,${config.terminal}"

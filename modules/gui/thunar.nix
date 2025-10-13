@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.thunar = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.nixos.thunar;
+      cfg = config.modules.gui.thunar;
     in
     {
-      options.modules.nixos.thunar = {
+      options.modules.gui.thunar = {
         enable = lib.mkEnableOption "Enable thunar module";
       };
 

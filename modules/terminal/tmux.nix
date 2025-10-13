@@ -1,11 +1,11 @@
 {
   flake.modules.homeManager.tmux = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.tmux;
+      cfg = config.modules.terminal.tmux;
       fish = lib.getExe pkgs.fish;
     in
     {
-      options.modules.programs.tmux = {
+      options.modules.terminal.tmux = {
         enable = lib.mkEnableOption "Enable Tmux configuration.";
       };
 

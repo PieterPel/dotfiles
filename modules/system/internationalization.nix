@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.internationalization = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.internationalization;
+      cfg = config.modules.system.internationalization;
     in
     {
-      options.modules.nixos.internationalization = {
+      options.modules.system.internationalization = {
         enable = lib.mkEnableOption "Enable internationalization module";
       };
 

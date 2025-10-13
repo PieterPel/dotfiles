@@ -1,8 +1,14 @@
 {
-  flake.modules.homeManager."nixvim-settings" = { lib, config, pkgs, ... }:
+  flake.modules.homeManager.nixvim-settings =
+    {
+      lib,
+      config,
+      pkgs,
+      ...
+    }:
     let
       isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
-      cfg = config.modules.programs.nixvim;
+      cfg = config.modules.terminal.nixvim;
     in
     {
       options.modules.programs.nixvim = {
@@ -23,8 +29,6 @@
 
         programs.nixvim = {
           nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
-
-          enable = true;
 
           diagnostic.settings = {
             # Enable virtual text for inline diagnostics

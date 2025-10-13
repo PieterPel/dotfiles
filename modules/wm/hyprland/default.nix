@@ -3,12 +3,12 @@
   ...
 }:
 {
-  flake.modules.nixos.hyprland = { config, lib, pkgs, ... }:
+  flake.modules.wm.hyprland = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.nixos-x86.hyprland;
+      cfg = config.modules.wm.hyprland;
     in
     {
-      options.modules.nixos-x86.hyprland = {
+      options.modules.wm.hyprland = {
         enable = lib.mkEnableOption "Enable hyprland module";
       };
 
@@ -68,7 +68,10 @@
       };
     };
 
-  flake.modules.homeManager.hyprland = {
+  flake.modules.homeManager.hyprland = {lib, ...}: {
+    options.modules.wm.hyprland = {
+      enable = lib.mkEnableOption "Enable Hyprland window manager configuration.";
+    };
     imports = [
       config.flake.modules.homeManager."hyprland-binds"
       config.flake.modules.homeManager."hyprland-config"

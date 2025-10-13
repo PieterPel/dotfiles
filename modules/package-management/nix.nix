@@ -1,10 +1,10 @@
 let
   mkNixModule = { config, lib, ... }:
     let
-      cfg = config.modules.core.nix;
+      cfg = config.modules.package-management.nix;
     in
     {
-      options.modules.core.nix = {
+      options.modules.package-management.nix = {
         enable = lib.mkEnableOption "Enable nix module";
       };
 

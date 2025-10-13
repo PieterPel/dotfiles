@@ -1,12 +1,12 @@
 {
   flake.modules.homeManager.hyprlock = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.hyprlock;
+      cfg = config.modules.wayland.hyprlock;
       wallpaper = ../../wallpapers/tux-teaching.jpg;
       face = ../../img/face.jpg;
     in
     {
-      options.modules.programs.hyprlock = {
+      options.modules.wayland.hyprlock = {
         enable = lib.mkEnableOption "Enable Hyprlock configuration.";
       };
 

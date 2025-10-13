@@ -1,6 +1,6 @@
 {
-  flake.modules.homeManager."nixvim-binds" = { config, lib, ... }: {
-    config = lib.mkIf config.modules.programs.nixvim.enable {
+  flake.modules.homeManager.nixvim-binds = { config, lib, ... }: {
+    config = lib.mkIf config.modules.terminal.nixvim.enable {
       programs.nixvim.keymaps = [
         # Disable arrow keys
         {

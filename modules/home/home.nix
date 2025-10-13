@@ -1,11 +1,7 @@
 {
   flake.modules.homeManager.home = { config, ... }:
     {
-      imports = [
-      ];
-
       config = {
-        # NOTE: let apps by default be done by user
         enableTerminalApps = !config.minimal;
         home.packages = config.packages;
         home.shellAliases = config.aliases;

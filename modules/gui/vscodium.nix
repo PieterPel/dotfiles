@@ -1,10 +1,10 @@
 {
   flake.modules.homeManager.vscodium = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.vscodium;
+      cfg = config.modules.gui.vscodium;
     in
     {
-      options.modules.programs.vscodium = {
+      options.modules.gui.vscodium = {
         enable = lib.mkEnableOption "Enable VSCode/VSCodium configuration.";
       };
 

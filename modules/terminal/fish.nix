@@ -3,10 +3,10 @@
   flake.modules.homeManager.fish =
     { lib, config, ... }:
     let
-      cfg = config.modules.programs.fish;
+      cfg = config.modules.terminal.fish;
     in
     {
-      options.modules.programs.fish = {
+      options.modules.terminal.fish = {
         enable = lib.mkEnableOption "Enable Fish shell configuration.";
       };
 

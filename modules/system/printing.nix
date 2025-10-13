@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.printing = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.printing;
+      cfg = config.modules.system.printing;
     in
     {
-      options.modules.nixos.printing = {
+      options.modules.system.printing = {
         enable = lib.mkEnableOption "Enable printing module";
       };
 

@@ -1,10 +1,10 @@
 {
   flake.modules.homeManager.git = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.git;
+      cfg = config.modules.terminal.git;
     in
     {
-      options.modules.programs.git = {
+      options.modules.terminal.git = {
         enable = lib.mkEnableOption "Enable Git configuration.";
       };
 

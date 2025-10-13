@@ -4,10 +4,10 @@
 }:
 let
   coreModule = { config, lib, ... }: {
-    options.modules.core.configuration = {
+    options.modules.system.configuration = {
       enable = lib.mkEnableOption "Enable core configuration";
     };
-    config = lib.mkIf config.modules.core.configuration.enable {
+    config = lib.mkIf config.modules.system.configuration.enable {
       environment.systemPackages = config.packages;
       environment.shellAliases = config.aliases;
       programs.fish.enable = true;
@@ -20,10 +20,7 @@ let
 
   nixosModule = { config, lib, ... }: {
     imports = [ coreModule ];
-    options.modules.nixos.configuration = {
-      enable = lib.mkEnableOption "Enable nixos configuration";
-    };
-    config = lib.mkIf config.modules.nixos.configuration.enable {
+    config = lib.mkIf config.modules.system.configuration.enable {
       environment.sessionVariables = config.envVars;
       security.polkit.enable = true;
       programs.firefox.enable = true;
@@ -34,10 +31,7 @@ let
 
   darwinModule = { config, lib, ... }: {
     imports = [ coreModule ];
-    options.modules.darwin.configuration = {
-      enable = lib.mkEnableOption "Enable darwin configuration";
-    };
-    config = lib.mkIf config.modules.darwin.configuration.enable {
+    config = lib.mkIf config.modules.system.configuration.enable {
       security.pam.services.sudo_local.touchIdAuth = true;
       nix.gc.interval = { Weekday = 0; Hour = 0; Minute = 0; };
       system.defaults = {
@@ -49,7 +43,7 @@ let
         sketchybar.enable = false;
         jankyborders.enable = false;
       };
-      modules.darwin.aerospace.profile = "numbered";
+      modules.wm.aerospace.profile = "numbered";
       programs.zsh = {
         shellInit = ''
           eval "$(/opt/homebrew/bin/brew shellenv)"

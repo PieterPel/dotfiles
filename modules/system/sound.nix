@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.sound = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.sound;
+      cfg = config.modules.system.sound;
     in
     {
-      options.modules.nixos.sound = {
+      options.modules.system.sound = {
         enable = lib.mkEnableOption "Enable sound module";
       };
 

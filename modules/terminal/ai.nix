@@ -1,10 +1,10 @@
 {
   flake.modules.homeManager.ai = { config, lib, ... }:
     let
-      cfg = config.modules.programs.ai;
+      cfg = config.modules.terminal.ai;
     in
     {
-      options.modules.programs.ai = {
+      options.modules.terminal.ai = {
         enable = lib.mkEnableOption "Enable AI terminal configuration.";
       };
 

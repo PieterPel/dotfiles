@@ -1,10 +1,10 @@
 {
   flake.modules.nixos.networking = { config, lib, ... }:
     let
-      cfg = config.modules.nixos.networking;
+      cfg = config.modules.system.networking;
     in
     {
-      options.modules.nixos.networking = {
+      options.modules.system.networking = {
         enable = lib.mkEnableOption "Enable networking module";
       };
 

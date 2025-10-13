@@ -1,10 +1,10 @@
 {
   flake.modules.homeManager.zed = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.zed;
+      cfg = config.modules.gui.zed;
     in
     {
-      options.modules.programs.zed = {
+      options.modules.gui.zed = {
         enable = lib.mkEnableOption "Enable Zed editor configuration.";
       };
 

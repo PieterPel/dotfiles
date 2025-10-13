@@ -2,10 +2,10 @@
 let
   mkHomeManagerModule = modules: {config, lib, ... }:
     let
-      cfg = config.modules.core.home-manager;
+      cfg = config.modules.home.home-manager;
     in
     {
-      options.modules.core.home-manager = {
+      options.modules.home.home-manager = {
         enable = lib.mkEnableOption "Enable home-manager module";
       };
 

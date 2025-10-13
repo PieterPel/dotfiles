@@ -6,11 +6,14 @@ let
   polarity = "dark";
   image = ../../wallpapers/tux-teaching.jpg;
   base16Scheme = pkgs: "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
-  systemModule = { lib, config, pkgs, ... }: {
-    options.modules.core.stylix = {
+  systemModule = modules: { lib, config, pkgs, ... }: {
+    imports = [
+      inputs.stylix.${modules}.stylix
+    ];
+    options.modules.theming.stylix = {
       enable = lib.mkEnableOption "Enable stylix module";
     };
-    config = lib.mkIf config.modules.core.stylix.enable {
+    config = lib.mkIf config.modules.theming.stylix.enable {
       environment.systemPackages = with pkgs; [ base16-schemes ];
       stylix = {
         enable = true;
@@ -21,10 +24,13 @@ let
   };
 
   homeModule = { lib, config, pkgs, ... }: {
-    options.modules.stylix = {
+    imports = [
+      inputs.stylix.homeModules.stylix
+    ];
+    options.modules.theming.stylix = {
       enable = lib.mkEnableOption "Enable Stylix theming configuration.";
     };
-    config = lib.mkIf config.modules.stylix.enable {
+    config = lib.mkIf config.modules.theming.stylix.enable {
       packages = with pkgs; [ base16-schemes ];
       stylix = {
         inherit image polarity;
@@ -53,8 +59,8 @@ let
 
 in
 {
-  flake.modules.nixos.stylix = systemModule;
-  flake.modules.darwin.stylix = systemModule;
+  flake.modules.nixos.stylix = systemModule "nixosModules";
+  flake.modules.darwin.stylix = systemModule "darwinModules";
   flake.modules.homeManager.stylix = homeModule;
 
   flake.modules.standaloneHomeManager.stylix = { pkgs, ... }: {

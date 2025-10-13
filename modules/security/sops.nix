@@ -1,11 +1,11 @@
 let
   mkSopsModule = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.core.sops;
+      cfg = config.modules.security.sops;
       wifiSecrets = ../../secrets/wifi.yaml;
     in
     {
-      options.modules.core.sops = {
+      options.modules.security.sops = {
         enable = lib.mkEnableOption "Enable sops module";
       };
 

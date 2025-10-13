@@ -2,17 +2,6 @@
   flake.modules.homeManager.terminal-apps = { config, lib, pkgs, ... }:
     {
       config = lib.mkIf config.enableTerminalApps {
-        modules.programs = {
-          direnv.enable = true;
-          tmux.enable = true;
-          starship.enable = true;
-          nixvim.enable = true;
-          fish.enable = true;
-          git.enable = true;
-          ai.enable = true;
-        };
-        modules.stylix.enable = true;
-
         home.packages = with pkgs; [
           # Nix
           nh

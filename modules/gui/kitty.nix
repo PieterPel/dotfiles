@@ -2,11 +2,11 @@
 {
   flake.modules.homeManager.kitty = { config, lib, pkgs, ... }:
     let
-      cfg = config.modules.programs.kitty;
+      cfg = config.modules.gui.kitty;
       shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
     in
     {
-      options.modules.programs.kitty = {
+      options.modules.gui.kitty = {
         enable = lib.mkEnableOption "Enable Kitty terminal configuration.";
       };
 

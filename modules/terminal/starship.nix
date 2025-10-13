@@ -1,11 +1,11 @@
 {
   flake.modules.homeManager.starship = { config, lib, ... }:
     let
-      cfg = config.modules.programs.starship;
+      cfg = config.modules.terminal.starship;
       firstColor = "#741D83";
     in
     {
-      options.modules.programs.starship = {
+      options.modules.terminal.starship = {
         enable = lib.mkEnableOption "Enable Starship configuration.";
       };
 

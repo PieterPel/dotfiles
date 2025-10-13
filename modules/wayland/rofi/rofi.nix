@@ -1,15 +1,17 @@
 {
-  flake.modules.homeManager."rofi-config" = { lib, pkgs, config, ... }:
+  flake.modules.homeManager.rofi-config =
+    {
+      lib,
+      pkgs,
+      config,
+      ...
+    }:
     let
-      cfg = config.modules.programs.rofi;
+      cfg = config.modules.wayland.rofi;
     in
     {
-      options.modules.programs.rofi = {
-        enable = lib.mkEnableOption "Enable Rofi configuration.";
-      };
       config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
         programs.rofi = {
-          enable = config.enableDesktopApps;
           extraConfig = {
             modi = "drun,filebrowser,run";
             show-icons = true;
