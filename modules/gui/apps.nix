@@ -1,37 +1,46 @@
 {
-  flake.modules.homeManager.desktop-apps = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.desktop-apps =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
     in
     {
       config = lib.mkIf config.enableDesktopApps {
-        home.packages = with pkgs; [
-          # Photoshop
-          gimp
+        home.packages =
+          with pkgs;
+          [
+            # Photoshop
+            gimp
 
-          # Font
-          montserrat
+            # Font
+            montserrat
 
-          # Browser
-          brave
+            # Browser
+            brave
+          ]
+          ++ lib.optionals pkgs.stdenv.isLinux [
+            # Browser
+            chromium
 
-        ]
-        ++ lib.optionals pkgs.stdenv.isLinux [
-          chromium
-          # Screenshots
-          grim
-          slurp
-          swappy
+            # Screenshots
+            grim
+            slurp
+            swappy
 
-          # Editor
-          libreoffice-qt6-fresh
+            # Editor
+            libreoffice-qt6-fresh
 
-          # Partitioning
-          gparted
+            # Partitioning
+            gparted
 
-          # Messaging
-          legcord
-        ];
+            # Messaging
+            legcord
+          ];
 
         programs.ghostty = {
           enable = true;

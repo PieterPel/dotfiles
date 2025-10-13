@@ -21,9 +21,9 @@ in
     };
 
     modules = [
-      ../../../../profiles/user/wsl
       ../../../../modules/hm-standalone
       {
+        modules.profiles.wsl.enable = true;
         inherit username;
         inherit hostname;
 

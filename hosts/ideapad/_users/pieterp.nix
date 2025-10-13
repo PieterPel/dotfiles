@@ -10,7 +10,10 @@ in
   home-manager.users.${username} = {
     imports = [
       ../../../modules/home
-      ../../../profiles/user/laptop
     ];
+    config = {
+      modules.profiles.laptop.enable = true;
+    };
+
   };
 }

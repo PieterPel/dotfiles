@@ -12,12 +12,12 @@ in
     };
 
     modules = [
-      ../../modules/nixos-x86
-      ../../profiles/system/laptop
+      # ../../modules/nixos-x86 # This is probably not needed anymore if modules are enabled explicitly
       ./hardware-configuration.nix
       ./users
       {
         inherit hostname;
+        modules.profiles.laptop.enable = true;
         services.fprintd = {
           enable = true;
         };

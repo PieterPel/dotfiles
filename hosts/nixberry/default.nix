@@ -20,9 +20,12 @@ in
         system.stateVersion = "25.05"; # Do not change this !
       }
 
-      ../../profiles/system/rpi
       ./users
       ./hardware-configuration.nix
+      {
+        modules.profiles.rpi.enable = true;
+      }
+
 
     ];
   };
