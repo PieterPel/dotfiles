@@ -8,7 +8,6 @@ in
   flake.darwinConfigurations.${hostname} = inputs.nix-darwin.lib.darwinSystem {
     inherit system;
     specialArgs = {
-      inherit inputs;
       self = config.flake;
     };
 

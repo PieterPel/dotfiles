@@ -1,7 +1,9 @@
-{ inputs
-, system
-, hostname
-, ...
+{
+  inputs,
+  system,
+  hostname,
+  self,
+  ...
 }:
 let
   gitCredentialPath = "/mnt/c/Users/ROB8135/AppData/Local/Programs/Git/mingw64/bin/git-credential-manager.exe";
@@ -16,25 +18,24 @@ in
 
   flake.homeConfigurations.${username} = inputs.home-manager.lib.homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit inputs;
-    };
 
-    modules = [
-      ../../../../modules/hm-standalone
-      {
-        modules.profiles.wsl.enable = true;
-        inherit username;
-        inherit hostname;
+    modules =
+      builtins.attrValues self.modules.homeManager
+      ++ (builtins.attrValues self.modules.standaloneHomeManager)
+      ++ [
+        {
+          modules.profiles.wsl.enable = true;
+          inherit username;
+          inherit hostname;
 
-        programs.git = {
-          extraConfig = {
-            credential = {
-              helper = gitCredentialPath;
+          programs.git = {
+            extraConfig = {
+              credential = {
+                helper = gitCredentialPath;
+              };
             };
           };
-        };
-      }
-    ];
+        }
+      ];
   };
 }

@@ -1,4 +1,5 @@
 { pkgs
+, self
 , ...
 }:
 let
@@ -8,12 +9,9 @@ in
 {
   users.users.${username} = mkUser pkgs username;
   home-manager.users.${username} = {
-    imports = [
-      ../../../modules/home
-    ];
+    imports = builtins.attrValues self.modules.homeManager;
     config = {
       modules.profiles.laptop.enable = true;
     };
-
   };
 }

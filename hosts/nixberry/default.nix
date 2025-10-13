@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
 
 let
   hostname = "nixberry";
@@ -7,6 +7,7 @@ in
   flake.nixosConfigurations.${hostname} = inputs.nixos-raspberrypi.lib.nixosSystem {
     specialArgs = {
       inherit inputs;
+      self = config.flake;
       # NOTE: this is needed
       nixos-raspberrypi = inputs.nixos-raspberrypi;
     };
@@ -20,7 +21,7 @@ in
         system.stateVersion = "25.05"; # Do not change this !
       }
 
-      ./users
+      ./_users
       ./hardware-configuration.nix
       {
         modules.profiles.rpi.enable = true;
