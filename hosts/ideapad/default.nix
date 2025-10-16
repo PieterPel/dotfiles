@@ -12,12 +12,13 @@ in
       self = config.flake;
     };
 
-    modules = [
-      ./hardware-configuration.nix
+    modules = builtins.attrValues config.flake.modules.nixos ++ [
+      ./_hardware-configuration.nix
       ./_users
       {
         inherit hostname;
         modules.profiles.laptop.enable = true;
+        modules.profiles.full.enable = true;
         services.fprintd = {
           enable = true;
         };

@@ -18,7 +18,7 @@
       config = lib.mkIf cfg.enable {
 
         # TODO: having rust analyzer setup like this is not ideal, should be per dev flake
-        home.packages = with pkgs; [
+        packages = with pkgs; [
           fd
           rust-analyzer
         ];

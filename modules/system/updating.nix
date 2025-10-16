@@ -1,5 +1,6 @@
-{
-  flake.modules.nixos.updating = { inputs, config, lib, ... }:
+{ inputs, ... }:
+let
+  nixosModule = { config, lib, ... }:
     let
       cfg = config.modules.system.updating;
     in
@@ -9,7 +10,6 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # Automatic updating
         system.autoUpgrade = {
           enable = true;
           flake = inputs.self.outPath;
@@ -17,12 +17,14 @@
             "--update-input"
             "nixpkgs"
             "--no-write-lock-file"
-            "-L" # print build logs
+            "-L"
           ];
           dates = "02:00";
           randomizedDelaySec = "45min";
         };
-
       };
     };
+in
+{
+  flake.modules.nixos.updating = nixosModule;
 }

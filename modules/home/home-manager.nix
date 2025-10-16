@@ -1,6 +1,8 @@
-{inputs, ...}:
+{ inputs, ... }:
 let
-  mkHomeManagerModule = modules: {config, lib, ... }:
+  mkHomeManagerModule =
+    modules:
+    { config, lib, ... }:
     let
       cfg = config.modules.home.home-manager;
     in

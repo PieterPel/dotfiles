@@ -2,7 +2,8 @@
   ...
 }:
 let
-  nixosLaptopModule = { config, lib, ... }:
+  nixosLaptopModule =
+    { config, lib, ... }:
     let
       cfg = config.modules.profiles.laptop;
     in
@@ -12,16 +13,17 @@ let
       };
 
       config = lib.mkIf cfg.enable {
-        services.logind.settings.Login = {
-          HandleLidSwitch = "poweroff";
-          HandleLidSwitchExternalPower = "lock";
-          HandleLidSwitchDocked = "ignore";
-        };
+        # services.logind.settings.Login = {
+        #   HandleLidSwitch = "poweroff";
+        #   HandleLidSwitchExternalPower = "lock";
+        #   HandleLidSwitchDocked = "ignore";
+        # };
         powerManagement.enable = true;
       };
     };
 
-  homeManagerLaptopModule = { config, lib, ... }:
+  homeManagerLaptopModule =
+    { config, lib, ... }:
     let
       cfg = config.modules.profiles.laptop;
     in
@@ -31,7 +33,6 @@ let
       };
 
       config = lib.mkIf cfg.enable {
-        enableDesktopApps = true;
       };
     };
 in

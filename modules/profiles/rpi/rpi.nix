@@ -2,7 +2,13 @@
   ...
 }:
 let
-  nixosRpiModule = { config, lib, pkgs, ... }:
+  nixosRpiModule =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.modules.profiles.rpi;
       SSIDpasswordFile = "/run/secrets/wifi/HomeNetwork/password";
@@ -13,8 +19,6 @@ let
       };
 
       config = lib.mkIf cfg.enable {
-        minimal = true;
-
         services.openssh = {
           settings.PasswordAuthentication = true;
           settings.PermitRootLogin = "no";
@@ -28,7 +32,6 @@ let
         networking.wireless = {
           enable = true;
           interfaces = [ "wlan0" ];
-          networks."RVers zijn koeien".pskFile = SSIDpasswordFile;
         };
 
         system.nixos.tags =

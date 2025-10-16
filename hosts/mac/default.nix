@@ -11,14 +11,7 @@ in
       self = config.flake;
     };
 
-    modules = [
-      config.flake.modules.darwin.common-options
-      config.flake.modules.darwin.configuration
-      config.flake.modules.darwin.home-manager
-      config.flake.modules.darwin.nix
-      config.flake.modules.darwin.aerospace
-      config.flake.modules.darwin.fonts
-      config.flake.modules.darwin.homebrew
+    modules = builtins.attrValues config.flake.modules.darwin ++ [
       ./_users
       {
         config = {
@@ -30,10 +23,8 @@ in
             "pieterpel"
           ];
 
-          modules.system.configuration.enable = true;
-          modules.wm.aerospace.enable = true;
-          modules.system.fonts.enable = true;
-          modules.package-management.homebrew.enable = true;
+          modules.profiles.full.enable = true;
+          modules.security.sops.enable = false;
         };
       }
     ];

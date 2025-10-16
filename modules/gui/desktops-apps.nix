@@ -7,11 +7,14 @@
       ...
     }:
     let
-      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
+      cfg = config.modules.gui.desktop-apps;
     in
     {
-      config = lib.mkIf config.enableDesktopApps {
-        home.packages =
+      options.modules.gui.desktop-apps = {
+        enable = lib.mkEnableOption "Enable desktop apps module";
+      };
+      config = lib.mkIf cfg.enable {
+        packages =
           with pkgs;
           [
             # Photoshop
@@ -41,16 +44,6 @@
             # Messaging
             legcord
           ];
-
-        programs.ghostty = {
-          enable = true;
-          package = ghosttyPackage;
-          enableFishIntegration = true;
-          enableZshIntegration = true;
-          settings = {
-            command = lib.getExe pkgs.fish;
-          };
-        };
       };
     };
 }

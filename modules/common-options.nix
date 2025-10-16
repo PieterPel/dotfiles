@@ -8,21 +8,6 @@ let
       type = lib.types.str;
       description = "The hostname of the system";
     };
-    minimal = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable a very minimal configuration";
-    };
-    enableTerminalApps = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable terminal applications";
-    };
-    enableDesktopApps = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable desktop applications";
-    };
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
@@ -41,7 +26,13 @@ let
   };
 in
 {
-  flake.modules.nixos.common-options = { options = commonOptions; };
-  flake.modules.darwin.common-options = { options = commonOptions; };
-  flake.modules.homeManager.common-options = { options = commonOptions; };
+  flake.modules.nixos.common-options = {
+    options = commonOptions;
+  };
+  flake.modules.darwin.common-options = {
+    options = commonOptions;
+  };
+  flake.modules.homeManager.common-options = {
+    options = commonOptions;
+  };
 }

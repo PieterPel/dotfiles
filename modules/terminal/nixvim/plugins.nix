@@ -110,6 +110,7 @@
               yamlls.enable = true;
               taplo.enable = true;
               ts_ls.enable = true;
+              eslint.enable = true;
               lua_ls.enable = true;
               gleam.enable = true;
               bicep.enable = false; # Requires manual stuff to get working https://nix-community.github.io/nixvim/plugins/lsp/servers/bicep/index.html

@@ -1,6 +1,7 @@
-{ pkgs
-, self
-, ...
+{
+  pkgs,
+  self,
+  ...
 }:
 let
   mkUser = import ../../../lib/mkUser.nix;
@@ -12,7 +13,7 @@ in
     imports = builtins.attrValues self.modules.homeManager;
     config = {
       modules.profiles.laptop.enable = true;
+      modules.profiles.full.enable = true;
     };
-
   };
 }

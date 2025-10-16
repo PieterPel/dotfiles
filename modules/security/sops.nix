@@ -1,5 +1,13 @@
+{ inputs, ... }:
 let
-  mkSopsModule = { config, lib, pkgs, ... }:
+  mkSopsModule =
+    modules:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.modules.security.sops;
       wifiSecrets = ../../secrets/wifi.yaml;
@@ -9,8 +17,12 @@ let
         enable = lib.mkEnableOption "Enable sops module";
       };
 
+      imports = [
+        inputs.sops-nix.${modules}.default
+      ];
+
       config = lib.mkIf cfg.enable {
-        environment.systemPackages = with pkgs; [
+        packages = with pkgs; [
           sops
           age
           ssh-to-age
@@ -27,6 +39,6 @@ let
     };
 in
 {
-  flake.modules.nixos.sops = mkSopsModule;
-  flake.modules.darwin.sops = mkSopsModule;
+  flake.modules.nixos.sops = mkSopsModule "nixosModules";
+  flake.modules.darwin.sops = mkSopsModule "darwinModules";
 }

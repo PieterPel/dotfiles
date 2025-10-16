@@ -1,8 +1,8 @@
 {
-  flake.modules.homeManager.home = { config, ... }:
+  flake.modules.homeManager.home =
+    { config, ... }:
     {
       config = {
-        enableTerminalApps = !config.minimal;
         home.packages = config.packages;
         home.shellAliases = config.aliases;
 
@@ -64,9 +64,11 @@
       };
     };
 
-  flake.modules.standaloneHomeManager.home = { config, ... }:
+  flake.modules.standaloneHomeManager.home =
+    { config, ... }:
     {
       home.username = config.username;
+      # TODO: this only works on linux it seems
       home.homeDirectory = "/home/${config.username}";
     };
 }

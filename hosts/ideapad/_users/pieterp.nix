@@ -12,6 +12,7 @@ in
     imports = builtins.attrValues self.modules.homeManager;
     config = {
       modules.profiles.laptop.enable = true;
+      modules.profiles.full.enable = true;
     };
   };
 }

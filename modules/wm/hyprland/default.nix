@@ -1,9 +1,16 @@
 {
   config,
+  inputs,
   ...
 }:
 {
-  flake.modules.wm.hyprland = { config, lib, pkgs, ... }:
+  flake.modules.nixos.hyprland =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.modules.wm.hyprland;
     in
@@ -11,9 +18,12 @@
       options.modules.wm.hyprland = {
         enable = lib.mkEnableOption "Enable hyprland module";
       };
+      imports = [
+        inputs.hyprland.nixosModules.default
+      ];
 
       config = lib.mkIf cfg.enable {
-        services.displayManager.gdm.wayland = true;
+        services.xserver.displayManager.gdm.wayland = true;
 
         programs.hyprland = {
           enable = true;
@@ -33,7 +43,7 @@
           nvidia.modesetting.enable = true;
         };
 
-        environment.systemPackages = with pkgs; [
+        packages = with pkgs; [
           wayland
           wlroots
           wayland-utils
@@ -68,13 +78,15 @@
       };
     };
 
-  flake.modules.homeManager.hyprland = {lib, ...}: {
-    options.modules.wm.hyprland = {
-      enable = lib.mkEnableOption "Enable Hyprland window manager configuration.";
+  flake.modules.homeManager.hyprland =
+    { lib, ... }:
+    {
+      options.modules.wm.hyprland = {
+        enable = lib.mkEnableOption "Enable Hyprland window manager configuration.";
+      };
+      imports = [
+        config.flake.modules.homeManager."hyprland-binds"
+        config.flake.modules.homeManager."hyprland-config"
+      ];
     };
-    imports = [
-      config.flake.modules.homeManager."hyprland-binds"
-      config.flake.modules.homeManager."hyprland-config"
-    ];
-  };
 }

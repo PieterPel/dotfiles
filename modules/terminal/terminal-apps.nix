@@ -1,8 +1,20 @@
 {
-  flake.modules.homeManager.terminal-apps = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.terminal-apps =
     {
-      config = lib.mkIf config.enableTerminalApps {
-        home.packages = with pkgs; [
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.modules.terminal.terminal-apps;
+    in
+    {
+      options.modules.terminal.terminal-apps = {
+        enable = lib.mkEnableOption "Enable terminal apps.";
+      };
+      config = lib.mkIf cfg.enable {
+        packages = with pkgs; [
           # Nix
           nh
 
