@@ -17,9 +17,6 @@
         packages =
           with pkgs;
           [
-            # Photoshop
-            gimp
-
             # Font
             montserrat
 
@@ -27,6 +24,9 @@
             brave
           ]
           ++ lib.optionals pkgs.stdenv.isLinux [
+            # Photoshop
+            gimp
+
             # Browser
             chromium
 
