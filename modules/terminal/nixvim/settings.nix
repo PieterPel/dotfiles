@@ -28,6 +28,7 @@
         };
 
         programs.nixvim = {
+          enable = true;
           nixpkgs.config.allowUnfree = true; # nixvim uses its own nixpkgs!!
 
           diagnostic.settings = {

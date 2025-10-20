@@ -1,5 +1,6 @@
 {
-  flake.modules.darwin.homebrew = { config, lib, ... }:
+  flake.modules.darwin.homebrew =
+    { config, lib, ... }:
     let
       cfg = config.modules.package-management.homebrew;
     in
@@ -19,38 +20,41 @@
       # But on macOS, homebrew has a much larger selection of apps than nixpkgs, especially for GUI apps!
       config = lib.mkIf cfg.enable {
 
-    homebrew = {
-      enable = true;
+        homebrew = {
+          enable = true;
 
-      onActivation = {
-        autoUpdate = false;
-        # 'zap': uninstalls all formulae(and related files) not listed here.
-        cleanup = "zap";
-      };
+          onActivation = {
+            autoUpdate = false;
+            # 'zap': uninstalls all formulae(and related files) not listed here.
+            cleanup = "zap";
+          };
 
-      taps = [
-      ];
+          taps = [
+          ];
 
-      # `brew install`
-      brews = [
-      ];
+          # `brew install`
+          brews = [
+          ];
 
-      # `brew install --cask`
-      casks = [
-        "raycast"
-        "notion"
-        "bitwarden"
-        "cursor-cli"
-        "cursor"
-        "slack"
+          # `brew install --cask`
+          casks = [
+            "raycast"
+            "notion"
+            "bitwarden"
+            "cursor-cli"
+            "cursor"
+            "slack"
 
-        # Empty package trick (broken on nixpkgs)
-        "ghostty"
+            # Empty package trick (broken on nixpkgs)
+            "ghostty"
 
-        # Sometimes Broken on nixpkgs due to hash mistmatch
-        "spotify"
-      ];
-    };
+            # Sometimes Broken on nixpkgs due to hash mistmatch
+            "spotify"
+
+            # Not on aarch64-darwin nixpkgs
+            "beekeeper-studio"
+          ];
+        };
       };
     };
 }

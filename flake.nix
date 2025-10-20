@@ -66,14 +66,19 @@
     import-tree = {
       url = "github:vic/import-tree";
     };
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    };
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , flake-parts
-    , import-tree
-    , ...
+    {
+      self,
+      nixpkgs,
+      flake-parts,
+      import-tree,
+      ...
     }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
@@ -89,23 +94,32 @@
         (import-tree ./hosts)
       ];
 
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
-        checks = {
-          pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixpkgs-fmt.enable = true;
+      perSystem =
+        {
+          config,
+          self',
+          inputs',
+          pkgs,
+          system,
+          ...
+        }:
+        {
+          checks = {
+            pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                nixpkgs-fmt.enable = true;
+              };
+            };
+          };
+
+          devShells = {
+            default = pkgs.mkShell {
+              inherit (config.checks.pre-commit-check) shellHook;
+              buildInputs = config.checks.pre-commit-check.enabledPackages;
             };
           };
         };
-
-        devShells = {
-          default = pkgs.mkShell {
-            inherit (config.checks.pre-commit-check) shellHook;
-            buildInputs = config.checks.pre-commit-check.enabledPackages;
-          };
-        };
-      };
     };
 
   nixConfig = {

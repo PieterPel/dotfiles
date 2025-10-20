@@ -1,4 +1,8 @@
-{ inputs, config, ... }:
+{
+  inputs,
+  config,
+  ...
+}:
 
 let
   hostname = "rebel-pieter";
@@ -24,6 +28,7 @@ in
           ];
 
           modules.profiles.full.enable = true;
+          modules.package-management.determinate.enable = true;
           modules.security.sops.enable = false;
         };
       }

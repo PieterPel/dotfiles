@@ -3,7 +3,8 @@
   ...
 }:
 {
-  flake.modules.homeManager.flatpaks = { config, lib, ... }:
+  flake.modules.homeManager.flatpaks =
+    { config, lib, ... }:
     let
       cfg = config.modules.package-management.flatpaks;
     in
@@ -14,11 +15,12 @@
       options.modules.package-management.flatpaks = {
         enable = lib.mkEnableOption "Enable flatpaks  configuration";
       };
-      config = lib.mkIf cfg.enable {services.flatpak = {
-        packages = [
-          #"org.onlyoffice.desktopeditors"
-        ];
+      config = lib.mkIf cfg.enable {
+        services.flatpak = {
+          packages = [
+            #"org.onlyoffice.desktopeditors"
+          ];
+        };
       };
     };
-  };
 }

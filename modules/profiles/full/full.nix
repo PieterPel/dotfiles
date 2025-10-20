@@ -59,7 +59,6 @@ let
         zed = defaultEnable;
       };
       package-management.flatpaks = defaultEnable;
-      programs.nixvim = defaultEnable;
       terminal = {
         ai = defaultEnable;
         direnv = defaultEnable;
@@ -86,18 +85,10 @@ let
     { config, options, ... }:
     let
       cfg = config.modules.profiles.full;
-      prunedDefaults =
-        if defaults ? modules && defaults.modules ? wm && !(lib.hasAttrByPath [ "modules" "wm" ] options) then
-          defaults
-          // {
-            modules = builtins.removeAttrs defaults.modules [ "wm" ];
-          }
-        else
-          defaults;
     in
     {
       options.modules.profiles.full.enable = lib.mkEnableOption "Enable the full profile";
-      config = lib.mkIf cfg.enable prunedDefaults;
+      config = lib.mkIf cfg.enable defaults;
     };
 in
 {

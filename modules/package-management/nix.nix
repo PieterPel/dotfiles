@@ -1,5 +1,6 @@
 let
-  mkNixModule = { config, lib, ... }:
+  mkNixModule =
+    { config, lib, ... }:
     let
       cfg = config.modules.package-management.nix;
     in
