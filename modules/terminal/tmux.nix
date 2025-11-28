@@ -42,21 +42,21 @@
         bind r source-file ~/tmux/tmux.conf
 
         # Navigation between panes
-        bind -n M-h select-pane -L
-        bind -n M-l select-pane -R
-        bind -n M-k select-pane -U
-        bind -n M-j select-pane -D
+        bind h select-pane -L
+        bind l select-pane -R
+        bind k select-pane -U
+        bind j select-pane -D
 
         # Navigation between windows
-        bind -n M-[ previous-window
-        bind -n M-] next-window
+        bind p previous-window
+        bind n next-window
 
         # Open new windows in current directory
         bind c new-window -c "#{pane_current_path}"
 
         # Split panes using | and -
-        bind | split-window -h -c "#{pane_current_path}"
-        bind - split-window -v -c "#{pane_current_path}"
+        bind d split-window -h -c "#{pane_current_path}"
+        bind s split-window -v -c "#{pane_current_path}"
         unbind '"'
         unbind %
 

@@ -53,6 +53,9 @@
 
             # Not on aarch64-darwin nixpkgs
             "beekeeper-studio"
+
+            # Apple container
+            "container"
           ];
         };
       };
