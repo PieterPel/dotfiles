@@ -66,6 +66,8 @@
             enable = true;
             lazyLoad.settings.ft = "markdown";
           };
+          zig.enable = true;
+          flutter-tools.enable = true;
 
           # Treesitter
           treesitter-context = {
@@ -120,6 +122,8 @@
                 installRustc = true;
                 installCargo = true;
               };
+              zls.enable = true;
+              dartls.enable = true;
             };
           };
 
