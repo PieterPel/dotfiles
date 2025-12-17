@@ -40,6 +40,16 @@
         cpp.symbol = " ";
         gleam.symbol = "★";
 
+        # Hide redundant package.json version noise
+        package = {
+          disabled = true;
+        };
+
+        # Keep bun indicator without printing the runtime version number
+        bun = {
+          format = "via [$symbol]($style)";
+        };
+
         # Module specific
         directory = {
           style = "bg:${firstColor}";
