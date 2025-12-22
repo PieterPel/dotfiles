@@ -58,7 +58,7 @@ let
         kitty = defaultEnable;
         spicetify = defaultDisable; # Hash mismatch (22-12-25)
         vscodium = defaultEnable;
-        zed = defaultEnable;
+        zed = defaultDisable; # Something broken (22-12-25)
       };
       package-management.flatpaks = defaultEnable;
       terminal = {
