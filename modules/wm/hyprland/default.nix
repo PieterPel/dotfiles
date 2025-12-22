@@ -1,15 +1,13 @@
-{
-  config,
-  inputs,
-  ...
+{ config
+, inputs
+, ...
 }:
 {
   flake.modules.nixos.hyprland =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.wm.hyprland;
@@ -48,7 +46,7 @@
           wlroots
           wayland-utils
           wl-clipboard
-          firefox-wayland
+          firefox
           (waybar.overrideAttrs (oldAttrs: {
             mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
           }))

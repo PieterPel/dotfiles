@@ -1,5 +1,10 @@
 {
-  flake.modules.homeManager.git = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.git =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.terminal.git;
     in
@@ -16,8 +21,10 @@
 
         programs.git = {
           enable = true;
-          userName = "Pieter Pel";
-          userEmail = "pelpieter@gmail.com";
+          settings = {
+            user.name = "Pieter Pel";
+            user.email = "pelpieter@gmail.com";
+          };
         };
       };
     };
