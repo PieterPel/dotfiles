@@ -1,10 +1,12 @@
-{
-  lib,
-  ...
+{ lib
+, ...
 }:
 let
   defaultEnable = {
     enable = lib.mkDefault true;
+  };
+  defaultDisable = {
+    enable = lib.mkDefault false;
   };
 
   nixosDefaults = {
@@ -54,7 +56,7 @@ let
         "desktop-apps" = defaultEnable;
         ghostty = defaultEnable;
         kitty = defaultEnable;
-        spicetify = defaultEnable;
+        spicetify = defaultDisable; # Hash mismatch (22-12-25)
         vscodium = defaultEnable;
         zed = defaultEnable;
       };
