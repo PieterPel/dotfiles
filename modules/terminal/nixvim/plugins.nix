@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.nixvim-plugins =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     {
       config = lib.mkIf config.modules.terminal.nixvim.enable {
@@ -131,7 +130,7 @@
 
           # Completion
           cmp.enable = true; # Needed for Windsurf
-          blink-copilot.enable = false;
+          blink-copilot.enable = true;
           blink-cmp = {
             enable = true;
             settings = {
@@ -178,7 +177,7 @@
 
           # AI suggestions
           avante = {
-            enable = true;
+            enable = false;
             settings = {
               provider = "copilot";
               acp_providers = {
