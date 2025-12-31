@@ -70,6 +70,8 @@ let
         starship = defaultEnable;
         tmux = defaultEnable;
         "terminal-apps" = defaultEnable;
+        yazi = defaultEnable;
+        sesh = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wayland = {

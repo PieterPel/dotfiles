@@ -42,6 +42,13 @@
           lazygit.enable = true; # Lazygit from within nvim
           flash.enable = true; # Jump to anywhere
           claude-code.enable = true; # Claude-code support
+          yazi = {
+            # Yazi file explorer
+            enable = true;
+            settings = {
+              open_for_directories = true;
+            };
+          };
 
           # Language specific
           /*
@@ -99,13 +106,14 @@
               nil_ls.enable = true;
               dockerls.enable = true;
               basedpyright = {
-                enable = true;
+                enable = false;
                 # packageFallback = true; # Devshell basedpyright overrides global one # NOTE: may give issues if true?
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
                 ];
               };
+              ty.enable = true;
               ruff.enable = true;
               bashls.enable = true;
               yamlls.enable = true;
@@ -150,7 +158,7 @@
                 "lsp"
                 "path"
                 "buffer"
-                "copilot"
+                #"copilot"
               ];
 
               providers = {

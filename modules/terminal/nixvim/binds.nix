@@ -217,6 +217,16 @@
           key = "<leader>bo";
           action = "<cmd>GitBlameOpenFileURL<CR>";
         }
+
+        # Yazi
+        {
+          key = "<leader>y";
+          action = "<cmd>Yazi<CR>";
+        }
+        {
+          key = "<leader>cw";
+          action = "<cmd>Yazi cwd<CR>";
+        }
       ];
     };
   };

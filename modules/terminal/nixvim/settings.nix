@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.nixvim-settings =
-    {
-      lib,
-      config,
-      pkgs,
-      ...
+    { lib
+    , config
+    , pkgs
+    , ...
     }:
     let
       isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
@@ -141,6 +140,9 @@
               command = "if mode() != 'c' | checktime | endif",
               pattern = { "*" },
             })
+
+            -- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
+            vim.g.loaded_netrwPlugin = 1
           '';
         };
       };
