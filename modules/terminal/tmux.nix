@@ -10,19 +10,35 @@
       fish = lib.getExe pkgs.fish;
 
       incubatorScript = pkgs.writeShellScriptBin "tmux-incubator" ''
-        WIDTH=$(tmux display-message -p '#{window_width}')
-        if [ "$WIDTH" -gt 200 ]; then
-          tmux display-popup -E -w 120 -h 80% "fish"
+        set -euo pipefail
+
+        width=""
+        if ! width=$(tmux display-message -p '#{window_width}' 2>/dev/null); then
+          width=""
+        fi
+
+        if [[ ! "$width" =~ ^[0-9]+$ ]]; then
+            width=""
+        fi
+
+        # Fall back to the default popup sizing whenever tmux can't report width.
+        if [ -n "$width" ] && [ "$width" -gt 200 ]; then
+          tmux display-popup -k -E -w 120 -h 80% "${fish}"
         else
-          tmux display-popup -E -w 90% -h 80% "fish"
+          tmux display-popup -k -E -w 90% -h 80% "${fish}"
         fi
       '';
 
       promoteScript = pkgs.writeShellScriptBin "tmux-promote" ''
-        current_pane=$(tmux display-message -p '#P')
-        new_window=$(tmux new-window -P -n "promoted")
-        tmux join-pane -s "$current_pane" -t "$new_window.0"
-        tmux kill-pane -t "$new_window.1"
+        set -euo pipefail
+
+        current_pane=$(tmux display-message -p '#{pane_id}')
+        pane_path=$(tmux display-message -p '#{pane_current_path}')
+        new_pane=$(tmux new-window -P -F '#{pane_id}' -n 'promoted' -c "''${pane_path}")
+
+        tmux join-pane -s "''${current_pane}" -t "''${new_pane}"
+        tmux select-pane -t "''${current_pane}"
+        tmux kill-pane -t "''${new_pane}"
       '';
 
       incubator = lib.getExe' incubatorScript "tmux-incubator";
@@ -99,8 +115,12 @@
             bind j select-pane -D
 
             # Navigation between windows
-            bind b previous-window
+            bind p previous-window
             bind n next-window
+
+            # Cycle between sessions
+            bind P switch-client -p
+            bind N switch-client -n
 
             # Open new windows in current directory
             bind c new-window -c "#{pane_current_path}"
@@ -127,14 +147,14 @@
             set -g prefix C-a
             bind C-a send-prefix
 
-            # Custom scripts
-            bind o run-shell "${incubator}"
+            # Create a temporary popup shell
+            bind t run-shell "${incubator}"
             # Re-bind prefix inside the popup table
             bind-key -T popup C-a switch-client -T popup-prefix
 
-            # Bind p to promote within the popup-prefix table
+            # Put pane into Own window
             bind-key -T popup-prefix p run-shell "${promote}"
-            bind p run-shell "${promote}"
+            bind o run-shell "${promote}"
 
             # Continuum + Resurrect
             set -g @continuum-restore 'on'  # Auto-restore on boot
