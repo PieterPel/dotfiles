@@ -42,6 +42,65 @@
           action = "<cmd>Telescope help_tags<CR>";
         }
 
+        # Harpoon
+        {
+          key = "<leader>a";
+          action.__raw = "function() require('harpoon.mark').add_file() end";
+          options.desc = "Add file to harpoon";
+        }
+        {
+          key = "<leader>m";
+          action.__raw = "function() require('harpoon.ui').toggle_quick_menu() end";
+          options.desc = "Toggle harpoon menu";
+        }
+        {
+          key = "<leader>1";
+          action.__raw = "function() require('harpoon.ui').nav_file(1) end";
+          options.desc = "Navigate to harpoon file 1";
+        }
+        {
+          key = "<leader>2";
+          action.__raw = "function() require('harpoon.ui').nav_file(2) end";
+          options.desc = "Navigate to harpoon file 2";
+        }
+        {
+          key = "<leader>3";
+          action.__raw = "function() require('harpoon.ui').nav_file(3) end";
+          options.desc = "Navigate to harpoon file 3";
+        }
+        {
+          key = "<leader>4";
+          action.__raw = "function() require('harpoon.ui').nav_file(4) end";
+          options.desc = "Navigate to harpoon file 4";
+        }
+        {
+          key = "<C-n>";
+          action.__raw = "function() require('harpoon.ui').nav_next() end";
+          options.desc = "Navigate to next harpoon file";
+        }
+        {
+          key = "<C-p>";
+          action.__raw = "function() require('harpoon.ui').nav_prev() end";
+          options.desc = "Navigate to previous harpoon file";
+        }
+
+        # Buffer navigation
+        {
+          key = "<leader>n";
+          action = "<cmd>bnext<CR>";
+          options.desc = "Next buffer";
+        }
+        {
+          key = "<leader>p";
+          action = "<cmd>bprevious<CR>";
+          options.desc = "Previous buffer";
+        }
+        {
+          key = "<leader>d";
+          action = "<cmd>bdelete<CR>";
+          options.desc = "Delete buffer";
+        }
+
         # Nvimtree
         {
           key = "<leader>e";
