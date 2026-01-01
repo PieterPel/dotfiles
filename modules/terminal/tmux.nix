@@ -45,6 +45,7 @@
             better-mouse-mode
             prefix-highlight
             continuum
+            resurrect
             {
               # https://github.com/nix-community/home-manager/issues/4894
               plugin = power-theme;
@@ -52,8 +53,30 @@
                 set -g @tmux_power_theme 'violet'
               '';
             }
+            {
+              plugin = pkgs.tmuxPlugins.mkTmuxPlugin {
+                pluginName = "smart-splits";
+                version = "unstable-2025-12-26";
+                src = pkgs.fetchFromGitHub {
+                  owner = "mrjones2014";
+                  repo = "smart-splits.nvim";
+                  rev = "1ea2e55bcc0dd2bdec5c5fef0082219f76c532fc";
+                  sha256 = "sha256-D5Yf9GTFpLMDS8zUHHkNM2BUCnwxMBnyyr2lQFAxouA=";
+                };
+                rtpFilePath = "smart-splits.tmux";
+              };
+              extraConfig = ''
+                set -g @smart-splits_move_left_key  'C-h'
+                set -g @smart-splits_move_down_key  'C-j'
+                set -g @smart-splits_move_up_key    'C-k'
+                set -g @smart-splits_move_right_key 'C-l'
+                set -g @smart-splits_resize_left_key  'M-h'
+                set -g @smart-splits_resize_down_key  'M-j'
+                set -g @smart-splits_resize_up_key    'M-k'
+                set -g @smart-splits_resize_right_key 'M-l'
+              '';
+            }
           ];
-          # TODO: some of these alt bindings conflict with aerospace now
           extraConfig = ''
             # General 
             set -gu default-command
@@ -67,7 +90,7 @@
 
             ## Keybinds
             # Source conf file
-            bind r source-file ~/tmux/tmux.conf
+            bind r source-file ~/.config/tmux/tmux.conf
 
             # Navigation between panes
             bind h select-pane -L
@@ -105,13 +128,18 @@
             bind C-a send-prefix
 
             # Custom scripts
-            bind n run-shell "${incubator}"
+            bind o run-shell "${incubator}"
             # Re-bind prefix inside the popup table
             bind-key -T popup C-a switch-client -T popup-prefix
-            
+
             # Bind p to promote within the popup-prefix table
             bind-key -T popup-prefix p run-shell "${promote}"
             bind p run-shell "${promote}"
+
+            # Continuum + Resurrect
+            set -g @continuum-restore 'on'  # Auto-restore on boot
+            set -g @resurrect-strategy-nvim 'session'  # Restore nvim sessions
+            set -g @resurrect-capture-pane-contents 'on'
           '';
         };
       };

@@ -42,6 +42,7 @@
           lazygit.enable = true; # Lazygit from within nvim
           flash.enable = true; # Jump to anywhere
           claude-code.enable = true; # Claude-code support
+          smart-splits.enable = true; # Seamless navigation between nvim and tmux
           yazi = {
             # Yazi file explorer
             enable = true;

@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.terminal-apps =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.terminal.terminal-apps;
@@ -69,13 +68,6 @@
         programs.btop.enable = true;
 
         programs.lazygit.enable = true;
-
-        programs.zoxide = {
-          enable = true;
-          options = [
-            "--cmd cd"
-          ];
-        };
       };
     };
 }

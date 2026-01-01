@@ -56,7 +56,7 @@
         programs.tmux = {
           extraConfig = lib.mkAfter ''
             # 'Prefix + y' opens the Yazi project launcher in a popup
-            bind y display-popup -E -w 80% -h 80% "${yazi-tmux-launcher}"
+            bind y display-popup -w 80% -h 80% "${yazi-tmux-launcher}"
           '';
         };
       };

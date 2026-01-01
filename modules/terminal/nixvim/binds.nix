@@ -24,6 +24,28 @@
           mode = [ "n" "i" "v" ];
         }
 
+        # Smart-splits navigation
+        {
+          key = "<C-h>";
+          action.__raw = "require('smart-splits').move_cursor_left";
+          options.desc = "Move to left split";
+        }
+        {
+          key = "<C-j>";
+          action.__raw = "require('smart-splits').move_cursor_down";
+          options.desc = "Move to split below";
+        }
+        {
+          key = "<C-k>";
+          action.__raw = "require('smart-splits').move_cursor_up";
+          options.desc = "Move to split above";
+        }
+        {
+          key = "<C-l>";
+          action.__raw = "require('smart-splits').move_cursor_right";
+          options.desc = "Move to right split";
+        }
+
         # Telescope
         {
           key = "<leader>ff";

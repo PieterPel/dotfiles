@@ -72,6 +72,7 @@ let
         "terminal-apps" = defaultEnable;
         yazi = defaultEnable;
         sesh = defaultEnable;
+        zoxide = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wayland = {
