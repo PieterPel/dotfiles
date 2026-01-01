@@ -1,5 +1,4 @@
-{
-  ...
+{ ...
 }:
 let
   nixosLaptopModule =
@@ -32,8 +31,7 @@ let
         enable = lib.mkEnableOption "Enable laptop profile for Home Manager";
       };
 
-      config = lib.mkIf cfg.enable {
-      };
+      config = lib.mkIf cfg.enable { };
     };
 in
 {

@@ -1,9 +1,8 @@
-{
-  inputs,
-  system,
-  hostname,
-  self,
-  ...
+{ inputs
+, system
+, hostname
+, self
+, ...
 }:
 let
   gitCredentialPath = "/mnt/c/Users/ROB8135/AppData/Local/Programs/Git/mingw64/bin/git-credential-manager.exe";

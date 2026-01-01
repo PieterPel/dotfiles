@@ -1,4 +1,4 @@
-{inputs, ...}:
+{ inputs, ... }:
 {
   flake.modules.homeManager.spicetify = { config, lib, pkgs, ... }:
     let

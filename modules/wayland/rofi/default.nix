@@ -1,6 +1,5 @@
-{
-  config,
-  ...
+{ config
+, ...
 }:
 {
   flake.modules.homeManager.rofi =

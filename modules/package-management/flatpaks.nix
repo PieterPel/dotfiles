@@ -1,6 +1,5 @@
-{
-  inputs,
-  ...
+{ inputs
+, ...
 }:
 {
   flake.modules.homeManager.flatpaks =

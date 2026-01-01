@@ -1,11 +1,10 @@
 # Source: ZaneyOS
 {
   flake.modules.homeManager.wlogout =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.wayland.wlogout;
@@ -122,3 +121,4 @@
       };
     };
 }
+

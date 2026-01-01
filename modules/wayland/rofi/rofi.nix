@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.rofi-config =
-    {
-      lib,
-      pkgs,
-      config,
-      ...
+    { lib
+    , pkgs
+    , config
+    , ...
     }:
     let
       cfg = config.modules.wayland.rofi;

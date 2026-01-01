@@ -1,6 +1,4 @@
-
-{
-  ...
+{ ...
 }:
 let
   coreModule = { config, lib, ... }: {

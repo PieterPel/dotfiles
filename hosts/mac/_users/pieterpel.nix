@@ -1,7 +1,6 @@
-{
-  pkgs,
-  self,
-  ...
+{ pkgs
+, self
+, ...
 }:
 let
   mkUser = import ../../../lib/mkUser.nix;

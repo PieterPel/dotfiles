@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.desktop-apps =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.gui.desktop-apps;

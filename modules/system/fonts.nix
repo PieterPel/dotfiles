@@ -1,5 +1,4 @@
-{
-  ...
+{ ...
 }:
 let
   nixosModule = { lib, config, pkgs, ... }: {

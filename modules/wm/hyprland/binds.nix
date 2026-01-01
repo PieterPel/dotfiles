@@ -1,4 +1,4 @@
-{ 
+{
   flake.modules.homeManager.hyprland-binds = { config, lib, ... }:
     {
       config = lib.mkIf config.modules.wm.hyprland.enable {
@@ -92,3 +92,4 @@
       };
     };
 }
+

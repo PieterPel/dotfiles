@@ -2,11 +2,10 @@
 let
   mkSopsModule =
     modules:
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.security.sops;

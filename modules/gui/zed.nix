@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.zed =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.gui.zed;
