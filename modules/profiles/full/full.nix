@@ -73,6 +73,7 @@ let
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
+        zellij = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wayland = {
