@@ -73,7 +73,6 @@ let
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
-        zellij = defaultEnable;
         lazygit = defaultEnable;
       };
       theming.stylix = defaultEnable;
