@@ -60,14 +60,9 @@
           # Jujutsu
           jujutsu
           jjui
-
-          # Monitoring
-          btop
         ];
 
         programs.btop.enable = true;
-
-        programs.lazygit.enable = true;
       };
     };
 }

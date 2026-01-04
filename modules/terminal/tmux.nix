@@ -9,91 +9,6 @@
       cfg = config.modules.terminal.tmux;
       fish = lib.getExe pkgs.fish;
 
-      scratchScript = pkgs.writeShellScriptBin "tmux-scratch" ''
-        set -euo pipefail
-
-        scratch_session="scratch"
-
-        get_window_option() {
-          tmux show-options -wqv -t "$1" "$2" 2>/dev/null || true
-        }
-
-        sanitize_name() {
-          local raw="$1"
-          if [ -z "$raw" ]; then
-            printf 'scratch'
-            return
-          fi
-          printf '%s' "$raw" | tr -c '[:alnum:]_-' '-'
-        }
-
-        enter_scratch() {
-          local caller_session_id caller_session_name pane_path label_suffix label scratch_window
-          caller_session_id=$(tmux display-message -p '#{session_id}')
-          caller_session_name=$(tmux display-message -p '#{session_name}')
-          pane_path=$(tmux display-message -p '#{pane_current_path}')
-          label_suffix=$(sanitize_name "$caller_session_name")
-          label="scratch-''${label_suffix}"
-
-          if ! tmux has-session -t "$scratch_session" 2>/dev/null; then
-            tmux new-session -ds "$scratch_session" -c "$pane_path" -n "$label"
-            scratch_window=$(tmux list-windows -t "$scratch_session" -F '#{window_id}' | tail -n 1)
-          else
-            scratch_window=$(tmux new-window -P -t "$scratch_session" -F '#{window_id}' -n "$label" -c "$pane_path")
-          fi
-
-          tmux set-option -w -t "$scratch_window" '@scratch_source_session_id' "$caller_session_id"
-          tmux set-option -w -t "$scratch_window" '@scratch_source_session_name' "$caller_session_name"
-          tmux set-option -w -t "$scratch_window" '@scratch_source_path' "$pane_path"
-
-          tmux switch-client -t "$scratch_session"
-          tmux select-window -t "$scratch_window"
-        }
-
-        pull_scratch() {
-          local current_window target_session target_session_id target_session_name
-          current_window=$(tmux display-message -p '#{window_id}')
-          target_session_id=$(get_window_option "$current_window" '@scratch_source_session_id')
-          target_session_name=$(get_window_option "$current_window" '@scratch_source_session_name')
-
-          if [ -z "$target_session_id" ] && [ -z "$target_session_name" ]; then
-            tmux display-message 'scratch: current window has no origin session information'
-            exit 0
-          fi
-
-          target_session=""
-          if [ -n "$target_session_id" ] && tmux has-session -t "$target_session_id" 2>/dev/null; then
-            target_session="$target_session_id"
-          elif [ -n "$target_session_name" ] && tmux has-session -t "$target_session_name" 2>/dev/null; then
-            target_session="$target_session_name"
-          else
-            tmux display-message 'scratch: original session is no longer available'
-            exit 0
-          fi
-
-          tmux move-window -s "$current_window" -t "$target_session"
-          tmux switch-client -t "$target_session"
-          tmux select-window -t "$current_window"
-        }
-
-        command="enter"
-        if [ "$#" -gt 0 ] && [ -n "$1" ]; then
-          command="$1"
-        fi
-        case "$command" in
-          enter|open|start)
-            enter_scratch
-            ;;
-          pull|return)
-            pull_scratch
-            ;;
-          *)
-            echo "Usage: tmux-scratch [enter|pull]" >&2
-            exit 1
-            ;;
-        esac
-      '';
-
       promoteScript = pkgs.writeShellScriptBin "tmux-promote" ''
         set -euo pipefail
 
@@ -106,7 +21,6 @@
         tmux kill-pane -t "''${new_pane}"
       '';
 
-      scratch = lib.getExe' scratchScript "tmux-scratch";
       promote = lib.getExe' promoteScript "tmux-promote";
     in
     {
@@ -211,10 +125,6 @@
             unbind C-b
             set -g prefix C-a
             bind C-a send-prefix
-
-            # Scratch session helpers
-            bind t run-shell "${scratch} enter"
-            bind T run-shell "${scratch} pull"
 
             # Put pane into Own window
             bind o run-shell "${promote}"
