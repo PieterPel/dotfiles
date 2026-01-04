@@ -24,7 +24,7 @@ in
 
         programs.tmux = {
           extraConfig = lib.mkAfter ''
-            bind g display-popup -w 80% -h 80% "${lazygitBin}"
+            bind g display-popup -E -w 80% -h 80% "${lazygitBin}"
           '';
         };
       };
