@@ -86,6 +86,12 @@
 
             textwidth = 0;
 
+            swapfile = true;
+            # The "//" forces nvim to save the file as "%path%to%file.swp"
+            # to prevent name collisions in the temp folder.
+            directory = "/tmp//,.";
+
+            scrolloff = 8;
           };
 
           globals = {
@@ -124,15 +130,9 @@
             require("venv-selector").setup({
               settings = { 
                 search = {
-                  find_devenvs = {
-                    command = "fd '.devenv/state/venv/bin/python3$' ~/Programming/Python --full-path -IHL -E /proc"
-                  }
                 }
               }  
             })
-
-
-            require("gemini_cli").setup()
 
             -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
             vim.o.autoread = true

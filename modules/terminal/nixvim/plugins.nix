@@ -7,6 +7,12 @@
     }:
     {
       config = lib.mkIf config.modules.terminal.nixvim.enable {
+        home.packages = [
+          pkgs.ruff
+          pkgs.prettierd
+          pkgs.nixfmt
+          pkgs.fzf
+        ];
         programs.nixvim.plugins = {
           # General
           undotree.enable = true; # Virtualize undo history
@@ -20,11 +26,67 @@
           colorizer.enable = true; # Inline colors
           twilight.enable = true; # Dim inactive code
           todo-comments.enable = true; # See notes/todos better
-          gitblame.enable = true; # Show git blame
-          diffview.enable = true; # Show git diff
+          noice.enable = true; # Better notifications
+          fidget.enable = true; # Show lsp progress
+          illuminate = {
+            enable = true;
+            settings = {
+              delay = 100;
+              underCursor = false; # Don't highlight the one you are on
+            };
+          };
+
+          # File diffs
+          diffview = {
+            enable = true;
+            settings = {
+              view.default.layout = "diff2_horizontal"; # Or "diff2_vertical" if you have a wide screen
+              file_panel.listing_style = "tree"; # Looks like a proper file explorer
+            };
+          };
+
+          # Git
+          gitsigns = {
+            enable = true;
+            settings = {
+              current_line_blame = false;
+              current_line_blame_opts = {
+                virt_text = true;
+                virt_text_pos = "eol";
+                delay = 500;
+              };
+              signs = {
+                add = {
+                  text = "│";
+                };
+                change = {
+                  text = "│";
+                };
+                delete = {
+                  text = "_";
+                };
+                topdelete = {
+                  text = "‾";
+                };
+                changedelete = {
+                  text = "~";
+                };
+              };
+            };
+          };
 
           # Extension
-          telescope.enable = true; # Fuzzy finder
+          telescope = {
+            enable = true;
+            extensions = {
+              ui-select = {
+                enable = true;
+              };
+              fzf-native = {
+                enable = true;
+              };
+            };
+          };
           nvim-tree = {
             enable = true; # File explorer
             settings = {
@@ -41,13 +103,34 @@
           trouble.enable = true; # Give diagnostics overview
           lazygit.enable = true; # Lazygit from within nvim
           flash.enable = true; # Jump to anywhere
-          claude-code.enable = true; # Claude-code support
           smart-splits.enable = true; # Seamless navigation between nvim and tmux
           yazi = {
             # Yazi file explorer
             enable = true;
             settings = {
               open_for_directories = true;
+            };
+          };
+
+          programs.nixvim.plugins.oil = {
+            enable = true;
+            settings = {
+              default_file_explorer = true; # Replaces netrw
+              delete_to_trash = true;
+              skip_confirm_for_simple_edits = true;
+              view_options = {
+                show_hidden = true; # Show dotfiles
+              };
+            };
+          };
+
+          programs.nixvim.plugins.which-key = {
+            enable = true;
+            lazyload.enable = false;
+            settings = {
+              # This effectively disables the "auto" popup behavior
+              # formatting it like this ensures it overrides default "auto"
+              triggers = [ ];
             };
           };
 
@@ -80,7 +163,37 @@
           treesitter-context = {
             enable = true;
           };
-          treesitter-textobjects.enable = true;
+          treesitter-textobjects = {
+            enable = true;
+
+            settings = {
+              select = {
+                enable = true;
+                lookahead = true;
+
+                keymaps = {
+                  "aa" = "@parameter.outer";
+                  "ia" = "@parameter.inner";
+                  "af" = "@function.outer";
+                  "if" = "@function.inner";
+                  "ac" = "@class.outer";
+                  "ic" = "@class.inner";
+                };
+              };
+
+              move = {
+                enable = true;
+                goto_next_start = {
+                  "]m" = "@function.outer";
+                  "]c" = "@class.outer";
+                };
+                goto_previous_start = {
+                  "[m" = "@function.outer";
+                  "[c" = "@class.outer";
+                };
+              };
+            };
+          };
           treesitter = {
             autoLoad = true;
             enable = true;
@@ -100,22 +213,28 @@
           };
 
           # LSP
-          lspconfig.enable = true;
           lsp = {
             enable = true;
             inlayHints = true;
             servers = {
               nil_ls.enable = true;
               dockerls.enable = true;
+              ty.enable = true;
               basedpyright = {
-                enable = false;
-                # packageFallback = true; # Devshell basedpyright overrides global one # NOTE: may give issues if true?
+                # Keep as fallback for ty
+                enable = true;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
                 ];
+                settings = {
+                  disableOrganizeImports = true;
+                  analysis = {
+                    # Let ty do all type checking
+                    typeCheckingMode = "off";
+                  };
+                };
               };
-              ty.enable = true;
               ruff.enable = true;
               bashls.enable = true;
               yamlls.enable = true;
@@ -134,9 +253,50 @@
               zls.enable = true;
               dartls.enable = true;
             };
+            keymaps = {
+              silent = true; # Makes the binds silent (no command echo)
+
+              lspBuf = {
+                "gD" = "references";
+                "gt" = "type_definition";
+                "gi" = "implementation";
+              };
+
+              # 2. Diagnostic Bindings (vim.diagnostic.*)
+              diagnostic = {
+                "<leader>k" = "goto_prev";
+                "<leader>j" = "goto_next";
+              };
+            };
           };
 
-          lsp-format.enable = true;
+          inc-rename.enable = true; # Live renaming
+
+          lspsaga = {
+            enable = true;
+            ui.code_action = "";
+          };
+
+          conform-nvim = {
+            enable = true;
+            settings = {
+              formatters_by_ft = {
+                python = [ "ruff_format" ];
+                javascript = [ "prettier" ];
+                typescript = [ "prettier" ];
+                typescriptreact = [ "prettier" ];
+                nix = [ "nixfmt" ];
+                # For everything else, this list is empty, so it hits the fallback
+                "_" = [ "trim_whitespace" ];
+              };
+
+              format_on_save = {
+                timeout_ms = 500;
+                # Format by lsp as fallback
+                lsp_fallback = true;
+              };
+            };
+          };
 
           # Completion
           cmp.enable = true; # Needed for Windsurf
@@ -214,12 +374,13 @@
           mini = {
             enable = true;
             modules = {
-              files = { };
               comment = { };
               bracketed = { };
               indentscope = { };
               tabline = { };
-              # pairs = { }; # I changed this for nvim-autopairs
+              ai = {
+                n_lines = 500; # How many lines nearby to search
+              };
             };
           };
 
@@ -234,8 +395,19 @@
           # Keeping track of time (enable with :WakaTimeApiKey)
           wakatime.enable = true;
 
-          # Dependency of gemini-cli
-          snacks.enable = true;
+          # UI improvements
+          snacks = {
+            enable = true;
+            settings = {
+              bigfile.enabled = true;
+              dashboard.enabled = true; # Beautiful startup screen
+              input.enabled = true; # Better rename/input dialogs
+              notifier.enabled = true; # Better notifications
+              quickfile.enabled = true;
+              scroll.enabled = true; # Smooth scrolling
+              statuscolumn.enabled = true; # Git signs in the left column
+            };
+          };
         };
 
         programs.nixvim.extraPlugins = with pkgs; [
@@ -248,28 +420,6 @@
               # 02-02-2025
               rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
               hash = "sha256-UXKlVn4D6Qj4s01mcFRUsIgXh8c9KmAX5E16Z/RenYE=";
-            };
-          })
-
-          (vimUtils.buildVimPlugin {
-            name = "gemini_cli";
-            src = pkgs.fetchFromGitHub {
-              owner = "marcinjahn";
-              repo = "gemini-cli.nvim";
-              # 18-07-2025
-              rev = "c9fd62adda823628f5131a939d9c56ef7a898600";
-              hash = "sha256-C4OI6NM+Bpa5WffmXY+tNLfuYyX0LNbmsAe9GDBRVCQ=";
-            };
-          })
-
-          (vimUtils.buildVimPlugin {
-            name = "opencode";
-            src = pkgs.fetchFromGitHub {
-              owner = "NIckvanDyke";
-              repo = "opencode.nvim";
-              # 02-09-2025
-              rev = "a7142e20a96becf09ee1dd70a80396ca2ab7c66f";
-              hash = "sha256-p02EXhbaawxX4xYC9fxXRD/klPxXpv1d2obUw5G8N3g=";
             };
           })
 
