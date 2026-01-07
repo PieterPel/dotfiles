@@ -78,9 +78,14 @@
           # Extension
           telescope = {
             enable = true;
+            settings = { };
             extensions = {
               ui-select = {
                 enable = true;
+                settings = {
+                  # This makes the menu a small dropdown under your cursor
+                  specific_opts.codeactions = true;
+                };
               };
               fzf-native = {
                 enable = true;
@@ -260,6 +265,7 @@
                 "gD" = "references";
                 "gt" = "type_definition";
                 "gi" = "implementation";
+                "ca" = "code_action";
               };
 
               # 2. Diagnostic Bindings (vim.diagnostic.*)
