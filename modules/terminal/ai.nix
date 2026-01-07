@@ -1,5 +1,10 @@
 {
-  flake.modules.homeManager.ai = { config, lib, ... }:
+  flake.modules.homeManager.ai =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.terminal.ai;
     in
@@ -9,6 +14,9 @@
       };
 
       config = lib.mkIf cfg.enable {
+        packages = [
+          pkgs.amp-cli
+        ];
         programs.claude-code.enable = true;
         programs.opencode.enable = true;
         programs.gemini-cli = {
