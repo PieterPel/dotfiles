@@ -227,7 +227,7 @@
               ty.enable = true;
               basedpyright = {
                 # Keep as fallback for ty
-                enable = true;
+                enable = false;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
