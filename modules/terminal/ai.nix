@@ -18,7 +18,15 @@
           pkgs.amp-cli
         ];
         programs.claude-code.enable = true;
-        programs.opencode.enable = true;
+        programs.opencode = {
+          enable = true;
+          enableMcpIntegration = true;
+          settings = {
+            plugin = [
+              "opencode-gemini-auth@latest"
+            ];
+          };
+        };
         programs.gemini-cli = {
           enable = true;
           settings = {
