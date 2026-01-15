@@ -136,6 +136,7 @@
               # This effectively disables the "auto" popup behavior
               # formatting it like this ensures it overrides default "auto"
               triggers = [ ];
+              delay = 10000; # leader leader is set in binds.nix
             };
           };
 

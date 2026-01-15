@@ -1,8 +1,13 @@
 {
   flake.modules.homeManager.fish =
-    { lib, config, ... }:
+    { lib
+    , config
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.terminal.fish;
+      jq = lib.getExe pkgs.jq;
     in
     {
       options.modules.terminal.fish = {
@@ -57,6 +62,24 @@
                 tmux select-pane -t "$target"
               '';
             };
+
+            # Sync flake.nix with nix-darwin rev
+            nix-sync = ''
+              # Get the revision from the local nixpkgs registry entry
+              set -l rev (nix flake metadata nixpkgs --json | ${jq} -r '.resolved.rev')
+
+              if test -z "$rev"
+                set_color red; echo "❌ Could not find a nixpkgs revision in your registry."; set_color normal
+                return 1
+              end
+
+              echo (set_color blue)"🔄 Syncing project to system revision: "(set_color yellow)"$rev"(set_color normal)
+
+              # Update the lockfile to match your system's exact commit
+              nix flake update --override-input nixpkgs "github:NixOS/nixpkgs/$rev"
+
+              set_color green; echo "✅ Done!"; set_color normal
+            '';
           };
         };
       };
