@@ -1,4 +1,3 @@
-{ config, lib, ... }:
 {
   flake.modules.homeManager.fish =
     { lib, config, ... }:

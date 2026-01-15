@@ -1,5 +1,10 @@
 {
-  flake.modules.homeManager.aliases = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.aliases =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       eza = lib.getExe pkgs.eza;
       nh = lib.getExe pkgs.nh;

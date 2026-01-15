@@ -117,7 +117,7 @@
             };
           };
 
-          programs.nixvim.plugins.oil = {
+          oil = {
             enable = true;
             settings = {
               default_file_explorer = true; # Replaces netrw
@@ -129,7 +129,7 @@
             };
           };
 
-          programs.nixvim.plugins.which-key = {
+          which-key = {
             enable = true;
             lazyload.enable = false;
             settings = {
