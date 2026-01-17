@@ -74,6 +74,9 @@ let
         sesh = defaultEnable;
         zoxide = defaultEnable;
         lazygit = defaultEnable;
+        jjui = defaultEnable;
+        jujutsu = defaultEnable;
+        delta = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wayland = {

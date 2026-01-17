@@ -363,11 +363,6 @@
             action = "<CMD>LspRestart<Enter>";
             options.desc = "Lsp Restart";
           }
-          {
-            key = "<leader>ca";
-            action = "<cmd>Telescope lsp_code_actions theme=cursor<CR>";
-            options.desc = "Code Actions";
-          }
         ];
 
       };
