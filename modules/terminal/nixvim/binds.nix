@@ -363,6 +363,13 @@
             action = "<CMD>LspRestart<Enter>";
             options.desc = "Lsp Restart";
           }
+
+          {
+            key = "<leader>a";
+            action = "<cmd>AerialToggle! left<CR>";
+            options.desc = "Toggle Outline Sidebar";
+          }
+
         ];
 
       };

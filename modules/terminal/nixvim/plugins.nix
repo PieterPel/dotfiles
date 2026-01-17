@@ -93,7 +93,7 @@
             };
           };
           nvim-tree = {
-            enable = true; # File explorer
+            enable = false; # File explorer
             settings = {
               diagnostics = {
                 enable = true;
@@ -114,6 +114,43 @@
             enable = true;
             settings = {
               open_for_directories = true;
+            };
+          };
+
+          plugins.aerial = {
+            enable = true;
+            settings = {
+              # Use these backends in order
+              backends = [
+                "treesitter"
+                "lsp"
+                "markdown"
+                "man"
+              ];
+
+              # Layout settings to make it feel like a sidebar
+              layout = {
+                min_width = 30;
+                default_direction = "left";
+                placement = "window";
+              };
+
+              attach_mode = "global";
+
+              icons = {
+                # You can customize icons here or use defaults
+              };
+
+              filter_kind = [
+                "Class"
+                "Constructor"
+                "Enum"
+                "Function"
+                "Interface"
+                "Module"
+                "Method"
+                "Struct"
+              ];
             };
           };
 
@@ -327,10 +364,22 @@
                 "lsp"
                 "path"
                 "buffer"
+                "git"
                 #"copilot"
               ];
 
               providers = {
+                git = {
+                  module = "blink-cmp-git";
+                  name = "git";
+                  score_offset = 100;
+                  opts = {
+                    commit = { };
+                    git_centers = {
+                      git_hub = { };
+                    };
+                  };
+                };
                 copilot = {
                   async = true;
                   module = "blink-copilot";
