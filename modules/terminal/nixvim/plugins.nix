@@ -117,7 +117,7 @@
             };
           };
 
-          plugins.aerial = {
+          aerial = {
             enable = true;
             settings = {
               # Use these backends in order
@@ -262,10 +262,10 @@
             servers = {
               nil_ls.enable = true;
               dockerls.enable = true;
-              ty.enable = true;
+              ty.enable = false; # Not production ready at all in jan '26
               basedpyright = {
                 # Keep as fallback for ty
-                enable = false;
+                enable = true;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
@@ -364,7 +364,6 @@
                 "lsp"
                 "path"
                 "buffer"
-                "git"
                 #"copilot"
               ];
 
