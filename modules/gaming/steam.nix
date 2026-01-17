@@ -1,0 +1,32 @@
+{
+  flake.modules.nixos.steam = { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.gaming.steam;
+    in
+    {
+      options.modules.gaming.steam = {
+        enable = lib.mkEnableOption "Enable steam module";
+      };
+
+      config = lib.mkIf cfg.enable {
+        programs = {
+          steam = {
+            enable = true;
+            remotePlay.openFirewall = true;
+            dedicatedServer.openFirewall = false;
+            gamescopeSession.enable = true;
+            extraCompatPackages = [ pkgs.proton-ge-bin ];
+          };
+
+          gamescope = {
+            enable = true;
+            capSysNice = true;
+            args = [
+              "--rt"
+              "--expose-wayland"
+            ];
+          };
+        };
+      };
+    };
+}

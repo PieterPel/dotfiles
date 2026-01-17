@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
 
 let
   hostname = "surface";
@@ -6,6 +6,6 @@ let
 in
 {
   imports = [
-    (import ./users/pieterpel { inherit inputs system hostname; })
+    (import ./_users/pieterpel { inherit inputs system hostname; self = config.flake; })
   ];
 }

@@ -1,5 +1,5 @@
 {
-  description = "Flake that I can use both for NixOS and home-manager standalone";
+  description = "Dendritic flake configuration for NixOS, nix-darwin, and home-manager";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -62,39 +62,46 @@
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
     };
+
+    import-tree = {
+      url = "github:vic/import-tree";
+    };
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    };
   };
 
   outputs =
     { self
     , nixpkgs
     , flake-parts
+    , import-tree
     , ...
     }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      top@{ config
-      , withSystem
-      , moduleWithSystem
-      , ...
-      }:
-      let
-        supportedSystems = [
-          "x86_64-linux"
-          "aarch64-linux"
-          "x86_64-darwin"
-          "aarch64-darwin"
-        ];
-      in
-      {
-        imports = [
-          # My modules are set up in a way that you can create outputs for
-          # 1) NixOS
-          # 2) Nix-darwin
-          # 3) Home-manager standalone
-          ./hosts
-        ];
-        systems = supportedSystems;
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
 
-        perSystem = { config, self', inputs', pkgs, system, ... }: {
+      imports = [
+        inputs.flake-parts.flakeModules.modules
+        (import-tree ./modules)
+        (import-tree ./hosts)
+      ];
+
+      perSystem =
+        { config
+        , self'
+        , inputs'
+        , pkgs
+        , system
+        , ...
+        }:
+        {
           checks = {
             pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
               src = ./.;
@@ -111,8 +118,7 @@
             };
           };
         };
-      }
-    );
+    };
 
   nixConfig = {
     extra-substituters = [

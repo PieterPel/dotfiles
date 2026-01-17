@@ -2,3 +2,4 @@
 *.backup
 .direnv/
 result
+.DS_Store

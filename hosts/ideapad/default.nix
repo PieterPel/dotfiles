@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
 
 let
   hostname = "ideapad";
@@ -8,16 +8,17 @@ in
   flake.nixosConfigurations.${hostname} = inputs.nixpkgs.lib.nixosSystem {
     inherit system;
     specialArgs = {
-      inherit inputs;
+      # TODO: also flake-partsify the user modules?
+      self = config.flake;
     };
 
-    modules = [
-      ../../modules/nixos-x86
-      ../../profiles/system/laptop
-      ./hardware-configuration.nix
-      ./users
+    modules = builtins.attrValues config.flake.modules.nixos ++ [
+      ./_hardware-configuration.nix
+      ./_users
       {
         inherit hostname;
+        modules.profiles.laptop.enable = true;
+        modules.profiles.full.enable = true;
         services.fprintd = {
           enable = true;
         };

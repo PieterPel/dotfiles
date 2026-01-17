@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
 
 let
   hostname = "nixberry";
@@ -7,10 +7,11 @@ in
   flake.nixosConfigurations.${hostname} = inputs.nixos-raspberrypi.lib.nixosSystem {
     specialArgs = {
       inherit inputs;
+      self = config.flake;
       # NOTE: this is needed
       nixos-raspberrypi = inputs.nixos-raspberrypi;
     };
-    modules = [
+    modules = builtins.attrValues config.flake.modules.nixos ++ [
       {
         imports = with inputs.nixos-raspberrypi.nixosModules; [
           raspberry-pi-4.base
@@ -19,12 +20,27 @@ in
         inherit hostname;
         system.stateVersion = "25.05"; # Do not change this !
       }
-
-      ../../profiles/system/rpi
-      ./users
-      ./hardware-configuration.nix
-
+      ./_users
+      ./_hardware-configuration.nix
+      {
+        modules = {
+          profiles.rpi.enable = true;
+          system = {
+            configuration.enable = true;
+            internationalization.enable = true;
+            updating.enable = true;
+          };
+          security = {
+            sops.enable = true;
+          };
+          package-management = {
+            nix.enable = true;
+          };
+          virtualization = {
+            virtualization.enable = true;
+          };
+        };
+      }
     ];
   };
-
 }
