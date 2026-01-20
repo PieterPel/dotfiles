@@ -275,19 +275,16 @@
               dockerls.enable = true;
               ty.enable = false; # Not production ready at all in jan '26
               basedpyright = {
-                # Keep as fallback for ty
                 enable = true;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
                 ];
-                settings = {
-                  disableOrganizeImports = true;
-                  analysis = {
-                    # Let ty do all type checking
-                    typeCheckingMode = "off";
-                  };
-                };
+                rootMarkers = [
+                  "pyrightconfig.json"
+                  "pyproject.toml"
+                  ".git"
+                ];
               };
               ruff.enable = true;
               bashls.enable = true;
