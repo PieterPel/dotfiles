@@ -41,9 +41,8 @@
             "raycast"
             "notion"
             "bitwarden"
-            "cursor-cli"
-            "cursor"
             "slack"
+            "microsoft-teams"
 
             # Empty package trick (broken on nixpkgs)
             "ghostty"
@@ -51,11 +50,6 @@
             # Sometimes Broken on nixpkgs due to hash mistmatch
             "spotify"
 
-            # Not on aarch64-darwin nixpkgs
-            "beekeeper-studio"
-
-            # Apple container
-            "container"
           ];
         };
       };

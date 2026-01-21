@@ -1,9 +1,14 @@
 # Source: ZaneyOS
 {
-  flake.modules.homeManager.kitty = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.kitty =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.gui.kitty;
-      shellCommand = if pkgs.stdenv.isLinux then ''fish'' else ''${lib.getExe pkgs.fish}'';
+      shellCommand = if pkgs.stdenv.isLinux then "fish" else "${lib.getExe pkgs.fish}";
     in
     {
       options.modules.gui.kitty = {
@@ -24,6 +29,10 @@
             enable_audio_bell = false;
             mouse_hide_wait = 60;
             shell = shellCommand;
+            background_blur = 1;
+            allow_remote_control = "yes";
+            listen_on = "unix:/tmp/kitty";
+            dynamic_background_opacity = "yes";
           };
           extraConfig = ''
             tab_bar_style fade
@@ -83,6 +92,16 @@
             map ctrl+shift+up      increase_font_size
             map ctrl+shift+down    decrease_font_size
             map ctrl+shift+backspace restore_font_size
+
+            # Toggle background
+            # F1: Opaque
+            map f1 remote_control set-background-opacity 1.0
+
+            # F2: Transparent (Standard)
+            map f2 combine : remote_control set-background-opacity 0.8 : remote_control set-background-blur 0
+
+            # F3: Glass-like (Transparent + Blur)
+            map f3 combine : remote_control set-background-opacity 0.8 : remote_control set-background-blur 32
           '';
         };
       };
