@@ -143,6 +143,16 @@
 
             -- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
             vim.g.loaded_netrwPlugin = 1
+
+            -- Let terminal transparency show through
+            local function set_transparent_bg()
+              vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+              vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+            end
+            vim.api.nvim_create_autocmd("ColorScheme", {
+              callback = set_transparent_bg,
+            })
+            set_transparent_bg()
           '';
         };
       };
