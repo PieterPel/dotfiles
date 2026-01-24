@@ -121,6 +121,11 @@
             # Enable mouse support
             set -g mouse on
 
+            # Let terminal background show through the status bar
+            set -g status-style "bg=default"
+            set -g status-left-style "bg=default"
+            set -g status-right-style "bg=default"
+
             # Change prefix key to Ctrl-a
             unbind C-b
             set -g prefix C-a
