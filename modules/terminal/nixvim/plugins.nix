@@ -303,6 +303,7 @@
               };
               zls.enable = true;
               dartls.enable = true;
+              statix.enable = true;
             };
             keymaps = {
               silent = true; # Makes the binds silent (no command echo)

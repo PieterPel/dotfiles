@@ -1,5 +1,9 @@
+let
+  module = "ghostty";
+  parent = "gui";
+in
 {
-  flake.modules.homeManager.ghostty =
+  flake.modules.homeManager.${module} =
     { config
     , lib
     , pkgs
@@ -7,10 +11,10 @@
     }:
     let
       ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
-      cfg = config.modules.gui.kitty;
+      cfg = config.modules.${parent}.${module};
     in
     {
-      options.modules.gui.ghostty = {
+      options.modules.${parent}.${module} = {
         enable = lib.mkEnableOption "Enable Ghostty terminal configuration.";
       };
       config = lib.mkIf cfg.enable {
@@ -21,7 +25,7 @@
           enableZshIntegration = true;
           settings = {
             background-opacity = 0.8;
-            background-blur = true;
+            background-blur = 20;
             command = lib.getExe pkgs.fish;
           };
         };
