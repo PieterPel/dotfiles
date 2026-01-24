@@ -1,5 +1,4 @@
-{ ...
-}:
+{ ... }:
 let
   homeManagerWslModule = { config, lib, ... }:
     let

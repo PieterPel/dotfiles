@@ -9,7 +9,7 @@ in
       inherit inputs;
       self = config.flake;
       # NOTE: this is needed
-      nixos-raspberrypi = inputs.nixos-raspberrypi;
+      inherit (inputs) nixos-raspberrypi;
     };
     modules = builtins.attrValues config.flake.modules.nixos ++ [
       {

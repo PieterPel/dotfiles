@@ -14,7 +14,7 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = with pkgs; ([
+        packages = with pkgs; [
           # There is a home-manager module but it sucks
           zed-editor
 
@@ -23,7 +23,7 @@
           ruff
           nil
           basedpyright
-        ]);
+        ];
       };
     };
 }

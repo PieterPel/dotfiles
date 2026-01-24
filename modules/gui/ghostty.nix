@@ -29,6 +29,11 @@ in
             command = lib.getExe pkgs.fish;
           };
         };
+        home.file = lib.mkIf pkgs.stdenv.isDarwin {
+          "Library/Application Support/com.mitchellh.ghostty/config" = {
+            source = config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/ghostty/config";
+          };
+        };
       };
     };
 }

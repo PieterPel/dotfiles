@@ -66,9 +66,11 @@ let
 
 in
 {
-  flake.modules.nixos.stylix = systemModule "nixosModules";
-  flake.modules.darwin.stylix = systemModule "darwinModules";
-  flake.modules.homeManager.stylix = homeModule;
+  flake.modules = {
+    nixos.stylix = systemModule "nixosModules";
+    darwin.stylix = systemModule "darwinModules";
+    homeManager.stylix = homeModule;
+  };
 
   flake.modules.standaloneHomeManager.stylix =
     { pkgs, ... }:

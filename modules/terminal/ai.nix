@@ -17,20 +17,22 @@
         packages = [
           pkgs.amp-cli
         ];
-        programs.claude-code.enable = true;
-        programs.opencode = {
-          enable = true;
-          enableMcpIntegration = true;
-          settings = {
-            plugin = [
-              "opencode-gemini-auth@latest"
-            ];
+        programs = {
+          claude-code.enable = true;
+          opencode = {
+            enable = true;
+            enableMcpIntegration = true;
+            settings = {
+              plugin = [
+                "opencode-gemini-auth@latest"
+              ];
+            };
           };
-        };
-        programs.gemini-cli = {
-          enable = true;
-          settings = {
-            selectedAuthType = "oauth-personal";
+          gemini-cli = {
+            enable = true;
+            settings = {
+              selectedAuthType = "oauth-personal";
+            };
           };
         };
       };

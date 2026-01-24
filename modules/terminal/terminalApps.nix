@@ -20,6 +20,9 @@ in
         packages = with pkgs; [
           # Nix
           nh
+          statix
+          nil
+          nixpkgs-fmt
 
           # Languages
           python3

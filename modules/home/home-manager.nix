@@ -24,7 +24,7 @@ let
           # NOTE: Set the correct hostname for all users
           sharedModules = [
             {
-              hostname = config.hostname;
+              inherit (config) hostname;
             }
           ];
         };

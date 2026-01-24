@@ -101,7 +101,9 @@ let
     };
 in
 {
-  flake.modules.nixos.full = mkFullProfileModule nixosDefaults;
-  flake.modules.darwin.full = mkFullProfileModule darwinDefaults;
-  flake.modules.homeManager.full = mkFullProfileModule homeManagerDefaults;
+  flake.modules = {
+    nixos.full = mkFullProfileModule nixosDefaults;
+    darwin.full = mkFullProfileModule darwinDefaults;
+    homeManager.full = mkFullProfileModule homeManagerDefaults;
+  };
 }
