@@ -125,6 +125,16 @@
             set -g status-style "bg=default"
             set -g status-left-style "bg=default"
             set -g status-right-style "bg=default"
+            set -g status-bg default
+            set -g status-fg default
+
+            # Override tmux-power's hardcoded backgrounds for transparency
+            set -g status-left "#S"
+            set -g status-right "%Y-%m-%d %H:%M"
+            set -g window-status-format "#I:#W"
+            set -g window-status-current-format "#[bold]#I:#W"
+            set -g window-status-style "bg=default"
+            set -g window-status-current-style "bg=default"
 
             # Change prefix key to Ctrl-a
             unbind C-b

@@ -36,8 +36,32 @@ let
         };
       };
     };
+
+  mkHmSopsModule =
+    { config, lib, pkgs, ... }:
+    let
+      cfg = config.modules.security.sops;
+    in
+    {
+      options.modules.security.sops = {
+        enable = lib.mkEnableOption "Enable sops module";
+      };
+
+      imports = [
+        inputs.sops-nix.homeManagerModules.sops
+      ];
+
+      config = lib.mkIf cfg.enable {
+        home.packages = with pkgs; [
+          sops
+          age
+          ssh-to-age
+        ];
+      };
+    };
 in
 {
   flake.modules.nixos.sops = mkSopsModule "nixosModules";
   flake.modules.darwin.sops = mkSopsModule "darwinModules";
+  flake.modules.homeManager.sops = mkHmSopsModule;
 }
