@@ -20,6 +20,8 @@
           enableFishIntegration = true;
           enableZshIntegration = true;
           settings = {
+            background-opacity = 0.8;
+            background-blur = true;
             command = lib.getExe pkgs.fish;
           };
         };

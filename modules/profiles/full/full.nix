@@ -53,7 +53,7 @@ let
   homeManagerDefaults = {
     modules = {
       gui = {
-        "desktop-apps" = defaultEnable;
+        desktopApps = defaultEnable;
         ghostty = defaultEnable;
         kitty = defaultEnable;
         spicetify = defaultDisable; # Hash mismatch (22-12-25)
@@ -69,7 +69,7 @@ let
         nixvim = defaultEnable;
         starship = defaultEnable;
         tmux = defaultEnable;
-        "terminal-apps" = defaultEnable;
+        terminalApps = defaultEnable;
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;

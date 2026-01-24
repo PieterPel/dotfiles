@@ -99,9 +99,6 @@
 
             # F2: Transparent (Standard)
             map f2 combine : remote_control set-background-opacity 0.8 : remote_control set-background-blur 0
-
-            # F3: Glass-like (Transparent + Blur)
-            map f3 combine : remote_control set-background-opacity 0.8 : remote_control set-background-blur 32
           '';
         };
       };
