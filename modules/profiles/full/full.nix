@@ -77,8 +77,10 @@ let
         jjui = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
+
       };
       theming.stylix = defaultEnable;
+      security.sops = defaultEnable;
       wayland = {
         hyprlock = defaultEnable;
         rofi = defaultEnable;

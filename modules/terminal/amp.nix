@@ -229,24 +229,23 @@ in
                 "apiKey@https://ampcode.com/" = config.sops.placeholder."amp-upstream-api-key";
               };
             };
-          };
-        };
-
-        sops.templates = lib.mkIf (cfg.sops.enable && cfg.proxy.enable) {
-          "cli-proxy-api-config.yaml" = {
-            path = absPath cfg.proxy.configPath;
-            content =
-              let
-                proxyConfigWithSecrets =
-                  proxyConfigBase
-                  // {
-                    api-keys = [ config.sops.placeholder."amp-client-api-key" ];
-                    ampcode = proxyConfigBase.ampcode // {
-                      upstream-api-key = config.sops.placeholder."amp-upstream-api-key";
+          }
+          // lib.optionalAttrs cfg.proxy.enable {
+            "cli-proxy-api-config.yaml" = {
+              path = absPath cfg.proxy.configPath;
+              content =
+                let
+                  proxyConfigWithSecrets =
+                    proxyConfigBase
+                      // {
+                      api-keys = [ config.sops.placeholder."amp-client-api-key" ];
+                      ampcode = proxyConfigBase.ampcode // {
+                        upstream-api-key = config.sops.placeholder."amp-upstream-api-key";
+                      };
                     };
-                  };
-              in
-              lib.generators.toYAML { } proxyConfigWithSecrets;
+                in
+                lib.generators.toYAML { } proxyConfigWithSecrets;
+            };
           };
         };
       };
