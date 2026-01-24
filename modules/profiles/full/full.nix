@@ -1,4 +1,5 @@
 { lib
+, inputs
 , ...
 }:
 let
@@ -77,6 +78,18 @@ let
         jjui = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
+
+        amp = {
+          enable = true;
+          url = "http://localhost:8317";
+
+          proxy.enable = true;
+
+          sops = {
+            enable = true;
+            sopsFile = ../../../secrets/amp.yaml;
+          };
+        };
 
       };
       theming.stylix = defaultEnable;

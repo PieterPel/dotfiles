@@ -66,6 +66,9 @@ in
           # Jujutsu
           jujutsu
           jjui
+
+          # Command runner
+          just
         ];
 
         programs.btop.enable = true;
