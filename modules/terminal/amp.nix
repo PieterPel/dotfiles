@@ -64,6 +64,18 @@ in
           (absPath cfg.proxy.configPath)
         ]
         ++ cfg.proxy.service.extraArgs;
+      proxyMgmtBase = "http://${cfg.proxy.host}:${toString cfg.proxy.port}/v0/management";
+      proxyMgmtKeyPath =
+        if cfg.sops.enable then
+          config.sops.secrets."amp-client-api-key".path
+        else
+          null;
+      proxyMgmtKeyCommand =
+        if proxyMgmtKeyPath != null then
+          "cat ${proxyMgmtKeyPath}"
+        else
+          null;
+      curlBin = lib.getExe pkgs.curl;
       proxyLoginCommand =
         lib.concatStringsSep " " (
           map lib.escapeShellArg (
@@ -306,6 +318,40 @@ in
           ]
           ++ lib.optional (cfg.proxy.package != null) cfg.proxy.package
           ++ lib.optional (cfg.proxy.package == null && lib.hasAttr "cli-proxy-api" pkgs) pkgs.cli-proxy-api;
+
+        programs.fish.functions = lib.mkIf (cfg.proxy.enable && proxyMgmtKeyCommand != null) {
+          proxy-route = {
+            description = "Route all Amp requests to a local model via CLIProxyAPI.";
+            body = ''
+              set -l model $argv[1]
+              if test -z "$model"
+                echo "usage: proxy-route <model>"
+                return 1
+              end
+              set -l key (${proxyMgmtKeyCommand})
+              ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
+                -H "Authorization: Bearer $key" \
+                -H "Content-Type: application/json" \
+                -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
+            '';
+          };
+          proxy-route-off = {
+            description = "Clear Amp model mappings.";
+            body = ''
+              set -l key (${proxyMgmtKeyCommand})
+              ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
+                -H "Authorization: Bearer $key"
+            '';
+          };
+          proxy-route-status = {
+            description = "Show current Amp model mappings.";
+            body = ''
+              set -l key (${proxyMgmtKeyCommand})
+              ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
+                -H "Authorization: Bearer $key"
+            '';
+          };
+        };
 
         home.file =
           {

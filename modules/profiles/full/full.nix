@@ -84,12 +84,6 @@ let
           url = "http://localhost:8317";
 
           proxy.enable = true;
-          proxy.modelMappings = [
-            {
-              from = "claude-haiku-4-5-20251001";
-              to = "gemini-2.5-flash";
-            }
-          ];
 
           sops = {
             enable = true;
