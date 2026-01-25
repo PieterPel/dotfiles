@@ -337,49 +337,71 @@ in
           ++ lib.optional (cfg.proxy.package != null) cfg.proxy.package
           ++ lib.optional (cfg.proxy.package == null && lib.hasAttr "cli-proxy-api" pkgs) pkgs.cli-proxy-api;
 
-        programs.fish.functions = lib.mkIf (cfg.proxy.enable && proxyMgmtKeyCommand != null) {
-          proxy-route = {
-            description = "Route all Amp requests to a local model via CLIProxyAPI.";
-            body = ''
-              set -l command $argv[1]
-              if test -z "$command"
-                echo "usage: proxy-route <model> | proxy-route status | proxy-route off"
-                return 1
-              end
-              set -l key (${proxyMgmtKeyCommand})
-              switch "$command"
-                case status
-                  ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
-                    -H "Authorization: Bearer $key"
-                case off clear disable
-                  ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
-                    -H "Authorization: Bearer $key"
-                case '*'
-                  set -l model "$command"
-                  ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
-                    -H "Authorization: Bearer $key" \
-                    -H "Content-Type: application/json" \
-                    -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
-              end
-            '';
-          };
-          proxy-route-off = {
-            description = "Clear Amp model mappings.";
-            body = ''
-              set -l key (${proxyMgmtKeyCommand})
-              ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
-                -H "Authorization: Bearer $key"
-            '';
-          };
-          proxy-route-status = {
-            description = "Show current Amp model mappings.";
-            body = ''
-              set -l key (${proxyMgmtKeyCommand})
-              ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
-                -H "Authorization: Bearer $key"
-            '';
-          };
-        };
+        programs.fish.functions = lib.mkIf cfg.proxy.enable (
+          {
+            proxy = {
+              description = "Login to Gemini via CLIProxyAPI.";
+              body = ''
+                ${proxyLoginCommand} $argv
+              '';
+            };
+            proxy-codex = {
+              description = "Login to Codex via CLIProxyAPI.";
+              body = ''
+                ${proxyCodexLoginCommand} $argv
+              '';
+            };
+            proxy-claude = {
+              description = "Login to Claude via CLIProxyAPI.";
+              body = ''
+                ${proxyClaudeLoginCommand} $argv
+              '';
+            };
+          }
+          // lib.optionalAttrs (proxyMgmtKeyCommand != null) {
+            proxy-route = {
+              description = "Route all Amp requests to a local model via CLIProxyAPI.";
+              body = ''
+                set -l command $argv[1]
+                if test -z "$command"
+                  echo "usage: proxy-route <model> | proxy-route status | proxy-route off"
+                  return 1
+                end
+                set -l key (${proxyMgmtKeyCommand})
+                switch "$command"
+                  case status
+                    ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
+                      -H "Authorization: Bearer $key"
+                  case off clear disable
+                    ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
+                      -H "Authorization: Bearer $key"
+                  case '*'
+                    set -l model "$command"
+                    ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
+                      -H "Authorization: Bearer $key" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
+                end
+              '';
+            };
+            proxy-route-off = {
+              description = "Clear Amp model mappings.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
+                  -H "Authorization: Bearer $key"
+              '';
+            };
+            proxy-route-status = {
+              description = "Show current Amp model mappings.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
+                  -H "Authorization: Bearer $key"
+              '';
+            };
+          }
+        );
 
         home.file =
           {
