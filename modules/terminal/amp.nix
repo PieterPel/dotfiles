@@ -281,6 +281,36 @@ in
               }
           );
 
+        home.shellAliases = lib.mkIf cfg.proxy.enable {
+          proxy = lib.concatStringsSep " " (
+            map lib.escapeShellArg (
+              proxyCommand ++ [
+                "--config"
+                (absPath cfg.proxy.configPath)
+                "--login"
+              ]
+            )
+          );
+          proxy-codex = lib.concatStringsSep " " (
+            map lib.escapeShellArg (
+              proxyCommand ++ [
+                "--config"
+                (absPath cfg.proxy.configPath)
+                "--codex-login"
+              ]
+            )
+          );
+          proxy-claude = lib.concatStringsSep " " (
+            map lib.escapeShellArg (
+              proxyCommand ++ [
+                "--config"
+                (absPath cfg.proxy.configPath)
+                "--claude-login"
+              ]
+            )
+          );
+        };
+
         home.activation = lib.mkIf (cfg.proxy.enable && cfg.proxy.service.enable && pkgs.stdenv.isDarwin) {
           cliProxyApiLogs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             mkdir -p "$HOME/Library/Logs/CLIProxyAPI"
