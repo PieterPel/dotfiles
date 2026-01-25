@@ -290,6 +290,10 @@ in
           }
         ];
 
+        home.sessionPath = lib.mkAfter [
+          "${config.home.homeDirectory}/.local/bin"
+        ];
+
         packages =
           [
             pkgs.amp-cli
