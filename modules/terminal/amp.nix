@@ -294,6 +294,14 @@ in
           "${config.home.homeDirectory}/.local/bin"
         ];
 
+        programs.zsh.initExtra = lib.mkAfter ''
+          export PATH="$HOME/.local/bin:$PATH"
+        '';
+
+        programs.fish.interactiveShellInit = lib.mkAfter ''
+          set -gx PATH $HOME/.local/bin $PATH
+        '';
+
         packages =
           [
             pkgs.amp-cli
