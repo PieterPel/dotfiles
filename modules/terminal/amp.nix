@@ -47,6 +47,8 @@ in
           [ (lib.getExe cfg.proxy.package) ]
         else if cfg.proxy.command != null then
           cfg.proxy.command
+        else if lib.hasAttr "cli-proxy-api" pkgs then
+          [ (lib.getExe pkgs.cli-proxy-api) ]
         else
           [ "cli-proxy-api" ];
       proxyArgs =
@@ -245,7 +247,9 @@ in
             message = "Enable modules.security.sops when modules.terminal.amp.sops.enable is true.";
           }
           {
-            assertion = !(cfg.proxy.enable && cfg.proxy.service.enable) || (cfg.proxy.package != null || cfg.proxy.command != null);
+            assertion =
+              !(cfg.proxy.enable && cfg.proxy.service.enable)
+              || (cfg.proxy.package != null || cfg.proxy.command != null || lib.hasAttr "cli-proxy-api" pkgs);
             message = "Set modules.terminal.amp.proxy.package or modules.terminal.amp.proxy.command when enabling the CLIProxyAPI service.";
           }
         ];
@@ -254,7 +258,8 @@ in
           [
             pkgs.amp-cli
           ]
-          ++ lib.optional (cfg.proxy.package != null) cfg.proxy.package;
+          ++ lib.optional (cfg.proxy.package != null) cfg.proxy.package
+          ++ lib.optional (cfg.proxy.package == null && lib.hasAttr "cli-proxy-api" pkgs) pkgs.cli-proxy-api;
 
         home.file =
           {

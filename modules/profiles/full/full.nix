@@ -1,6 +1,5 @@
 { lib
 , inputs
-, pkgs
 , ...
 }:
 let
@@ -85,7 +84,6 @@ let
           url = "http://localhost:8317";
 
           proxy.enable = true;
-          proxy.package = pkgs.cli-proxy-api;
 
           sops = {
             enable = true;
