@@ -24,6 +24,7 @@ in
         auth-dir = cfg.proxy.authDir;
         debug = cfg.proxy.debug;
         logging-to-file = cfg.proxy.loggingToFile;
+        oauth-model-alias = cfg.proxy.oauthModelAlias;
         ampcode = {
           upstream-url = cfg.proxy.ampcodeUpstreamUrl;
           restrict-management-to-localhost = cfg.proxy.restrictManagementToLocalhost;
@@ -175,6 +176,11 @@ in
             type = lib.types.listOf lib.types.attrs;
             default = [ ];
             description = "Amp model mappings for CLIProxyAPI.";
+          };
+          oauthModelAlias = lib.mkOption {
+            type = lib.types.attrsOf lib.types.anything;
+            default = { };
+            description = "OAuth model aliases for CLIProxyAPI.";
           };
           apiKeys = lib.mkOption {
             type = lib.types.listOf lib.types.str;
