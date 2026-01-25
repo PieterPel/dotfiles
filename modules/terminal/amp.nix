@@ -290,18 +290,6 @@ in
           }
         ];
 
-        home.sessionPath = lib.mkAfter [
-          "${config.home.homeDirectory}/.local/bin"
-        ];
-
-        programs.zsh.initExtra = lib.mkAfter ''
-          export PATH="$HOME/.local/bin:$PATH"
-        '';
-
-        programs.fish.interactiveShellInit = lib.mkAfter ''
-          set -gx PATH $HOME/.local/bin $PATH
-        '';
-
         packages =
           [
             pkgs.amp-cli
@@ -327,32 +315,9 @@ in
               {
                 "${cfg.proxy.configPath}".text = proxyConfigYaml;
               }
-          )
-          // lib.optionalAttrs cfg.proxy.enable {
-            ".local/bin/proxy" = {
-              text = ''
-                #!/usr/bin/env sh
-                exec ${proxyLoginCommand}
-              '';
-              executable = true;
-            };
-            ".local/bin/proxy-codex" = {
-              text = ''
-                #!/usr/bin/env sh
-                exec ${proxyCodexLoginCommand}
-              '';
-              executable = true;
-            };
-            ".local/bin/proxy-claude" = {
-              text = ''
-                #!/usr/bin/env sh
-                exec ${proxyClaudeLoginCommand}
-              '';
-              executable = true;
-            };
-          };
+          );
 
-        home.shellAliases = lib.mkIf cfg.proxy.enable {
+        aliases = lib.mkIf cfg.proxy.enable {
           proxy = proxyLoginCommand;
           proxy-codex = proxyCodexLoginCommand;
           proxy-claude = proxyClaudeLoginCommand;
