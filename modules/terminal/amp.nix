@@ -28,8 +28,13 @@ in
         ampcode = {
           upstream-url = cfg.proxy.ampcodeUpstreamUrl;
           restrict-management-to-localhost = cfg.proxy.restrictManagementToLocalhost;
-          model-mappings = cfg.proxy.modelMappings;
-          force-model-mappings = cfg.proxy.forceModelMappings;
+          model-mappings = cfg.proxy.modelMappings
+            ++ lib.optional (cfg.proxy.routeAllTo != null) {
+            from = ".*";
+            to = cfg.proxy.routeAllTo;
+            regex = true;
+          };
+          force-model-mappings = cfg.proxy.forceModelMappings || cfg.proxy.routeAllTo != null;
         };
       };
       proxyConfig =
@@ -206,6 +211,11 @@ in
             type = lib.types.listOf lib.types.attrs;
             default = [ ];
             description = "Amp model mappings for CLIProxyAPI.";
+          };
+          routeAllTo = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Route all Amp model requests to a single local model via a regex mapping.";
           };
           oauthModelAlias = lib.mkOption {
             type = lib.types.attrsOf lib.types.anything;
