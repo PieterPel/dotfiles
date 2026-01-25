@@ -368,6 +368,7 @@ in
           templates = {
             "amp-secrets.json" = {
               path = "${config.xdg.dataHome}/amp/secrets.json";
+              mode = "0600";
               content = builtins.toJSON {
                 "apiKey@${cfg.url}" = config.sops.placeholder."amp-client-api-key";
                 "apiKey@https://ampcode.com/" = config.sops.placeholder."amp-upstream-api-key";
@@ -377,6 +378,7 @@ in
           // lib.optionalAttrs cfg.proxy.enable {
             "cli-proxy-api-config.yaml" = {
               path = absPath cfg.proxy.configPath;
+              mode = "0600";
               content =
                 let
                   proxyConfigWithSecrets =
