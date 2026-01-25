@@ -149,6 +149,11 @@ let
         sops =
           { }
           // {
+            environment = {
+              PATH = lib.mkDefault "/usr/bin:/bin:/usr/sbin:/sbin";
+            };
+          }
+          // {
             age.keyFile = lib.mkDefault (if cfg.ageKeyFile != null then cfg.ageKeyFile else defaultAgeKeyFile);
           }
           // {
