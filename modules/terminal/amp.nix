@@ -42,6 +42,44 @@ in
           };
         };
       proxyConfigYaml = lib.generators.toYAML { } proxyConfig;
+      proxyCommand =
+        if cfg.proxy.package != null then
+          [ (lib.getExe cfg.proxy.package) ]
+        else if cfg.proxy.command != null then
+          cfg.proxy.command
+        else
+          [ "cli-proxy-api" ];
+      proxyArgs =
+        proxyCommand
+        ++ [
+          "--config"
+          (absPath cfg.proxy.configPath)
+        ]
+        ++ cfg.proxy.service.extraArgs;
+      defaultServicePath =
+        if pkgs.stdenv.isDarwin then
+          [
+            "/opt/homebrew/bin"
+            "/usr/local/bin"
+            "/usr/bin"
+            "/bin"
+            "/usr/sbin"
+            "/sbin"
+          ]
+        else
+          [
+            "/usr/local/bin"
+            "/usr/bin"
+            "/bin"
+            "/usr/sbin"
+            "/sbin"
+          ];
+      proxyServicePath = if cfg.proxy.service.path != null then cfg.proxy.service.path else defaultServicePath;
+      proxyServiceEnvironment =
+        cfg.proxy.service.environment
+        // lib.optionalAttrs (proxyServicePath != [ ]) {
+          PATH = lib.concatStringsSep ":" proxyServicePath;
+        };
     in
     {
       options.modules.${parent}.${module} = {
@@ -141,10 +179,37 @@ in
             default = [ ];
             description = "CLIProxyAPI client API keys (stored in Nix store if set).";
           };
+          command = lib.mkOption {
+            type = lib.types.nullOr (lib.types.listOf lib.types.str);
+            default = null;
+            description = "CLIProxyAPI command to run when not using a Nix package (arguments appended automatically).";
+          };
           package = lib.mkOption {
             type = lib.types.nullOr lib.types.package;
             default = null;
             description = "CLIProxyAPI package to install.";
+          };
+          service = {
+            enable = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = "Run CLIProxyAPI as a user service.";
+            };
+            environment = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              default = { };
+              description = "Extra environment variables for the CLIProxyAPI service.";
+            };
+            path = lib.mkOption {
+              type = lib.types.nullOr (lib.types.listOf lib.types.str);
+              default = null;
+              description = "PATH entries for the CLIProxyAPI service.";
+            };
+            extraArgs = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Extra CLIProxyAPI command-line arguments.";
+            };
           };
         };
       };
@@ -179,6 +244,10 @@ in
             assertion = !cfg.sops.enable || config.modules.security.sops.enable;
             message = "Enable modules.security.sops when modules.terminal.amp.sops.enable is true.";
           }
+          {
+            assertion = !(cfg.proxy.enable && cfg.proxy.service.enable) || (cfg.proxy.package != null || cfg.proxy.command != null);
+            message = "Set modules.terminal.amp.proxy.package or modules.terminal.amp.proxy.command when enabling the CLIProxyAPI service.";
+          }
         ];
 
         packages =
@@ -206,6 +275,46 @@ in
                 "${cfg.proxy.configPath}".text = proxyConfigYaml;
               }
           );
+
+        home.activation = lib.mkIf (cfg.proxy.enable && cfg.proxy.service.enable && pkgs.stdenv.isDarwin) {
+          cliProxyApiLogs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            mkdir -p "$HOME/Library/Logs/CLIProxyAPI"
+          '';
+        };
+
+        launchd.agents = lib.mkIf (cfg.proxy.enable && cfg.proxy.service.enable && pkgs.stdenv.isDarwin) {
+          cli-proxy-api = {
+            enable = true;
+            config = {
+              ProgramArguments = proxyArgs;
+              KeepAlive = true;
+              RunAtLoad = true;
+              StandardOutPath = "${config.home.homeDirectory}/Library/Logs/CLIProxyAPI/stdout";
+              StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/CLIProxyAPI/stderr";
+              EnvironmentVariables = proxyServiceEnvironment;
+            };
+          };
+        };
+
+        systemd.user.services = lib.mkIf (cfg.proxy.enable && cfg.proxy.service.enable && pkgs.stdenv.isLinux) {
+          cli-proxy-api = {
+            Unit = {
+              Description = "CLIProxyAPI";
+              After = lib.optional cfg.sops.enable "sops-nix.service";
+            };
+            Service = {
+              ExecStart =
+                lib.concatStringsSep " " (
+                  map lib.escapeShellArg proxyArgs
+                );
+              Environment = lib.mapAttrsToList (name: value: "${name}=${value}") proxyServiceEnvironment;
+              Restart = "on-failure";
+            };
+            Install = {
+              WantedBy = [ "default.target" ];
+            };
+          };
+        };
 
         sops = lib.mkIf cfg.sops.enable {
           secrets = {

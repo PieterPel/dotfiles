@@ -41,6 +41,7 @@
             prefix-highlight
             continuum
             resurrect
+            yank
             {
               # https://github.com/nix-community/home-manager/issues/4894
               plugin = power-theme;
