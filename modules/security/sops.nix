@@ -150,7 +150,7 @@ let
           { }
           // {
             environment = {
-              PATH = lib.mkDefault "/usr/bin:/bin:/usr/sbin:/sbin";
+              PATH = lib.mkForce "/usr/bin:/bin:/usr/sbin:/sbin";
             };
           }
           // {
