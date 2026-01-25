@@ -59,6 +59,36 @@ in
           (absPath cfg.proxy.configPath)
         ]
         ++ cfg.proxy.service.extraArgs;
+      proxyLoginCommand =
+        lib.concatStringsSep " " (
+          map lib.escapeShellArg (
+            proxyCommand ++ [
+              "--config"
+              (absPath cfg.proxy.configPath)
+              "--login"
+            ]
+          )
+        );
+      proxyCodexLoginCommand =
+        lib.concatStringsSep " " (
+          map lib.escapeShellArg (
+            proxyCommand ++ [
+              "--config"
+              (absPath cfg.proxy.configPath)
+              "--codex-login"
+            ]
+          )
+        );
+      proxyClaudeLoginCommand =
+        lib.concatStringsSep " " (
+          map lib.escapeShellArg (
+            proxyCommand ++ [
+              "--config"
+              (absPath cfg.proxy.configPath)
+              "--claude-login"
+            ]
+          )
+        );
       defaultServicePath =
         if pkgs.stdenv.isDarwin then
           [
@@ -285,36 +315,35 @@ in
               {
                 "${cfg.proxy.configPath}".text = proxyConfigYaml;
               }
-          );
+          )
+          // lib.optionalAttrs cfg.proxy.enable {
+            ".local/bin/proxy" = {
+              text = ''
+                #!/usr/bin/env sh
+                exec ${proxyLoginCommand}
+              '';
+              executable = true;
+            };
+            ".local/bin/proxy-codex" = {
+              text = ''
+                #!/usr/bin/env sh
+                exec ${proxyCodexLoginCommand}
+              '';
+              executable = true;
+            };
+            ".local/bin/proxy-claude" = {
+              text = ''
+                #!/usr/bin/env sh
+                exec ${proxyClaudeLoginCommand}
+              '';
+              executable = true;
+            };
+          };
 
         home.shellAliases = lib.mkIf cfg.proxy.enable {
-          proxy = lib.concatStringsSep " " (
-            map lib.escapeShellArg (
-              proxyCommand ++ [
-                "--config"
-                (absPath cfg.proxy.configPath)
-                "--login"
-              ]
-            )
-          );
-          proxy-codex = lib.concatStringsSep " " (
-            map lib.escapeShellArg (
-              proxyCommand ++ [
-                "--config"
-                (absPath cfg.proxy.configPath)
-                "--codex-login"
-              ]
-            )
-          );
-          proxy-claude = lib.concatStringsSep " " (
-            map lib.escapeShellArg (
-              proxyCommand ++ [
-                "--config"
-                (absPath cfg.proxy.configPath)
-                "--claude-login"
-              ]
-            )
-          );
+          proxy = proxyLoginCommand;
+          proxy-codex = proxyCodexLoginCommand;
+          proxy-claude = proxyClaudeLoginCommand;
         };
 
         home.activation = lib.mkIf (cfg.proxy.enable && cfg.proxy.service.enable && pkgs.stdenv.isDarwin) {
