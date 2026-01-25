@@ -42,6 +42,12 @@ in
         // lib.optionalAttrs (cfg.proxy.apiKeys != [ ]) {
           api-keys = cfg.proxy.apiKeys;
         }
+        // lib.optionalAttrs (cfg.proxy.remoteManagementSecretKey != null) {
+          remote-management = {
+            secret-key = cfg.proxy.remoteManagementSecretKey;
+            allow-remote = cfg.proxy.remoteManagementAllowRemote;
+          };
+        }
         // lib.optionalAttrs (cfg.proxy.ampcodeUpstreamApiKey != null) {
           ampcode = proxyConfigBase.ampcode // {
             upstream-api-key = cfg.proxy.ampcodeUpstreamApiKey;
@@ -73,6 +79,8 @@ in
       proxyMgmtKeyCommand =
         if proxyMgmtKeyPath != null then
           "cat ${proxyMgmtKeyPath}"
+        else if cfg.proxy.remoteManagementSecretKey != null then
+          "printf %s ${lib.escapeShellArg cfg.proxy.remoteManagementSecretKey}"
         else
           null;
       curlBin = lib.getExe pkgs.curl;
@@ -224,6 +232,16 @@ in
             default = [ ];
             description = "Amp model mappings for CLIProxyAPI.";
           };
+          remoteManagementSecretKey = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "CLIProxyAPI remote management key (stored in Nix store if set).";
+          };
+          remoteManagementAllowRemote = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Allow remote (non-localhost) access to CLIProxyAPI management API.";
+          };
           routeAllTo = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
             default = null;
@@ -323,16 +341,26 @@ in
           proxy-route = {
             description = "Route all Amp requests to a local model via CLIProxyAPI.";
             body = ''
-              set -l model $argv[1]
-              if test -z "$model"
-                echo "usage: proxy-route <model>"
+              set -l command $argv[1]
+              if test -z "$command"
+                echo "usage: proxy-route <model> | proxy-route status | proxy-route off"
                 return 1
               end
               set -l key (${proxyMgmtKeyCommand})
-              ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
-                -H "Authorization: Bearer $key" \
-                -H "Content-Type: application/json" \
-                -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
+              switch "$command"
+                case status
+                  ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
+                    -H "Authorization: Bearer $key"
+                case off clear disable
+                  ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
+                    -H "Authorization: Bearer $key"
+                case '*'
+                  set -l model "$command"
+                  ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
+                    -H "Authorization: Bearer $key" \
+                    -H "Content-Type: application/json" \
+                    -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
+              end
             '';
           };
           proxy-route-off = {
@@ -455,6 +483,10 @@ in
                       api-keys = [ config.sops.placeholder."amp-client-api-key" ];
                       ampcode = proxyConfigBase.ampcode // {
                         upstream-api-key = config.sops.placeholder."amp-upstream-api-key";
+                      };
+                      remote-management = {
+                        secret-key = config.sops.placeholder."amp-client-api-key";
+                        allow-remote = cfg.proxy.remoteManagementAllowRemote;
                       };
                     };
                 in
