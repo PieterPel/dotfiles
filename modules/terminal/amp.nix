@@ -24,6 +24,7 @@ in
         auth-dir = cfg.proxy.authDir;
         debug = cfg.proxy.debug;
         logging-to-file = cfg.proxy.loggingToFile;
+        request-log = cfg.proxy.requestLog;
         oauth-model-alias = cfg.proxy.oauthModelAlias;
         ampcode = {
           upstream-url = cfg.proxy.ampcodeUpstreamUrl;
@@ -84,6 +85,9 @@ in
         else
           null;
       curlBin = lib.getExe pkgs.curl;
+      fzfBin = lib.getExe pkgs.fzf;
+      jqBin = lib.getExe pkgs.jq;
+      rgBin = lib.getExe pkgs.ripgrep;
       proxyLoginCommand =
         lib.concatStringsSep " " (
           map lib.escapeShellArg (
@@ -138,6 +142,11 @@ in
         // lib.optionalAttrs (proxyServicePath != [ ]) {
           PATH = lib.concatStringsSep ":" proxyServicePath;
         };
+      proxyReloadCommand =
+        if pkgs.stdenv.isDarwin then
+          "launchctl kickstart -k gui/$UID/org.nix-community.home.cli-proxy-api"
+        else
+          "systemctl --user restart cli-proxy-api.service";
     in
     {
       options.modules.${parent}.${module} = {
@@ -231,6 +240,16 @@ in
             type = lib.types.listOf lib.types.attrs;
             default = [ ];
             description = "Amp model mappings for CLIProxyAPI.";
+          };
+          modelChoices = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+            description = "Model choices for the proxy route TUI.";
+          };
+          requestLog = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Enable CLIProxyAPI request logging (for model inspection).";
           };
           remoteManagementSecretKey = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
@@ -335,6 +354,9 @@ in
             pkgs.amp-cli
           ]
           ++ lib.optional (cfg.proxy.package != null) cfg.proxy.package
+          ++ lib.optional cfg.proxy.enable pkgs.fzf
+          ++ lib.optional cfg.proxy.enable pkgs.jq
+          ++ lib.optional cfg.proxy.enable pkgs.ripgrep
           ++ lib.optional (cfg.proxy.package == null && lib.hasAttr "cli-proxy-api" pkgs) pkgs.cli-proxy-api;
 
         programs.fish.functions = lib.mkIf cfg.proxy.enable (
@@ -375,12 +397,106 @@ in
                   case off clear disable
                     ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
                       -H "Authorization: Bearer $key"
+                    ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/force-model-mappings" \
+                      -H "Authorization: Bearer $key" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"value\":false}"
+                    ${proxyReloadCommand}
                   case '*'
                     set -l model "$command"
                     ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/model-mappings" \
                       -H "Authorization: Bearer $key" \
                       -H "Content-Type: application/json" \
                       -d "{\"value\":[{\"from\":\".*\",\"to\":\"$model\",\"regex\":true}]}"
+                    ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/force-model-mappings" \
+                      -H "Authorization: Bearer $key" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"value\":true}"
+                    ${proxyReloadCommand}
+                end
+              '';
+            };
+            proxy-route-tui = {
+              description = "Pick a model to route all Amp requests via a TUI (use --all for full list).";
+              body = ''
+                set -l cache_dir ${config.xdg.configHome}/cli-proxy-api
+                set -l amp_cache "$cache_dir/amp-models.json"
+                set -l cache "$cache_dir/models.json"
+                set -l selection ""
+                set -l use_amp_cache 1
+                if test "$argv[1]" = "--all"
+                  set use_amp_cache 0
+                end
+                if test $use_amp_cache -eq 1 -a -s "$amp_cache"
+                  set -l amp_count (${jqBin} -r 'length' "$amp_cache")
+                  if test "$amp_count" -gt 0
+                    set -l selection_line (${jqBin} -r 'sort_by(.display_name // .id)[] | "\(.display_name // .id)\t\(.id)\t\(.auth_file // "")"' "$amp_cache" | ${fzfBin} --prompt="Route model> " --delimiter="\t" --with-nth=1,2)
+                    if test -n "$selection_line"
+                      set -l parts (string split "\t" -- "$selection_line")
+                      set selection $parts[2]
+                    end
+                  else
+                    set use_amp_cache 0
+                  end
+                end
+                if test -z "$selection" -a $use_amp_cache -eq 0 -a -s "$cache"
+                  set -l selection_line (${jqBin} -r 'sort_by(.display_name // .id)[] | "\(.display_name // .id)\t\(.id)\t\(.auth_file // "")"' "$cache" | ${fzfBin} --prompt="Route model> " --delimiter="\t" --with-nth=1,2)
+                  if test -n "$selection_line"
+                    set -l parts (string split "\t" -- "$selection_line")
+                    set selection $parts[2]
+                  end
+                else
+                  set -l choices \
+                    ${lib.concatStringsSep " " (map lib.escapeShellArg cfg.proxy.modelChoices)}
+                  if test (count $choices) -eq 0
+                    echo "no models configured in modules.terminal.amp.proxy.modelChoices"
+                    return 1
+                  end
+                  set selection (printf "%s\n" $choices | ${fzfBin} --prompt="Route model> ")
+                end
+                if test -z "$selection"
+                  return 1
+                end
+                proxy-route "$selection"
+              '';
+            };
+            proxy-models-refresh = {
+              description = "Refresh cached models from CLIProxyAPI and Amp.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                set -l cache_dir ${config.xdg.configHome}/cli-proxy-api
+                set -l cache "$cache_dir/models.json"
+                set -l amp_cache "$cache_dir/amp-models.json"
+                mkdir -p "$cache_dir"
+                set -l auth_files (${curlBin} -sS "${proxyMgmtBase}/auth-files" \
+                  -H "Authorization: Bearer $key" | ${jqBin} -r '.files[].name')
+                if test (count $auth_files) -eq 0
+                  echo "no auth files found"
+                  return 1
+                end
+                set -l tmp (mktemp)
+                for name in $auth_files
+                  set -l encoded (string escape --style=url "$name")
+                  ${curlBin} -sS "${proxyMgmtBase}/auth-files/models?name=$encoded" \
+                    -H "Authorization: Bearer $key" \
+                    | ${jqBin} -c --arg name "$name" '.models[] | . + {auth_file: $name}' >> $tmp
+                end
+                if test -s "$tmp"
+                  ${jqBin} -s 'unique_by(.id)' "$tmp" > "$cache"
+                else
+                  rm -f "$tmp"
+                  echo "no models returned"
+                  return 1
+                end
+                rm -f "$tmp"
+                set -l amp_models (${curlBin} -sS https://ampcode.com/models | ${rgBin} -o 'currentModel:\"[^\"]+\"' | string replace -r 'currentModel:\"(.*)\"' '$1' | sort -u)
+                if test (count $amp_models) -gt 0
+                  set -l amp_json (printf "%s\n" $amp_models | ${jqBin} -R -s 'split("\n") | map(select(length>0))' | string collect)
+                  ${jqBin} -n --argjson amp "$amp_json" --slurpfile cache "$cache" '$cache[0] | map(select(.display_name as $name | ($amp | index($name)))) | unique_by(.id)' > "$amp_cache"
+                end
+                echo "wrote $cache"
+                if test -s "$amp_cache"
+                  echo "wrote $amp_cache"
                 end
               '';
             };
@@ -390,6 +506,17 @@ in
                 set -l key (${proxyMgmtKeyCommand})
                 ${curlBin} -sS -X DELETE "${proxyMgmtBase}/ampcode/model-mappings" \
                   -H "Authorization: Bearer $key"
+                ${curlBin} -sS -X PUT "${proxyMgmtBase}/ampcode/force-model-mappings" \
+                  -H "Authorization: Bearer $key" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"value\":false}"
+                ${proxyReloadCommand}
+              '';
+            };
+            proxy-reload = {
+              description = "Restart CLIProxyAPI to apply config changes.";
+              body = ''
+                ${proxyReloadCommand}
               '';
             };
             proxy-route-status = {
@@ -398,6 +525,65 @@ in
                 set -l key (${proxyMgmtKeyCommand})
                 ${curlBin} -sS -X GET "${proxyMgmtBase}/ampcode/model-mappings" \
                   -H "Authorization: Bearer $key"
+              '';
+            };
+            proxy-log-on = {
+              description = "Enable CLIProxyAPI request logging.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                ${curlBin} -sS -X PUT "${proxyMgmtBase}/request-log" \
+                  -H "Authorization: Bearer $key" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"value\":true}"
+              '';
+            };
+            proxy-log-off = {
+              description = "Disable CLIProxyAPI request logging.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                ${curlBin} -sS -X PUT "${proxyMgmtBase}/request-log" \
+                  -H "Authorization: Bearer $key" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"value\":false}"
+              '';
+            };
+            proxy-log-status = {
+              description = "Show whether request logging is enabled.";
+              body = ''
+                set -l key (${proxyMgmtKeyCommand})
+                ${curlBin} -sS -X GET "${proxyMgmtBase}/request-log" \
+                  -H "Authorization: Bearer $key"
+              '';
+            };
+            proxy-last-model = {
+              description = "Show the model from the latest request log.";
+              body = ''
+                set -l logdir ${config.xdg.configHome}/cli-proxy-api/logs
+                if test ! -d "$logdir"
+                  echo "no request logs found"
+                  return 1
+                end
+                set -l candidates (ls -t $logdir/api-provider-*.log 2>/dev/null)
+                if test (count $candidates) -eq 0
+                  set candidates (ls -t $logdir/*.log 2>/dev/null | string match -v -r '/error-')
+                end
+                set -l log ""
+                for entry in $candidates
+                  if test -f "$entry"
+                    set log "$entry"
+                    break
+                  end
+                end
+                if test -z "$log"
+                  echo "no request logs found"
+                  return 1
+                end
+                set -l match (${rgBin} -o -m 1 '"model"\\s*:\\s*"[^"]+"' "$log")
+                if test -z "$match"
+                  echo "model not found in $log"
+                  return 1
+                end
+                string replace -r '.*"model"\\s*:\\s*"([^"]+)".*' '$1' -- $match
               '';
             };
           }
