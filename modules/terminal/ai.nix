@@ -29,7 +29,7 @@
             };
           };
           gemini-cli = {
-            enable = true;
+            enable = lib.mkForce false;
             settings = {
               selectedAuthType = "oauth-personal";
             };
