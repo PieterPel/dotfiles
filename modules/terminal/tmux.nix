@@ -86,7 +86,10 @@
 
             ## Keybinds
             # Source conf file
-            bind r source-file ~/.config/tmux/tmux.conf
+            bind R source-file ~/.config/tmux/tmux.conf
+
+            # Command palette (all commands via fzf)
+            bind r display-popup -E -w 80% -h 80% 'bash -lc '"'"'cmd=$(compgen -c | sort -u | fzf --prompt="Run> " --height=100%); [ -n "$cmd" ] && tmux new-window "$cmd"'"'"''
 
             # Navigation between panes
             bind h select-pane -L

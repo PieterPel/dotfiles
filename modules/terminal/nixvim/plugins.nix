@@ -464,7 +464,15 @@
             enable = true;
             settings = {
               bigfile.enabled = true;
-              dashboard.enabled = true; # Beautiful startup screen
+              dashboard = {
+                enabled = true; # Beautiful startup screen
+                # Avoid lazy.nvim startup stats to prevent `lazy.stats` module errors.
+                sections = [
+                  { section = "header"; }
+                  { section = "keys"; gap = 1; padding = 1; }
+                  { section = "recent_files"; }
+                ];
+              };
               input.enabled = true; # Better rename/input dialogs
               notifier.enabled = true; # Better notifications
               quickfile.enabled = true;
