@@ -22,6 +22,42 @@
       '';
 
       promote = lib.getExe' promoteScript "tmux-promote";
+
+      paletteScript = pkgs.writeShellScriptBin "tmux-command-palette" ''
+        set -euo pipefail
+
+        if ! command -v fzf >/dev/null 2>&1; then
+          echo "fzf not found in PATH" >&2
+          exit 1
+        fi
+
+        list_commands() {
+          if command -v compgen >/dev/null 2>&1; then
+            compgen -c
+            return 0
+          fi
+
+          # Fallback for shells without compgen: scan PATH for executables.
+          local path_env
+          path_env="${PATH:-}"
+          local IFS=:
+          local dir
+          for dir in $path_env; do
+            [ -d "$dir" ] || continue
+            local file
+            for file in "$dir"/*; do
+              [ -f "$file" ] && [ -x "$file" ] && basename "$file"
+            done
+          done
+        }
+
+        cmd=$(list_commands | sort -u | fzf --prompt="Run> " --height=100%)
+        if [ -n "$cmd" ]; then
+          tmux new-window "$cmd"
+        fi
+      '';
+
+      palette = lib.getExe' paletteScript "tmux-command-palette";
     in
     {
       options.modules.terminal.tmux = {
@@ -89,7 +125,7 @@
             bind R source-file ~/.config/tmux/tmux.conf
 
             # Command palette (all commands via fzf)
-            bind r display-popup -E -w 80% -h 80% 'bash -lc '"'"'cmd=$(compgen -c | sort -u | fzf --prompt="Run> " --height=100%); [ -n "$cmd" ] && tmux new-window "$cmd"'"'"''
+            bind r display-popup -E -w 80% -h 80% "${palette}"
 
             # Navigation between panes
             bind h select-pane -L

@@ -37,6 +37,9 @@
         # Lazyjj
         # lj = lib.getExe pkgs.lazyjj; # Broken build
 
+        # Atuin
+        a = lib.getExe pkgs.atuin;
+
         # eza
         ls = "${eza} --color=always --group-directories-first --icons";
         ll = "${eza} -la --icons --octal-permissions --group-directories-first";

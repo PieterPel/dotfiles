@@ -64,6 +64,7 @@ let
       package-management.flatpaks = defaultEnable;
       terminal = {
         ai = defaultEnable;
+        atuin = defaultEnable;
         direnv = defaultEnable;
         fish = defaultEnable;
         git = defaultEnable;
