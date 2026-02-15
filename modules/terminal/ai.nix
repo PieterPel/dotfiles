@@ -14,7 +14,7 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = [
+        packages = lib.optionals (!config.programs.amp.enable) [
           pkgs.amp-cli
         ];
         programs = {

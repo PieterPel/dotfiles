@@ -78,10 +78,10 @@ let
             gnupg.sshKeyPaths = cfg.gnupgSshKeyPaths;
           }
           // lib.optionalAttrs (cfg.defaultSopsFile != null) {
-            defaultSopsFile = cfg.defaultSopsFile;
+            inherit (cfg) defaultSopsFile;
           }
           // {
-            validateSopsFiles = cfg.validateSopsFiles;
+            inherit (cfg) validateSopsFiles;
           };
       };
     };
@@ -90,7 +90,7 @@ let
     { config, lib, pkgs, ... }:
     let
       cfg = config.modules.security.sops;
-      defaultAgeKeyFile = builtins.toPath "${config.xdg.configHome}/sops/age/keys.txt";
+      defaultAgeKeyFile = "${config.xdg.configHome}/sops/age/keys.txt";
     in
     {
       options.modules.security.sops = {
@@ -170,16 +170,18 @@ let
             gnupg.sshKeyPaths = cfg.gnupgSshKeyPaths;
           }
           // lib.optionalAttrs (cfg.defaultSopsFile != null) {
-            defaultSopsFile = cfg.defaultSopsFile;
+            inherit (cfg) defaultSopsFile;
           }
           // {
-            validateSopsFiles = cfg.validateSopsFiles;
+            inherit (cfg) validateSopsFiles;
           };
       };
     };
 in
 {
-  flake.modules.nixos.sops = mkSopsModule "nixosModules";
-  flake.modules.darwin.sops = mkSopsModule "darwinModules";
-  flake.modules.homeManager.sops = mkHmSopsModule;
+  flake.modules = {
+    nixos.sops = mkSopsModule "nixosModules";
+    darwin.sops = mkSopsModule "darwinModules";
+    homeManager.sops = mkHmSopsModule;
+  };
 }
