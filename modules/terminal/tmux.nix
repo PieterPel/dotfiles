@@ -39,7 +39,7 @@
 
           # Fallback for shells without compgen: scan PATH for executables.
           local path_env
-          path_env="${PATH:-}"
+          path_env="''${PATH:-}"
           local IFS=:
           local dir
           for dir in $path_env; do
