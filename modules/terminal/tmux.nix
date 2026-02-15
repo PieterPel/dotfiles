@@ -58,6 +58,27 @@
       '';
 
       palette = lib.getExe' paletteScript "tmux-command-palette";
+
+      gitStatusScript = pkgs.writeShellScriptBin "tmux-git-status" ''
+        set -euo pipefail
+        cd "$1" 2>/dev/null || exit 0
+
+        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+          exit 0
+        fi
+
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        stats=$(git diff HEAD --shortstat 2>/dev/null | sed 's/^ //')
+
+        if [ -n "$stats" ]; then
+          clean_stats=$(echo "$stats" | sed -E 's/([^0-9]+)([0-9]+) file.*/\2f/; s/([^0-9]+)([0-9]+) ins.*/ +\2/; s/([^0-9]+)([0-9]+) del.*/ -\2/')
+          echo "#[fg=magenta] $branch #[fg=cyan][$clean_stats]"
+        else
+          echo "#[fg=magenta] $branch #[fg=green][clean]"
+        fi
+      '';
+
+      gitStatus = lib.getExe' gitStatusScript "tmux-git-status";
     in
     {
       options.modules.terminal.tmux = {
@@ -83,6 +104,12 @@
               plugin = power-theme;
               extraConfig = ''
                 set -g @tmux_power_theme 'violet'
+                set -g @tmux_power_show_date false
+                set -g @tmux_power_show_time false
+                set -g @tmux_power_user_opts "#(${gitStatus} \"#{pane_current_path}\")"
+
+                set-window-option -g window-status-format " #I:#W "
+                set-window-option -g window-status-current-format " #I:#W "
               '';
             }
             {
@@ -115,6 +142,7 @@
             set -g default-shell "$SHELL"
             set-option -g allow-rename off # Don't rename self-named windows
             set-option -g wrap-search on # Go from window N to window 1 
+            set -g status-interval 5
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
