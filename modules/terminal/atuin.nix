@@ -17,6 +17,9 @@ in
       };
 
       config = lib.mkIf cfg.enable {
+        home.sessionVariables = {
+          ATUIN_NOBIND = "true";
+        };
         programs.atuin = {
           enable = true;
           enableFishIntegration = true;

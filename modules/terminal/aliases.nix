@@ -38,7 +38,7 @@
         # lj = lib.getExe pkgs.lazyjj; # Broken build
 
         # Atuin
-        a = lib.getExe pkgs.atuin;
+        a = "${lib.getExe pkgs.atuin} search";
 
         # eza
         ls = "${eza} --color=always --group-directories-first --icons";
