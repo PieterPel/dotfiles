@@ -143,6 +143,9 @@
             set-option -g allow-rename off # Don't rename self-named windows
             set-option -g wrap-search on # Go from window N to window 1 
             set -g status-interval 5
+            # Override tmux-power's status-right so time/date don't reappear.
+            set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
+            set -g status-right-length 150
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
