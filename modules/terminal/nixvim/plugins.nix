@@ -328,6 +328,12 @@
           lspsaga = {
             enable = true;
             ui.code_action = "";
+            # Disable the code action lightbulb (flicker)
+            lightbulb = {
+              enable = false;
+              sign = false;
+              virtual_text = false;
+            };
           };
 
           conform-nvim = {
