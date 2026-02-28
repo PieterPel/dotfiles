@@ -48,6 +48,7 @@ let
       };
       theming.stylix = defaultEnable;
       wm.aerospace = defaultEnable;
+      virtualization.docker-mcp = defaultEnable;
     };
   };
 
