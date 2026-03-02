@@ -1,0 +1,12 @@
+[project]
+name = "mcp-oauth-wrapper"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.0",
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+    "python-multipart>=0.0.22",
+    "uvicorn>=0.41.0",
+]
