@@ -27,39 +27,38 @@
                     hooks = [
                       {
                         type = "command";
-                        command =
-                          "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg ''
-                            import json
-                            import subprocess
-                            import sys
+                        command = "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg ''
+                          import json
+                          import subprocess
+                          import sys
 
-                            def osa_escape(value: str) -> str:
-                                return (
-                                    value.replace("\\", "\\\\")
-                                    .replace("\"", "\\\"")
-                                    .replace("\n", "\\n")
-                                )
+                          def osa_escape(value: str) -> str:
+                              return (
+                                  value.replace("\\", "\\\\")
+                                  .replace("\"", "\\\"")
+                                  .replace("\n", "\\n")
+                              )
 
-                            try:
-                                data = json.load(sys.stdin)
-                            except Exception:
-                                data = {}
+                          try:
+                              data = json.load(sys.stdin)
+                          except Exception:
+                              data = {}
 
-                            title = "Claude Code"
-                            body = data.get("message") or "Claude Code notification"
+                          title = "Claude Code"
+                          body = data.get("message") or "Claude Code notification"
 
-                            title = osa_escape(str(title))
-                            body = osa_escape(str(body))
+                          title = osa_escape(str(title))
+                          body = osa_escape(str(body))
 
-                            subprocess.run(
-                                [
-                                    "/usr/bin/osascript",
-                                    "-e",
-                                    f'display notification "{body}" with title "{title}"',
-                                ],
-                                check=False,
-                            )
-                          ''}";
+                          subprocess.run(
+                              [
+                                  "/usr/bin/osascript",
+                                  "-e",
+                                  f'display notification "{body}" with title "{title}"',
+                              ],
+                              check=False,
+                          )
+                        ''}";
                       }
                     ];
                   }
@@ -84,42 +83,42 @@
                 notification_method = "osc9";
                 animations = false;
               };
-              notify = lib.optionals pkgs.stdenv.isDarwin [
-                "${pkgs.python3}/bin/python3"
-                "-c"
-                ''
-                  import json
-                  import subprocess
-                  import sys
-
-                  def osa_escape(value: str) -> str:
-                      return (
-                          value.replace("\\", "\\\\")
-                          .replace('"', '\\"')
-                          .replace("\n", "\\n")
-                      )
-
-                  try:
-                      data = json.load(sys.stdin)
-                  except Exception:
-                      data = {}
-
-                  title = data.get("title") or data.get("event") or "Codex"
-                  body = data.get("message") or data.get("summary") or "Codex notification"
-
-                  title = osa_escape(str(title))
-                  body = osa_escape(str(body))
-
-                  subprocess.run(
-                      [
-                          "/usr/bin/osascript",
-                          "-e",
-                          f'display notification "{body}" with title "{title}"',
-                      ],
-                      check=False,
-                  )
-                ''
-              ];
+              #   notify = lib.optionals pkgs.stdenv.isDarwin [
+              #     "${pkgs.python3}/bin/python3"
+              #     "-c"
+              #     ''
+              #       import json
+              #       import subprocess
+              #       import sys
+              #
+              #       def osa_escape(value: str) -> str:
+              #           return (
+              #               value.replace("\\", "\\\\")
+              #               .replace('"', '\\"')
+              #               .replace("\n", "\\n")
+              #           )
+              #
+              #       try:
+              #           data = json.load(sys.stdin)
+              #       except Exception:
+              #           data = {}
+              #
+              #       title = data.get("title") or data.get("event") or "Codex"
+              #       body = data.get("message") or data.get("summary") or "Codex notification"
+              #
+              #       title = osa_escape(str(title))
+              #       body = osa_escape(str(body))
+              #
+              #       subprocess.run(
+              #           [
+              #               "/usr/bin/osascript",
+              #               "-e",
+              #               f'display notification "{body}" with title "{title}"',
+              #           ],
+              #           check=False,
+              #       )
+              #     ''
+              #   ];
             };
           };
           gemini-cli = {
