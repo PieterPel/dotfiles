@@ -81,7 +81,6 @@
               tui = {
                 notifications = true;
                 notification_method = "osc9";
-                animations = false;
               };
               #   notify = lib.optionals pkgs.stdenv.isDarwin [
               #     "${pkgs.python3}/bin/python3"
