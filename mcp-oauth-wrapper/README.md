@@ -4,7 +4,18 @@ OAuth 2.0 wrapper for Docker MCP Gateway, allowing Claude.ai to connect using OA
 
 ## Setup
 
-### 1. Set the authentication token
+### 1. Set required environment variables
+
+Required:
+- `MCP_GATEWAY_AUTH_TOKEN`
+- `OAUTH_CLIENT_SECRET`
+- `PUBLIC_BASE_URL` (the public, reachable URL for this wrapper, e.g. your tunnel URL)
+
+Optional:
+- `MCP_GATEWAY_URL` (default: `http://localhost:8082/sse`)
+- `OAUTH_CLIENT_ID` (default: `claude-mcp-client`)
+
+#### Set the authentication token
 
 The wrapper and gateway share a Bearer token via the `MCP_GATEWAY_AUTH_TOKEN` environment variable.
 
@@ -46,13 +57,15 @@ devtunnel host mcp-gateway > /tmp/devtunnel-host.log 2>&1 &
 
 This gives you a **stable URL** that never changes: `https://<your-tunnel>.euw.devtunnels.ms`
 
+Set `PUBLIC_BASE_URL` to this value.
+
 ## Configuration
 
-- **MCP Gateway URL**: `http://localhost:8082/sse`
+- **MCP Gateway URL**: `http://localhost:8082/sse` (or `MCP_GATEWAY_URL`)
 - **OAuth Wrapper Port**: `8081`
 - **DevTunnel (stable)**: `https://<your-tunnel>.euw.devtunnels.ms`
-- **OAuth Client ID**: `claude-mcp-client`
-- **OAuth Client Secret**: `<generate-and-insert-secret>`
+- **OAuth Client ID**: `claude-mcp-client` (or `OAUTH_CLIENT_ID`)
+- **OAuth Client Secret**: `<generate-and-insert-secret>` (set `OAUTH_CLIENT_SECRET`)
 
 ## Connecting from Claude.ai
 
