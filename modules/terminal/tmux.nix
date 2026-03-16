@@ -23,6 +23,124 @@
 
       promote = lib.getExe' promoteScript "tmux-promote";
 
+      fzf-tmux = pkgs.lib.getExe' pkgs.fzf "fzf-tmux";
+
+      claudePickerScript = pkgs.writeShellScriptBin "claude-picker" ''
+        set -euo pipefail
+
+        export PATH="${lib.makeBinPath [ pkgs.fzf ]}:$PATH"
+        PS="/bin/ps"
+
+        if ! command -v tmux >/dev/null 2>&1; then
+          echo "tmux not found in PATH" >&2
+          exit 1
+        fi
+
+        if [ ! -x "$PS" ]; then
+          echo "ps not found in PATH" >&2
+          exit 1
+        fi
+
+        panes=$(tmux list-panes -a -F "#{pane_id}|#{session_name}|#{window_index}|#{window_name}|#{pane_index}|#{pane_current_path}|#{pane_pid}|#{pane_tty}" 2>/dev/null || true)
+        if [ -z "$panes" ]; then
+          tmux display-message "No tmux panes found"
+          exit 0
+        fi
+
+        claude_procs=$("$PS" -ax -o pid= -o tty= -o command= 2>/dev/null | awk '{
+          pid=$1
+          tty=$2
+          $1=""; $2=""
+          sub(/^ +/,"")
+          cmd=$0
+          if (cmd ~ /^claude( |$)/) {
+            print pid "\t" tty "\t" cmd
+          }
+        }')
+
+        if [ -z "$claude_procs" ]; then
+          tmux display-message "No Claude processes found"
+          exit 0
+        fi
+
+        is_descendant() {
+          local root_pid="$1"
+          local child_pid="$2"
+          local current_pid="$child_pid"
+          while [ -n "$current_pid" ] && [ "$current_pid" != "0" ]; do
+            if [ "$current_pid" = "$root_pid" ]; then
+              return 0
+            fi
+            current_pid=$("$PS" -o ppid= -p "$current_pid" 2>/dev/null | tr -d ' ')
+          done
+          return 1
+        }
+
+        matches=$(
+          while IFS='|' read -r pane_id session window_index window_name pane_index pane_path pane_pid pane_tty; do
+            [ -n "$pane_pid" ] || continue
+            match_cmd=""
+            pane_tty="''${pane_tty#/dev/}"
+            while IFS=$'\t' read -r claude_pid claude_tty claude_cmd; do
+              claude_tty="''${claude_tty#/dev/}"
+              if [ -n "$pane_tty" ] && [ "$pane_tty" = "$claude_tty" ]; then
+                match_cmd="$claude_cmd"
+                break
+              fi
+              if is_descendant "$pane_pid" "$claude_pid"; then
+                match_cmd="$claude_cmd"
+                break
+              fi
+            done <<< "$claude_procs"
+
+            if [ -n "$match_cmd" ]; then
+              printf "%s:%s\t%s\t%s\t%s\t%s\t%s\n" \
+                "$session" \
+                "$window_index" \
+                "$window_name" \
+                "$pane_index" \
+                "$match_cmd" \
+                "$pane_path" \
+                "$pane_id"
+            fi
+          done <<< "$panes"
+        )
+
+        if [ -z "$matches" ]; then
+          if [ "''${CLAUDE_PICKER_DEBUG:-0}" = "1" ]; then
+            tmpfile=$(mktemp "/tmp/claude-picker-debug.XXXXXX")
+            {
+              echo "=== claude-picker debug ==="
+              echo "-- panes"
+              printf "%s\n" "$panes"
+              echo "-- claude procs"
+              printf "%s\n" "$claude_procs"
+              echo "-- matches (none)"
+            } > "$tmpfile"
+            tmux display-popup -E -w 90% -h 80% "sh -c 'cat \"$tmpfile\"; printf \"\n(press enter to close)\"; read -r _'"
+            rm -f "$tmpfile"
+          else
+            tmux display-message "No Claude Code panes found"
+          fi
+          exit 0
+        fi
+
+        target=$(printf "%s\n" "$matches" | ${fzf-tmux} -p 80%,70% \
+          --no-sort --border-label ' claude ' --prompt '🤖 ' \
+          --delimiter '\t' --with-nth 1,2,3,4,5 \
+          --preview 'tmux capture-pane -ep -t {6} | tail -n 80' \
+          --preview-window 'right,60%,wrap')
+
+        if [ -n "$target" ]; then
+          session_target=$(echo "$target" | awk -F '\t' '{print $1}')
+          pane_target=$(echo "$target" | awk -F '\t' '{print $6}')
+          tmux switch-client -t "$session_target"
+          tmux select-pane -t "$pane_target"
+        fi
+      '';
+
+      claudePicker = lib.getExe' claudePickerScript "claude-picker";
+
       paletteScript = pkgs.writeShellScriptBin "tmux-command-palette" ''
         set -euo pipefail
 
@@ -157,6 +275,9 @@
 
             # Command palette (all commands via fzf)
             bind r display-popup -E -w 80% -h 80% "${palette}"
+
+            # Claude Code picker
+            bind a run-shell "CLAUDE_PICKER_DEBUG=1 ${claudePicker}"
 
             # Navigation between panes
             bind h select-pane -L
