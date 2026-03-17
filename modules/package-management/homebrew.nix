@@ -34,6 +34,8 @@
 
           # `brew install`
           brews = [
+            # Not in nixpkgs
+            "rtk"
           ];
 
           # `brew install --cask`
@@ -49,7 +51,6 @@
 
             # Sometimes Broken on nixpkgs due to hash mistmatch
             "spotify"
-
           ];
         };
       };
