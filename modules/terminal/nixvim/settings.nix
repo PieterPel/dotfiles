@@ -105,6 +105,13 @@
             providers.wl-copy.enable = isWayland;
           };
 
+          # Define custom highlight groups here
+          highlight = {
+            SnacksDashboardHeader = {
+              fg = "#9D00FF";
+            };
+          };
+
           extraConfigVim = ''
             " Make lightline the only bar and change the theme
             set noshowmode

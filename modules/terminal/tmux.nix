@@ -127,6 +127,7 @@
 
         target=$(printf "%s\n" "$matches" | ${fzf-tmux} -p 80%,70% \
           --no-sort --border-label ' claude ' --prompt '🤖 ' \
+          --bind 'esc:abort,ctrl-c:abort' \
           --delimiter '\t' --with-nth 1,2,3,4,5 \
           --preview 'tmux capture-pane -ep -t {6} | tail -n 80' \
           --preview-window 'right,60%,wrap')
