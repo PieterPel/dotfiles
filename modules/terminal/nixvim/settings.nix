@@ -109,7 +109,7 @@
           # Define custom highlight groups here
           highlight = {
             SnacksDashboardHeader = {
-              fg = dashboardHeaderColor;
+              fg = lib.mkForce dashboardHeaderColor;
             };
           };
 
