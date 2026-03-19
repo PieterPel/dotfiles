@@ -8,6 +8,7 @@
     let
       isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
       cfg = config.modules.terminal.nixvim;
+      dashboardHeaderColor = "#6A18D1";
     in
     {
       options.modules.programs.nixvim = {
@@ -108,7 +109,7 @@
           # Define custom highlight groups here
           highlight = {
             SnacksDashboardHeader = {
-              fg = "#9D00FF";
+              fg = dashboardHeaderColor;
             };
           };
 
@@ -161,7 +162,10 @@
               vim.api.nvim_set_hl(0, "FoldColumn", { bg = "none" })
             end
             vim.api.nvim_create_autocmd("ColorScheme", {
-              callback = set_transparent_bg,
+              callback = function()
+                set_transparent_bg()
+                vim.api.nvim_set_hl(0, "SnacksDashboardHeader", { fg = "${dashboardHeaderColor}" })
+              end,
             })
             set_transparent_bg()
           '';
