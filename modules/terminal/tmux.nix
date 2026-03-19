@@ -178,6 +178,19 @@
 
       palette = lib.getExe' paletteScript "tmux-command-palette";
 
+      windowPickerScript = pkgs.writeShellScriptBin "tmux-window-picker" ''
+        set -euo pipefail
+        export PATH="${lib.makeBinPath [ pkgs.fzf ]}:$PATH"
+
+        tmux list-windows -a -F '#{session_name}:#{window_id} #{window_name} #{pane_current_command} [#{pane_current_path}]' \
+          | fzf --prompt 'Windows> ' \
+                --preview 'tmux capture-pane -ep -t {1}' \
+                --preview-window 'right:60%,border-left' \
+                --bind 'enter:execute(tmux switch-client -t {1})+accept'
+      '';
+
+      windowPicker = lib.getExe' windowPickerScript "tmux-window-picker";
+
       gitStatusScript = pkgs.writeShellScriptBin "tmux-git-status" ''
         set -euo pipefail
         cd "$1" 2>/dev/null || exit 0
@@ -276,6 +289,11 @@
 
             # Command palette (all commands via fzf)
             bind r display-popup -E -w 80% -h 80% "${palette}"
+
+            # Fuzzy window picker (fzf + live preview)
+            bind w display-popup -E -w 80% -h 80% "${windowPicker}"
+            # Default tmux window chooser moved to W
+            bind W choose-tree -Zw
 
             # Claude Code picker
             bind a run-shell "CLAUDE_PICKER_DEBUG=1 ${claudePicker}"
