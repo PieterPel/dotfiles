@@ -63,6 +63,9 @@
         #          source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;
         #      };
         #};
+
+        # weirdest bug ever
+        targets.darwin.copyApps.enableChecks = false;
       };
     };
 
