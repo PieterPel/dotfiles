@@ -1,6 +1,6 @@
 {
   flake.modules.homeManager.home =
-    { config, ... }:
+    { pkgs, config, ... }:
     {
       config = {
         home = {
@@ -39,6 +39,11 @@
         programs.home-manager = {
           enable = true;
         };
+
+        # Also add cli
+        packages = [
+          pkgs.home-manager
+        ];
 
         # Home Manager can also manage your environment variables through
         # 'home.sessionVariables'. These will be explicitly sourced when using a
