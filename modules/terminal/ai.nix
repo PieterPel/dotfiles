@@ -24,10 +24,10 @@
           beads-viewer # Graph-aware TUI for navigating your local issue tracker
 
           # Assistant
-          picoclaw
+          # picoclaw # Hash mismatch
 
           # Tracker (Added for the local-first workflow)
-          beads-rust # Fast, local-first issue tracker right in your git repo
+          beads # Fast, local-first issue tracker right in your git repo
 
           # Dev
           tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
@@ -40,7 +40,7 @@
           entire # links AI sessions to code changes
           rtk # Reduce input tokens
           openskills # port SKILLS.md to other providers
-          happy # easy remote sessions
+          happy-coder # easy remote sessions
 
         ];
         programs = {
