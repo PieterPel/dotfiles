@@ -70,6 +70,10 @@
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     };
+
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+    };
   };
 
   outputs =

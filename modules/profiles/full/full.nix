@@ -80,7 +80,6 @@ let
         jjui = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
-        amp = defaultEnable;
       };
       theming.stylix = defaultEnable;
       security.sops = defaultEnable;
