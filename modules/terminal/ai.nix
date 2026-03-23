@@ -35,12 +35,20 @@
 
           # Multiagent / Workspace
           workmux # Easily make new tmux window + git worktree
+          agent-deck # AI Agent command center
 
           # Util
           entire # links AI sessions to code changes
           rtk # Reduce input tokens
           openskills # port SKILLS.md to other providers
           happy-coder # easy remote sessions
+          ccusage # Usage for claude code
+
+          # Appearance
+          ccstatusline # statusline for claude
+
+          # Security
+          claudebox # Containerize claude code easily
 
         ];
         programs = {
