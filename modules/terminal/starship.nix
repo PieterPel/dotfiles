@@ -45,6 +45,11 @@
               disabled = true;
             };
 
+            # Remove Google Cloud info from prompt
+            gcloud = {
+              disabled = true;
+            };
+
             # Keep bun indicator without printing the runtime version number
             bun = {
               format = "via [$symbol]($style)";
