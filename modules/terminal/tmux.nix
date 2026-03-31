@@ -53,7 +53,7 @@
           $1=""; $2=""
           sub(/^ +/,"")
           cmd=$0
-          if (cmd ~ /^claude( |$)/) {
+          if (cmd ~ /^claude( |$)/ || cmd ~ /\.claude-unwrapped/) {
             print pid "\t" tty "\t" cmd
           }
         }')
