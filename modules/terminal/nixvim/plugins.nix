@@ -526,7 +526,7 @@
               repo = "claucode.nvim";
               # 2026-02-05
               rev = "cbcb3bbb4b71b430c92002bfb0e2e6fcde9b2257";
-              hash = "sha256-96+ua3NMHRpQFFAg+jOdvbCK921RNOSoRI7Glh+4lKU=";
+              hash = "sha256-g/e6f150Z43zp1gcdUXugux+JuG4VnyKlgDaG551/rM=";
             };
           })
 
