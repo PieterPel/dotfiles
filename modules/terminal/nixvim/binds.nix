@@ -179,22 +179,27 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # Copilot Chat
-          {
-            key = "<leader>co";
-            action = "<cmd>CopilotChatOpen<CR>";
-          }
+          # Claude (claucode.nvim)
           {
             key = "<leader>cc";
-            action = "<cmd>CopilotChatClose<CR>";
+            action = "<cmd>Claude<CR>";
+            options.desc = "Claude prompt";
           }
           {
-            key = "<leader>cp";
-            action = "<cmd>CopilotChatToggle<CR>";
+            key = "<leader>ct";
+            action = "<cmd>ClaudeTerminal<CR>";
+            options.desc = "Claude terminal";
+          }
+          {
+            key = "<leader>cv";
+            action = ":<C-u>ClaudeVisual<CR>";
+            mode = [ "v" ];
+            options.desc = "Claude with selection";
           }
           {
             key = "<leader>cg";
             action = "<cmd>Gemini toggle<CR>";
+            options.desc = "Gemini toggle";
           }
 
           {

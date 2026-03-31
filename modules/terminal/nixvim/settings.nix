@@ -136,10 +136,25 @@
             })
 
             require("venv-selector").setup({
-              settings = { 
+              settings = {
                 search = {
                 }
-              }  
+              }
+            })
+
+            require("claucode").setup({
+              keymaps = {
+                enable = false,
+              },
+              notifications = {
+                silent_watcher = true,
+                silent_claude_md = true,
+              },
+              ui = {
+                icons = {
+                  enabled = false,
+                },
+              },
             })
 
             -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
