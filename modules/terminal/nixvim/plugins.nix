@@ -12,6 +12,7 @@
           pkgs.prettierd
           pkgs.nixfmt
           pkgs.fzf
+          pkgs.jq
         ];
         programs.nixvim.plugins = {
           # General
@@ -520,13 +521,13 @@
           })
 
           (vimUtils.buildVimPlugin {
-            name = "claucode-nvim";
+            name = "claude-preview-nvim";
             src = pkgs.fetchFromGitHub {
-              owner = "avifenesh";
-              repo = "claucode.nvim";
-              # 2026-02-05
-              rev = "cbcb3bbb4b71b430c92002bfb0e2e6fcde9b2257";
-              hash = "sha256-g/e6f150Z43zp1gcdUXugux+JuG4VnyKlgDaG551/rM=";
+              owner = "Cannon07";
+              repo = "claude-preview.nvim";
+              # 2026-03-28
+              rev = "4aee3b003ce806900de22986efe96dba44ec91e7";
+              hash = "sha256-n8cDNQwF6uoNKZtKSlRMtxvbTAbYIlRl6ZdlrahCIog=";
             };
           })
 

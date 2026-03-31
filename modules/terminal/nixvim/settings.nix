@@ -142,18 +142,9 @@
               }
             })
 
-            require("claucode").setup({
-              keymaps = {
-                enable = false,
-              },
-              notifications = {
-                silent_watcher = true,
-                silent_claude_md = true,
-              },
-              ui = {
-                icons = {
-                  enabled = false,
-                },
+            require("claude-preview").setup({
+              diff = {
+                layout = "tab",
               },
             })
 

@@ -179,22 +179,11 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # Claude (claucode.nvim)
+          # claude-preview.nvim — install hooks once per project with :ClaudePreviewInstallHooks
           {
-            key = "<leader>cc";
-            action.__raw = "function() vim.api.nvim_feedkeys(':Claude ', 'n', false) end";
-            options.desc = "Claude prompt";
-          }
-          {
-            key = "<leader>ct";
-            action = "<cmd>ClaudeTerminalToggle<CR>";
-            options.desc = "Claude terminal toggle";
-          }
-          {
-            key = "<leader>cv";
-            action = ":<C-u>lua require('claucode.commands').store_visual_selection()<CR>:Claude<CR>";
-            mode = [ "v" ];
-            options.desc = "Claude with selection";
+            key = "<leader>dq";
+            action = "<cmd>ClaudePreviewCloseDiff<CR>";
+            options.desc = "Close Claude diff preview";
           }
           {
             key = "<leader>cg";
