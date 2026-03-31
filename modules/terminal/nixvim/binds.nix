@@ -182,17 +182,17 @@
           # Claude (claucode.nvim)
           {
             key = "<leader>cc";
-            action = "<cmd>Claude<CR>";
+            action.__raw = "function() vim.api.nvim_feedkeys(':Claude ', 'n', false) end";
             options.desc = "Claude prompt";
           }
           {
             key = "<leader>ct";
-            action = "<cmd>ClaudeTerminal<CR>";
-            options.desc = "Claude terminal";
+            action = "<cmd>ClaudeTerminalToggle<CR>";
+            options.desc = "Claude terminal toggle";
           }
           {
             key = "<leader>cv";
-            action = ":<C-u>ClaudeVisual<CR>";
+            action = ":<C-u>lua require('claucode.commands').store_visual_selection()<CR>:Claude<CR>";
             mode = [ "v" ];
             options.desc = "Claude with selection";
           }
