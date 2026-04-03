@@ -43,6 +43,7 @@
           openskills # port SKILLS.md to other providers
           happy-coder # easy remote sessions
           ccusage # Usage for claude code
+          gitnexus # Repo as KG for agents
 
           # Appearance
           ccstatusline # statusline for claude
