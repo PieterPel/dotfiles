@@ -21,13 +21,9 @@
           code # Codex fork that also supports claude and gemini
           mistral-vibe
           sidecar # Terminal-based companion to orchestrate your AI agents alongside Neovim
-          beads-viewer # Graph-aware TUI for navigating your local issue tracker
 
           # Assistant
           # picoclaw # Hash mismatch
-
-          # Tracker (Added for the local-first workflow)
-          beads # Fast, local-first issue tracker right in your git repo
 
           # Dev
           tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
