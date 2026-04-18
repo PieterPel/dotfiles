@@ -17,6 +17,7 @@
         packages = with pkgs; [
           pre-commit
           gh
+          gh-dash
         ];
 
         programs.git = {
