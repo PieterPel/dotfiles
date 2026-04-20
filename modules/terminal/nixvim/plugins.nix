@@ -330,7 +330,7 @@
             enable = true;
             ui.code_action = "";
             # Disable the code action lightbulb (flicker)
-            lightbulb = {
+            settings.lightbulb = {
               enable = false;
               sign = false;
               virtual_text = false;

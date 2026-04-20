@@ -37,6 +37,7 @@
         cargoHash = "sha256-AKBNCHx6Ap6HKddwzxs/qfJhJDE7LdZ/tRKO94ugRkA=";
         nativeBuildInputs = [ pkgs.pkg-config ];
         buildInputs = [ pkgs.openssl pkgs.libgit2 pkgs.libiconv ];
+        meta.mainProgram = "claude-tmux";
       };
 
       paletteScript = pkgs.writeShellScriptBin "tmux-command-palette" ''

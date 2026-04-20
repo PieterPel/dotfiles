@@ -10,7 +10,10 @@ in
     , ...
     }:
     let
-      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
+      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else
+      pkgs.emptyDirectory.overrideAttrs (old: {
+        meta = (old.meta or { }) // { mainProgram = "ghostty"; };
+      });
       cfg = config.modules.${parent}.${module};
     in
     {

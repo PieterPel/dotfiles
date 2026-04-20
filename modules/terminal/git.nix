@@ -22,6 +22,7 @@
 
         programs.git = {
           enable = true;
+          signing.format = null;
           settings = {
             user.name = "Pieter Pel";
             user.email = "pelpieter@gmail.com";
