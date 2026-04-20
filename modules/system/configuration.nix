@@ -66,6 +66,16 @@ let
         launchd.user.envVariables = {
           PATH = "${config.environment.systemPath}";
         };
+
+        # Raise open file limits (macOS default of 256 is too low for nix builds)
+        launchd.daemons.limit-maxfiles = {
+          serviceConfig = {
+            Label = "limit.maxfiles";
+            ProgramArguments = [ "/bin/launchctl" "limit" "maxfiles" "65536" "200000" ];
+            RunAtLoad = true;
+          };
+        };
+
       };
     };
 in

@@ -25,6 +25,7 @@ let
         internationalization = defaultEnable;
         networking = defaultEnable;
         printing = defaultEnable;
+        tailscale = defaultEnable;
         sound = defaultEnable;
         updating = defaultEnable;
       };
@@ -45,6 +46,7 @@ let
       system = {
         configuration = defaultEnable;
         fonts = defaultEnable;
+        tailscale = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wm.aerospace = defaultEnable;
