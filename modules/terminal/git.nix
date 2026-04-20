@@ -16,9 +16,11 @@
       config = lib.mkIf cfg.enable {
         packages = with pkgs; [
           pre-commit
-          gh
-          gh-dash
         ];
+
+        programs.gh = {
+          enable = true;
+        };
 
         programs.git = {
           enable = true;

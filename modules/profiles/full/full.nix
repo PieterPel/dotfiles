@@ -76,6 +76,7 @@ let
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
+        gh-dash = defaultEnable;
         lazygit = defaultEnable;
         jjui = defaultEnable;
         jujutsu = defaultEnable;

@@ -51,6 +51,10 @@
 
             # Sometimes Broken on nixpkgs due to hash mistmatch
             "spotify"
+
+            # Not in nixpkgs
+            "claude"
+
           ];
         };
       };
