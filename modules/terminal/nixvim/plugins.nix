@@ -510,7 +510,8 @@
         programs.nixvim.extraPlugins = with pkgs; [
 
           (vimUtils.buildVimPlugin {
-            name = "venv-selector";
+            pname = "venv-selector";
+            version = "2025-02-02";
             src = pkgs.fetchFromGitHub {
               owner = "pieterpel";
               repo = "venv-selector.nvim";
@@ -521,7 +522,8 @@
           })
 
           (vimUtils.buildVimPlugin {
-            name = "claude-preview-nvim";
+            pname = "claude-preview-nvim";
+            version = "2026-03-28";
             src = pkgs.fetchFromGitHub {
               owner = "Cannon07";
               repo = "claude-preview.nvim";
