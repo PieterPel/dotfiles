@@ -173,6 +173,8 @@
             set-option -g allow-rename off # Don't rename self-named windows
             set-option -g wrap-search on # Go from window N to window 1
             set -g allow-passthrough on
+            set -s extended-keys on
+            set -as terminal-features 'xterm*:extkeys'
             set -g status-interval 5
             # Override tmux-power's status-right so time/date don't reappear.
             set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"

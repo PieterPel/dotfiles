@@ -13,10 +13,55 @@
         programs.direnv = {
           enable = true;
           nix-direnv.enable = true;
+          # Suppress all direnv output (loading messages, env diff on reload)
+          silent = true;
+          config = {
+            global = {
+              # Default is 5s which is too aggressive for Nix env evaluations
+              warn_timeout = "0s";
+            };
+          };
         };
 
         programs.fish = {
           enable = true;
+
+          # Override direnv's synchronous fish hook with a non-blocking async version.
+          #
+          # direnv's default `__direnv_export_eval` runs `direnv export fish | source`
+          # synchronously on every fish_prompt event. With a warm nix-direnv cache this
+          # is only ~8ms, but on a cache miss (first enter, flake.lock change) it blocks
+          # the terminal for the full Nix evaluation — potentially 30s+.
+          #
+          # This replacement runs the export in the background and sources the result on
+          # the *next* prompt render. With a warm cache the job finishes in <50ms, so by
+          # the time you type your next command the env is already in place. On a cold
+          # cache the shell stays responsive and the env silently loads when Nix is done.
+          #
+          # Trade-off: one-prompt delay before env vars are visible. In practice this is
+          # imperceptible because the bg job almost always finishes before you type again.
+          interactiveShellInit = lib.mkAfter ''
+            function __direnv_export_eval --on-event fish_prompt
+                set -l prev_status $status
+
+                # Source the output queued by the previous prompt's background job
+                if set -q __direnv_async_file
+                    if test -f $__direnv_async_file
+                        source $__direnv_async_file 2>/dev/null
+                    end
+                    rm -f $__direnv_async_file
+                    set -e __direnv_async_file
+                end
+
+                # Kick off the next export in the background
+                set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
+                command direnv export fish >$__direnv_async_file 2>/dev/null &
+                disown
+
+                return $prev_status
+            end
+          '';
+
           functions = {
             # 1. The "Space Hunter" - Your command fixed for Fish syntax
             nix-direnv-list-bloat = {

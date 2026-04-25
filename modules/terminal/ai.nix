@@ -52,6 +52,7 @@
           claude-code = {
             enable = true;
             settings = {
+              model = "claude-sonnet-4-6";
               hooks = {
                 Notification = lib.optionals pkgs.stdenv.isDarwin [
                   {
