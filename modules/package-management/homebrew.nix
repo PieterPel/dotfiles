@@ -29,9 +29,7 @@
             cleanup = "zap";
           };
 
-          taps = [
-            "cordwainersmith/claudoscope"
-          ];
+          taps = [ ];
 
           # `brew install`
           brews = [
@@ -57,7 +55,7 @@
 
             # Not in nixpkgs
             "claude"
-            "claudoscope"
+            # claudoscope tap is broken upstream (wrong dir structure + placeholder sha256)
 
           ];
         };

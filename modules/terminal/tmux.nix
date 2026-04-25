@@ -113,6 +113,41 @@
       sessionStatusScript = pkgs.writeShellScriptBin "tmux-session-status" ''
         set -euo pipefail
 
+        find_claude_status() {
+          local pane_pid="$1"
+          for sf in "$HOME/.claude/sessions/"*.json; do
+            [ -f "$sf" ] || continue
+            local claude_pid cur depth
+            claude_pid=$(basename "$sf" .json)
+            cur="$claude_pid" depth=0
+            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
+              if [ "$cur" = "$pane_pid" ]; then
+                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
+                return
+              fi
+              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+              depth=$((depth + 1))
+            done
+          done
+          echo ""
+        }
+
+        claude_badge() {
+          local session="$1" seg_fg="$2"
+          local busy=0 idle=0
+          while IFS= read -r pane_pid; do
+            case "$(find_claude_status "$pane_pid")" in
+              busy) busy=$((busy + 1)) ;;
+              idle) idle=$((idle + 1)) ;;
+            esac
+          done < <(tmux list-panes -s -t "$session" -F '#{pane_pid}' 2>/dev/null)
+          if [ "$busy" -gt 0 ]; then
+            printf ' #[fg=#a6e3a1]●%s#[fg=%s]' "$busy" "$seg_fg"
+          elif [ "$idle" -gt 0 ]; then
+            printf ' #[fg=#585b70]○%s#[fg=%s]' "$idle" "$seg_fg"
+          fi
+        }
+
         sessions=($(tmux list-sessions -F '#S' 2>/dev/null))
         current=$(tmux display-message -p '#S')
         count=''${#sessions[@]}
@@ -131,10 +166,9 @@
             seg_bold="nobold"
           fi
 
-          # Segment text (range tag makes it clickable — switches to that session)
-          output+="#[range=session|$s]#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s #[range=default]"
+          badge=$(claude_badge "$s" "$seg_fg")
+          output+="#[range=session|$s]#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s$badge #[range=default]"
 
-          # Powerline arrow: fg = this segment bg, bg = next segment bg (or row bg)
           next_i=$((i + 1))
           if [ "$next_i" -lt "$count" ]; then
             next_s="''${sessions[$next_i]}"
@@ -153,6 +187,40 @@
       '';
 
       sessionStatus = lib.getExe' sessionStatusScript "tmux-session-status";
+
+      # Claude is a child of the shell, not a parent.
+      # So we scan all session files and walk UP each claude PID to see if pane_pid is an ancestor.
+      claudeStatusScript = pkgs.writeShellScriptBin "tmux-claude-status" ''
+        set -euo pipefail
+
+        find_claude_status() {
+          local pane_pid="$1"
+          for sf in "$HOME/.claude/sessions/"*.json; do
+            [ -f "$sf" ] || continue
+            local claude_pid cur depth
+            claude_pid=$(basename "$sf" .json)
+            cur="$claude_pid" depth=0
+            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
+              if [ "$cur" = "$pane_pid" ]; then
+                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
+                return
+              fi
+              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+              depth=$((depth + 1))
+            done
+          done
+          echo ""
+        }
+
+        status=$(find_claude_status "''${1:-}")
+        case "$status" in
+          busy) printf '#[fg=#a6e3a1]● ' ;;
+          idle) printf '#[fg=#585b70]○ ' ;;
+          *)    printf "" ;;
+        esac
+      '';
+
+      claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
     in
     {
       options.modules.terminal.tmux = {
@@ -179,8 +247,8 @@
                 set -g @catppuccin_flavor 'mocha'
                 set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
-                set -g @catppuccin_window_current_text ' #W'
-                set -g @catppuccin_window_text ' #W'
+                set -g @catppuccin_window_current_text '#(${claudeStatus} #{pane_pid})#W'
+                set -g @catppuccin_window_text '#(${claudeStatus} #{pane_pid})#W'
               '';
             }
             {
@@ -227,9 +295,8 @@
             set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
             set -g status-right-length 150
 
-            # Override catppuccin active window accent to match Rebels purple
-            set-window-option -g window-status-current-style 'fg=#ffffff,bg=#6A18D1,bold'
-            set-window-option -g window-status-style 'fg=#585b70,bg=#1e1e2e'
+            # Override catppuccin's mauve accent to Rebels purple
+            set -g @thm_mauve '#6A18D1'
 
             # Row 1 (top): session list
             set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
@@ -274,36 +341,40 @@
             bind d split-window -h -c "#{pane_current_path}"
             bind v split-window -v -c "#{pane_current_path}"
             unbind '"'
-            unbind %
+                unbind %
 
-            # Set shell to fish
-            set-option -g default-shell ${fish}
+                # Set shell to fish
+                set-option -g default-shell ${fish}
 
-            ## These have home-manager settings, but no NixOS settings for some reason
-            # Disable confirmation prompts (e.g., for killing panes)
-            bind-key x kill-pane
-            bind-key & kill-window
+                ## These have home-manager settings, but no NixOS settings for some reason
+                # Disable confirmation prompts (e.g., for killing panes)
+                bind-key x kill-pane
+                bind-key & kill-window
 
-            # Enable mouse support
-            set -g mouse on
+                # Enable mouse support
+                set -g mouse on
 
 
 
-            # Change prefix key to Ctrl-a
-            unbind C-b
-            set -g prefix C-a
-            bind C-a send-prefix
+                # Change prefix key to Ctrl-a
+                unbind C-b
+                set -g prefix C-a
+                bind C-a send-prefix
 
-            # Put pane into Own window
-            bind o run-shell "${promote}"
-            bind O run-shell "${promote}"
+                # Put pane into Own window
+                bind o run-shell "${promote}"
+                bind O run-shell "${promote}"    
 
-            # Continuum + Resurrect
-            set -g @continuum-restore 'on'  # Auto-restore on boot
-            set -g @resurrect-strategy-nvim 'session'  # Restore nvim sessions
-            set -g @resurrect-capture-pane-contents 'on'
+                # Continuum + Resurrect
+                set -g @continuum-restore 'on'  # Auto-restore on boot
+                set -g @resurrect-strategy-nvim 'session'  # Restore nvim sessions
+                set -g @resurrect-capture-pane-contents 'on'
           '';
         };
       };
     };
 }
+
+
+
+
