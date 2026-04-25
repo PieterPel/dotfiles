@@ -82,6 +82,7 @@ let
         lazygit = defaultEnable;
         jjui = defaultEnable;
         nvim-popup = defaultEnable;
+        git-session-layout = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
       };
