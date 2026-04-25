@@ -155,11 +155,10 @@
         current=$(tmux display-message -p '#S')
         count=''${#sessions[@]}
         output=""
-        x_pos=0
-        pos_map=""
 
         for i in "''${!sessions[@]}"; do
           s="''${sessions[$i]}"
+          num=$((i + 1))
 
           if [ "$s" = "$current" ]; then
             seg_bg="#6A18D1"
@@ -172,12 +171,7 @@
           fi
 
           badge=$(claude_badge "$s" "$seg_fg")
-          if [ -n "$badge" ]; then badge_w=3; else badge_w=0; fi
-          seg_w=$((1 + ''${#s} + badge_w + 1))
-          pos_map+="$x_pos $((x_pos + seg_w)) $s"$'\n'
-          x_pos=$((x_pos + seg_w))
-
-          output+="#[range=session|$s]#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s$badge #[range=default]"
+          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $num $s$badge "
 
           next_i=$((i + 1))
           if [ "$next_i" -lt "$count" ]; then
@@ -193,7 +187,6 @@
           output+="#[fg=$seg_bg,bg=$next_bg,nobold]"
         done
 
-        printf '%s' "$pos_map" > /tmp/tmux-session-positions
         echo "$output"
       '';
 
@@ -249,6 +242,56 @@
       '';
 
       sessionClick = lib.getExe' sessionClickScript "tmux-session-click";
+
+      # Per-session Claude badge for use inside #{S:...} format strings.
+      # Takes <session_name> <active|inactive> — outputs tmux-formatted badge.
+      sessionBadgeScript = pkgs.writeShellScriptBin "tmux-session-badge" ''
+        set -euo pipefail
+
+        find_claude_status() {
+          local pane_pid="$1"
+          for sf in "$HOME/.claude/sessions/"*.json; do
+            [ -f "$sf" ] || continue
+            local claude_pid cur depth
+            claude_pid=$(basename "$sf" .json)
+            cur="$claude_pid" depth=0
+            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
+              if [ "$cur" = "$pane_pid" ]; then
+                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
+                return
+              fi
+              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+              depth=$((depth + 1))
+            done
+          done
+          echo ""
+        }
+
+        session_name="''${1:-}"
+        case "''${2:-inactive}" in
+          active) seg_fg="#ffffff" ;;
+          *)      seg_fg="#bac2de" ;;
+        esac
+
+        busy=0 idle=0 waiting=0
+        while IFS= read -r pane_pid; do
+          case "$(find_claude_status "$pane_pid")" in
+            busy)    busy=$((busy + 1)) ;;
+            idle)    idle=$((idle + 1)) ;;
+            waiting) waiting=$((waiting + 1)) ;;
+          esac
+        done < <(tmux list-panes -s -t "$session_name" -F '#{pane_pid}' 2>/dev/null)
+
+        if [ "$busy" -gt 0 ]; then
+          printf ' #[fg=#a6e3a1]●%s#[fg=%s]' "$busy" "$seg_fg"
+        elif [ "$waiting" -gt 0 ]; then
+          printf ' #[fg=#f38ba8]●%s#[fg=%s]' "$waiting" "$seg_fg"
+        elif [ "$idle" -gt 0 ]; then
+          printf ' #[fg=#585b70]○%s#[fg=%s]' "$idle" "$seg_fg"
+        fi
+      '';
+
+      sessionBadge = lib.getExe' sessionBadgeScript "tmux-session-badge";
     in
     {
       options.modules.terminal.tmux = {
@@ -315,10 +358,10 @@
             set -g status-interval 5
             set -g focus-events on
 
-            # Two-row status bar
+            # Two-row status bar:
+            #   format[0] (bottom): catppuccin window tabs — clickable (default tmux row)
+            #   format[1] (top):    session list with numbers and Claude badges
             set -g status 2
-
-            # Row 0 (bottom): windows + git
             set -g status-left ""
             set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
             set -g status-right-length 150
@@ -326,16 +369,22 @@
             # Override catppuccin's mauve accent to Rebels purple
             set -g @thm_mauve '#6A18D1'
 
-            # Row 1 (top): session list
+            # format[1] (top): session list — numbered, with Claude status badges
             set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
 
             # Redraw status bar immediately after switching sessions
             set-hook -g client-session-changed 'refresh-client -S'
 
-            # Click session name in top status row (row 1) to switch session
-            bind -n MouseDown1Status if-shell -F '#{==:#{mouse_status_line},1}' \
-                'run-shell "${sessionClick} #{mouse_x}"' \
-                'switch-client -t ='
+            # Jump to session N with Prefix+Shift+N (1–9)
+            bind '!' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "1p")"'
+            bind '@' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "2p")"'
+            bind '#' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "3p")"'
+            bind '$' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "4p")"'
+            bind '%' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "5p")"'
+            bind '^' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "6p")"'
+            bind '&' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "7p")"'
+            bind '*' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "8p")"'
+            bind '(' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "9p")"'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
