@@ -131,8 +131,8 @@
             seg_bold="nobold"
           fi
 
-          # Segment text
-          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s "
+          # Segment text (range tag makes it clickable — switches to that session)
+          output+="#[range=session|$s]#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s #[range=default]"
 
           # Powerline arrow: fg = this segment bg, bg = next segment bg (or row bg)
           next_i=$((i + 1))
@@ -144,7 +144,7 @@
               next_bg="#313244"
             fi
           else
-            next_bg="#11111b"
+            next_bg="#1e1e2e"
           fi
           output+="#[fg=$seg_bg,bg=$next_bg,nobold]"
         done
@@ -177,7 +177,7 @@
               plugin = catppuccin;
               extraConfig = ''
                 set -g @catppuccin_flavor 'mocha'
-                set -g @catppuccin_status_background 'default'
+                set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
                 set -g @catppuccin_window_current_text ' #W'
                 set -g @catppuccin_window_text ' #W'
@@ -217,6 +217,7 @@
             set -s extended-keys on
             set -as terminal-features 'xterm*:extkeys'
             set -g status-interval 5
+            set -g focus-events on
 
             # Two-row status bar
             set -g status 2
@@ -226,8 +227,12 @@
             set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
             set -g status-right-length 150
 
+            # Override catppuccin active window accent to match Rebels purple
+            set-window-option -g window-status-current-style 'fg=#ffffff,bg=#6A18D1,bold'
+            set-window-option -g window-status-style 'fg=#585b70,bg=#1e1e2e'
+
             # Row 1 (top): session list
-            set -g status-format[1] "#[bg=#11111b]#(${sessionStatus})"
+            set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
