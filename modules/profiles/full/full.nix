@@ -81,6 +81,7 @@ let
         gh-dash = defaultEnable;
         lazygit = defaultEnable;
         jjui = defaultEnable;
+        nvim-popup = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
       };
