@@ -52,7 +52,7 @@
                     set -e __direnv_async_file
                 end
                 set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
-                command direnv export fish >$__direnv_async_file 2>/dev/null &
+                command direnv export fish >$__direnv_async_file 2>/dev/null </dev/null &
                 disown
                 return $prev_status
             end
@@ -60,7 +60,7 @@
             # On cd: kick off a bg export (result sourced on next prompt).
             function __direnv_cd_hook --on-variable PWD
                 set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
-                command direnv export fish >$__direnv_async_file 2>/dev/null &
+                command direnv export fish >$__direnv_async_file 2>/dev/null </dev/null &
                 disown
             end
 
