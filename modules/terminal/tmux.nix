@@ -102,13 +102,57 @@
 
         if [ -n "$stats" ]; then
           clean_stats=$(echo "$stats" | sed -E 's/([^0-9]+)([0-9]+) file.*/\2f/; s/([^0-9]+)([0-9]+) ins.*/ +\2/; s/([^0-9]+)([0-9]+) del.*/ -\2/')
-          echo "#[fg=magenta] $branch #[fg=cyan][$clean_stats]"
+          echo "#[fg=#6A18D1] $branch #[fg=cyan][$clean_stats]"
         else
-          echo "#[fg=magenta] $branch #[fg=green][clean]"
+          echo "#[fg=#6A18D1] $branch #[fg=green][clean]"
         fi
       '';
 
       gitStatus = lib.getExe' gitStatusScript "tmux-git-status";
+
+      sessionStatusScript = pkgs.writeShellScriptBin "tmux-session-status" ''
+        set -euo pipefail
+
+        sessions=($(tmux list-sessions -F '#S' 2>/dev/null))
+        current=$(tmux display-message -p '#S')
+        count=''${#sessions[@]}
+        output=""
+
+        for i in "''${!sessions[@]}"; do
+          s="''${sessions[$i]}"
+
+          if [ "$s" = "$current" ]; then
+            seg_bg="#6A18D1"
+            seg_fg="#ffffff"
+            seg_bold="bold"
+          else
+            seg_bg="#313244"
+            seg_fg="#bac2de"
+            seg_bold="nobold"
+          fi
+
+          # Segment text
+          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s "
+
+          # Powerline arrow: fg = this segment bg, bg = next segment bg (or row bg)
+          next_i=$((i + 1))
+          if [ "$next_i" -lt "$count" ]; then
+            next_s="''${sessions[$next_i]}"
+            if [ "$next_s" = "$current" ]; then
+              next_bg="#6A18D1"
+            else
+              next_bg="#313244"
+            fi
+          else
+            next_bg="#11111b"
+          fi
+          output+="#[fg=$seg_bg,bg=$next_bg,nobold]"
+        done
+
+        echo "$output"
+      '';
+
+      sessionStatus = lib.getExe' sessionStatusScript "tmux-session-status";
     in
     {
       options.modules.terminal.tmux = {
@@ -130,16 +174,13 @@
             resurrect
             yank
             {
-              # https://github.com/nix-community/home-manager/issues/4894
-              plugin = power-theme;
+              plugin = catppuccin;
               extraConfig = ''
-                set -g @tmux_power_theme 'violet'
-                set -g @tmux_power_show_date false
-                set -g @tmux_power_show_time false
-                set -g @tmux_power_user_opts "#(${gitStatus} \"#{pane_current_path}\")"
-
-                set-window-option -g window-status-format " #I:#W "
-                set-window-option -g window-status-current-format " #I:#W "
+                set -g @catppuccin_flavor 'mocha'
+                set -g @catppuccin_status_background 'default'
+                set -g @catppuccin_window_status_style 'slanted'
+                set -g @catppuccin_window_current_text ' #W'
+                set -g @catppuccin_window_text ' #W'
               '';
             }
             {
@@ -176,9 +217,17 @@
             set -s extended-keys on
             set -as terminal-features 'xterm*:extkeys'
             set -g status-interval 5
-            # Override tmux-power's status-right so time/date don't reappear.
+
+            # Two-row status bar
+            set -g status 2
+
+            # Row 0 (bottom): windows + git
+            set -g status-left ""
             set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
             set -g status-right-length 150
+
+            # Row 1 (top): session list
+            set -g status-format[1] "#[bg=#11111b]#(${sessionStatus})"
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
