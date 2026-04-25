@@ -302,7 +302,7 @@
             set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
 
             # Redraw status bar immediately after switching sessions
-            set-hook -g after-switch-client 'refresh-client -S'
+            set-hook -g client-session-changed 'refresh-client -S'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
