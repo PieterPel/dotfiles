@@ -30,6 +30,7 @@
           };
 
           taps = [
+            "cordwainersmith/claudoscope"
           ];
 
           # `brew install`
@@ -56,6 +57,7 @@
 
             # Not in nixpkgs
             "claude"
+            "claudoscope"
 
           ];
         };
