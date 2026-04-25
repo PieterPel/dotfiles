@@ -40,7 +40,7 @@
           #
           # Trade-off: one-prompt delay before env vars are visible. In practice this is
           # imperceptible because the bg job almost always finishes before you type again.
-          interactiveShellInit = lib.mkAfter ''
+          interactiveShellInit = lib.mkOrder 9999 ''
             # On each prompt: source the result queued by the previous bg job, then queue the next one.
             function __direnv_export_eval --on-event fish_prompt
                 set -l prev_status $status
