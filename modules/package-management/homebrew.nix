@@ -42,6 +42,8 @@
           casks = [
             "raycast"
             "notion"
+            "notion-mail"
+            "notion-calendar"
             "bitwarden"
             "slack"
             "microsoft-teams"
