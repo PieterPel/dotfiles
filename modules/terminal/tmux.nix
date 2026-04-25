@@ -134,15 +134,18 @@
 
         claude_badge() {
           local session="$1" seg_fg="$2"
-          local busy=0 idle=0
+          local busy=0 idle=0 waiting=0
           while IFS= read -r pane_pid; do
             case "$(find_claude_status "$pane_pid")" in
-              busy) busy=$((busy + 1)) ;;
-              idle) idle=$((idle + 1)) ;;
+              busy)    busy=$((busy + 1)) ;;
+              idle)    idle=$((idle + 1)) ;;
+              waiting) waiting=$((waiting + 1)) ;;
             esac
           done < <(tmux list-panes -s -t "$session" -F '#{pane_pid}' 2>/dev/null)
           if [ "$busy" -gt 0 ]; then
             printf ' #[fg=#a6e3a1]●%s#[fg=%s]' "$busy" "$seg_fg"
+          elif [ "$waiting" -gt 0 ]; then
+            printf ' #[fg=#f38ba8]●%s#[fg=%s]' "$waiting" "$seg_fg"
           elif [ "$idle" -gt 0 ]; then
             printf ' #[fg=#585b70]○%s#[fg=%s]' "$idle" "$seg_fg"
           fi
@@ -152,6 +155,8 @@
         current=$(tmux display-message -p '#S')
         count=''${#sessions[@]}
         output=""
+        x_pos=0
+        pos_map=""
 
         for i in "''${!sessions[@]}"; do
           s="''${sessions[$i]}"
@@ -167,6 +172,11 @@
           fi
 
           badge=$(claude_badge "$s" "$seg_fg")
+          if [ -n "$badge" ]; then badge_w=3; else badge_w=0; fi
+          seg_w=$((1 + ''${#s} + badge_w + 1))
+          pos_map+="$x_pos $((x_pos + seg_w)) $s"$'\n'
+          x_pos=$((x_pos + seg_w))
+
           output+="#[range=session|$s]#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $s$badge #[range=default]"
 
           next_i=$((i + 1))
@@ -183,6 +193,7 @@
           output+="#[fg=$seg_bg,bg=$next_bg,nobold]"
         done
 
+        printf '%s' "$pos_map" > /tmp/tmux-session-positions
         echo "$output"
       '';
 
@@ -214,13 +225,30 @@
 
         status=$(find_claude_status "''${1:-}")
         case "$status" in
-          busy) printf '#[fg=#a6e3a1]● ' ;;
-          idle) printf '#[fg=#585b70]○ ' ;;
-          *)    printf "" ;;
+          busy)    printf '#[fg=#a6e3a1]● ' ;;
+          waiting) printf '#[fg=#f38ba8]● ' ;;
+          idle)    printf '#[fg=#585b70]○ ' ;;
+          *)       printf "" ;;
         esac
       '';
 
       claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
+
+      sessionClickScript = pkgs.writeShellScriptBin "tmux-session-click" ''
+        set -euo pipefail
+        mouse_x="''${1:-0}"
+        map_file="/tmp/tmux-session-positions"
+        [ -f "$map_file" ] || exit 0
+        while IFS=' ' read -r start end name; do
+          [ -z "$name" ] && continue
+          if [ "$mouse_x" -ge "$start" ] && [ "$mouse_x" -lt "$end" ]; then
+            tmux switch-client -t "$name"
+            exit 0
+          fi
+        done < "$map_file"
+      '';
+
+      sessionClick = lib.getExe' sessionClickScript "tmux-session-click";
     in
     {
       options.modules.terminal.tmux = {
@@ -303,6 +331,11 @@
 
             # Redraw status bar immediately after switching sessions
             set-hook -g client-session-changed 'refresh-client -S'
+
+            # Click session name in top status row (row 1) to switch session
+            bind -n MouseDown1Status if-shell -F '#{==:#{mouse_status_line},1}' \
+                'run-shell "${sessionClick} #{mouse_x}"' \
+                'switch-client -t ='
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
