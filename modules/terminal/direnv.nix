@@ -41,10 +41,9 @@
           # Trade-off: one-prompt delay before env vars are visible. In practice this is
           # imperceptible because the bg job almost always finishes before you type again.
           interactiveShellInit = lib.mkAfter ''
+            # On each prompt: source the result queued by the previous bg job, then queue the next one.
             function __direnv_export_eval --on-event fish_prompt
                 set -l prev_status $status
-
-                # Source the output queued by the previous prompt's background job
                 if set -q __direnv_async_file
                     if test -f $__direnv_async_file
                         source $__direnv_async_file 2>/dev/null
@@ -52,13 +51,22 @@
                     rm -f $__direnv_async_file
                     set -e __direnv_async_file
                 end
-
-                # Kick off the next export in the background
                 set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
                 command direnv export fish >$__direnv_async_file 2>/dev/null &
                 disown
-
                 return $prev_status
+            end
+
+            # On cd: kick off a bg export (result sourced on next prompt).
+            function __direnv_cd_hook --on-variable PWD
+                set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
+                command direnv export fish >$__direnv_async_file 2>/dev/null &
+                disown
+            end
+
+            # Drop direnv's synchronous preexec re-run; just clean up the cd hook.
+            function __direnv_export_eval_2 --on-event fish_preexec
+                functions --erase __direnv_cd_hook
             end
           '';
 
