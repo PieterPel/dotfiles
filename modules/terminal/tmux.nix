@@ -347,44 +347,48 @@
             }
           ];
           extraConfig = ''
-            # General
-            set -gu default-command
-            set -g default-shell "$SHELL"
-            set-option -g allow-rename off # Don't rename self-named windows
-            set-option -g wrap-search on # Go from window N to window 1
-            set -g allow-passthrough on
-            set -s extended-keys on
-            set -as terminal-features 'xterm*:extkeys'
-            set -g status-interval 5
-            set -g focus-events on
+              # General
+              set -gu default-command
+              set -g default-shell "$SHELL"
+              set-option -g allow-rename off # Don't rename self-named windows
+              set-option -g wrap-search on # Go from window N to window 1
+              set -g allow-passthrough on
+              set -s extended-keys on
+              set -as terminal-features 'xterm*:extkeys'
+              set -g status-interval 5
+              set -g focus-events on
 
-            # Two-row status bar:
-            #   format[0] (bottom): catppuccin window tabs — clickable (default tmux row)
-            #   format[1] (top):    session list with numbers and Claude badges
-            set -g status 2
-            set -g status-left ""
-            set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
-            set -g status-right-length 150
+              # Two-row status bar:
+              #   format[0] (bottom): catppuccin window tabs — clickable (default tmux row)
+              #   format[1] (top):    session list with numbers and Claude badges
+              set -g status 2
+              set -g status-left ""
+              set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
+              set -g status-right-length 150
 
-            # Override catppuccin's mauve accent to Rebels purple
-            set -g @thm_mauve '#6A18D1'
+              # Override catppuccin's mauve accent to Rebels purple
+              set -g @thm_mauve '#6A18D1'
 
-            # format[1] (top): session list — numbered, with Claude status badges
-            set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
+              # format[0] (bottom): window tabs; tmux 3.6 default is empty so set explicitly
+              set -g status-format[0] "#[align=left range=left]#{E:status-left}#[norange default]#[list=on align=#{status-justify}]#[list=left-marker]<#[list=right-marker]>#[list=on]#{W:#[range=window|#{window_id} #{E:window-status-style}]#[push-default]#{T:window-status-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}},#[range=window|#{window_id} list=focus #{?#{!=:#{E:window-status-current-style},default},#{E:window-status-current-style},#{E:window-status-style}}]#[push-default]#{T:window-status-current-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}}}#[nolist align=right range=right]#{E:status-right}#[norange default]"
 
-            # Redraw status bar immediately after switching sessions
-            set-hook -g client-session-changed 'refresh-client -S'
+              # format[1] (top): session list, numbered, with Claude status badges
+              set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
 
-            # Jump to session N with Prefix+Shift+N (1–9)
-            bind '!' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "1p")"'
-            bind '@' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "2p")"'
-            bind '#' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "3p")"'
-            bind '$' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "4p")"'
-            bind '%' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "5p")"'
-            bind '^' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "6p")"'
-            bind '&' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "7p")"'
-            bind '*' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "8p")"'
-            bind '(' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "#{session_name}" | sed -n "9p")"'
+              # Redraw status bar immediately after switching sessions
+              set-hook -g client-session-changed 'refresh-client -S'
+
+              # Jump to session N with Prefix+Shift+N (1-9)
+              # ##S: tmux run-shell expands ## to # so shell gets #S as literal for list-sessions -F
+              bind '!' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "1p")"'
+              bind '@' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "2p")"'
+              bind '#' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "3p")"'
+              bind '$' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "4p")"'
+              bind '%' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "5p")"'
+              bind '^' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "6p")"'
+              bind '&' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "7p")"'
+              bind '*' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "8p")"'
+              bind '(' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "9p")"'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
@@ -426,39 +430,41 @@
             bind d split-window -h -c "#{pane_current_path}"
             bind v split-window -v -c "#{pane_current_path}"
             unbind '"'
-                unbind %
+                  unbind %
 
-                # Set shell to fish
-                set-option -g default-shell ${fish}
+                  # Set shell to fish
+                  set-option -g default-shell ${fish}
 
-                ## These have home-manager settings, but no NixOS settings for some reason
-                # Disable confirmation prompts (e.g., for killing panes)
-                bind-key x kill-pane
-                bind-key & kill-window
+                  ## These have home-manager settings, but no NixOS settings for some reason
+                  # Disable confirmation prompts (e.g., for killing panes)
+                  bind-key x kill-pane
+                  bind-key & kill-window
 
-                # Enable mouse support
-                set -g mouse on
+                  # Enable mouse support
+                  set -g mouse on
 
 
 
-                # Change prefix key to Ctrl-a
-                unbind C-b
-                set -g prefix C-a
-                bind C-a send-prefix
+                  # Change prefix key to Ctrl-a
+                  unbind C-b
+                  set -g prefix C-a
+                  bind C-a send-prefix
 
-                # Put pane into Own window
-                bind o run-shell "${promote}"
-                bind O run-shell "${promote}"    
+                  # Put pane into Own window
+                  bind o run-shell "${promote}"
+                  bind O run-shell "${promote}"    
 
-                # Continuum + Resurrect
-                set -g @continuum-restore 'on'  # Auto-restore on boot
-                set -g @resurrect-strategy-nvim 'session'  # Restore nvim sessions
-                set -g @resurrect-capture-pane-contents 'on'
+                  # Continuum + Resurrect
+                  set -g @continuum-restore 'on'  # Auto-restore on boot
+                  set -g @resurrect-strategy-nvim 'session'  # Restore nvim sessions
+                  set -g @resurrect-capture-pane-contents 'on'
           '';
         };
       };
     };
 }
+
+
 
 
 
