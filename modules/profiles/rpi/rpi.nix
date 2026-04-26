@@ -1,5 +1,4 @@
-{ ...
-}:
+_:
 let
   nixosRpiModule =
     { config

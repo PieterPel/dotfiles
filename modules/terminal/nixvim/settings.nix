@@ -8,6 +8,7 @@
     let
       isWayland = builtins.hasAttr "WAYLAND_DISPLAY" config.home.sessionVariables;
       cfg = config.modules.terminal.nixvim;
+      dashboardHeaderColor = "#6A18D1";
     in
     {
       options.modules.programs.nixvim = {
@@ -105,6 +106,13 @@
             providers.wl-copy.enable = isWayland;
           };
 
+          # Define custom highlight groups here
+          highlight = {
+            SnacksDashboardHeader = {
+              fg = lib.mkForce dashboardHeaderColor;
+            };
+          };
+
           extraConfigVim = ''
             " Make lightline the only bar and change the theme
             set noshowmode
@@ -128,10 +136,16 @@
             })
 
             require("venv-selector").setup({
-              settings = { 
+              settings = {
                 search = {
                 }
-              }  
+              }
+            })
+
+            require("claude-preview").setup({
+              diff = {
+                layout = "tab",
+              },
             })
 
             -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
@@ -143,6 +157,23 @@
 
             -- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
             vim.g.loaded_netrwPlugin = 1
+
+            -- Let terminal transparency show through
+            local function set_transparent_bg()
+              vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+              vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+              vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+              vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "none" })
+              vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+              vim.api.nvim_set_hl(0, "FoldColumn", { bg = "none" })
+            end
+            vim.api.nvim_create_autocmd("ColorScheme", {
+              callback = function()
+                set_transparent_bg()
+                vim.api.nvim_set_hl(0, "SnacksDashboardHeader", { fg = "${dashboardHeaderColor}" })
+              end,
+            })
+            set_transparent_bg()
           '';
         };
       };

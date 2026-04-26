@@ -34,30 +34,32 @@
       };
 
       config = lib.mkIf cfg.enable {
-        programs.sesh = {
-          enable = true;
-          settings = {
-            session = [
-              {
-                name = "Downloads";
-                path = "~/Downloads";
-                startup_command = "yazi";
-              }
-            ];
+        programs = {
+          sesh = {
+            enable = true;
+            settings = {
+              session = [
+                {
+                  name = "Downloads";
+                  path = "~/Downloads";
+                  startup_command = "yazi";
+                }
+              ];
+            };
           };
-        };
 
-        programs.fish.shellAbbrs = {
-          "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
-        };
+          fish.shellAbbrs = {
+            "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
+          };
 
-        programs.tmux.extraConfig = lib.mkAfter ''
-          bind s run-shell "${seshPicker}";
-        '';
+          tmux.extraConfig = lib.mkAfter ''
+            bind s run-shell "${seshPicker}";
+          '';
 
-        programs.fzf = {
-          enable = true;
-          tmux.enableShellIntegration = true;
+          fzf = {
+            enable = true;
+            tmux.enableShellIntegration = true;
+          };
         };
       };
     };

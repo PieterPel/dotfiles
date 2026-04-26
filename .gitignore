@@ -3,3 +3,4 @@
 .direnv/
 result
 .DS_Store
+.env

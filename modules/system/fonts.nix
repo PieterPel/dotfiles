@@ -1,5 +1,4 @@
-{ ...
-}:
+_:
 let
   nixosModule = { lib, config, pkgs, ... }: {
     options.modules.system.fonts = {

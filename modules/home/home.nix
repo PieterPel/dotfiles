@@ -1,42 +1,49 @@
 {
   flake.modules.homeManager.home =
-    { config, ... }:
+    { pkgs, config, ... }:
     {
       config = {
-        home.packages = config.packages;
-        home.shellAliases = config.aliases;
+        home = {
+          inherit (config) packages;
+          shellAliases = config.aliases;
 
-        home.sessionVariables = {
-          EDITOR = config.editor;
-        }
-        // config.envVars;
+          sessionVariables = {
+            EDITOR = config.editor;
+          }
+          // config.envVars;
 
-        home.stateVersion = config.stateVersion;
+          inherit (config) stateVersion;
+
+          # Home Manager is pretty good at managing dotfiles. The primary way to manage
+          # plain files is through 'home.file'.
+          file = {
+            # # Building this configuration will create a copy of 'dotfiles/screenrc' in
+            # # the Nix store. Activating the configuration will then make '~/.screenrc' a
+            # # symlink to the Nix store copy.
+            # ".screenrc".source = dotfiles/screenrc;
+
+            # # You can also set the file content immediately.
+            # ".gradle/gradle.properties".text = ''
+            #   org.gradle.console=verbose
+            #   org.gradle.daemon.idletimeout=3600000
+            # '';
+
+            # Bash
+
+            # tmux
+
+          };
+        };
 
         # Enable home-manager to govern programs..
         programs.home-manager = {
           enable = true;
         };
 
-        # Home Manager is pretty good at managing dotfiles. The primary way to manage
-        # plain files is through 'home.file'.
-        home.file = {
-          # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-          # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-          # # symlink to the Nix store copy.
-          # ".screenrc".source = dotfiles/screenrc;
-
-          # # You can also set the file content immediately.
-          # ".gradle/gradle.properties".text = ''
-          #   org.gradle.console=verbose
-          #   org.gradle.daemon.idletimeout=3600000
-          # '';
-
-          # Bash
-
-          # tmux
-
-        };
+        # Also add cli
+        packages = [
+          pkgs.home-manager
+        ];
 
         # Home Manager can also manage your environment variables through
         # 'home.sessionVariables'. These will be explicitly sourced when using a
@@ -61,6 +68,9 @@
         #          source = config.lib.file.mkOutOfStoreSymlink ./dotconfig/nvim;
         #      };
         #};
+
+        # weirdest bug ever
+        targets.darwin.copyApps.enableChecks = false;
       };
     };
 

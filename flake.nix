@@ -70,6 +70,11 @@
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     };
+
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -80,55 +85,12 @@
     , ...
     }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-
       imports = [
         inputs.flake-parts.flakeModules.modules
         (import-tree ./modules)
         (import-tree ./hosts)
+        (import-tree ./flake)
       ];
-
-      perSystem =
-        { config
-        , self'
-        , inputs'
-        , pkgs
-        , system
-        , ...
-        }:
-        {
-          checks = {
-            pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-              src = ./.;
-              hooks = {
-                nixpkgs-fmt.enable = true;
-              };
-            };
-          };
-
-          devShells = {
-            default = pkgs.mkShell {
-              inherit (config.checks.pre-commit-check) shellHook;
-              buildInputs = config.checks.pre-commit-check.enabledPackages;
-            };
-          };
-        };
     };
 
-  nixConfig = {
-    extra-substituters = [
-      "https://cache.nixos.org/"
-      "https://nixos-raspberrypi.cachix.org"
-    ];
-
-    extra-trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
-    ];
-  };
 }

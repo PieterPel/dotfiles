@@ -19,16 +19,20 @@ in
       {
         config = {
           inherit hostname;
-          system.stateVersion = 6; # Do not change this !
-          system.primaryUser = "pieterpel";
+          system = {
+            stateVersion = 6; # Do not change this !
+            primaryUser = "pieterpel";
+          };
 
           nix.settings.trusted-users = [
             "pieterpel"
           ];
 
-          modules.profiles.full.enable = true;
-          modules.package-management.determinate.enable = true;
-          modules.security.sops.enable = false;
+          modules = {
+            profiles.full.enable = true;
+            package-management.determinate.enable = true;
+            security.sops.enable = false;
+          };
         };
       }
     ];

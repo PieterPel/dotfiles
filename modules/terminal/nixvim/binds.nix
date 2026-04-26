@@ -179,22 +179,16 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # Copilot Chat
+          # claude-preview.nvim — install hooks once per project with :ClaudePreviewInstallHooks
           {
-            key = "<leader>co";
-            action = "<cmd>CopilotChatOpen<CR>";
-          }
-          {
-            key = "<leader>cc";
-            action = "<cmd>CopilotChatClose<CR>";
-          }
-          {
-            key = "<leader>cp";
-            action = "<cmd>CopilotChatToggle<CR>";
+            key = "<leader>dq";
+            action = "<cmd>ClaudePreviewCloseDiff<CR>";
+            options.desc = "Close Claude diff preview";
           }
           {
             key = "<leader>cg";
             action = "<cmd>Gemini toggle<CR>";
+            options.desc = "Gemini toggle";
           }
 
           {
@@ -363,6 +357,13 @@
             action = "<CMD>LspRestart<Enter>";
             options.desc = "Lsp Restart";
           }
+
+          {
+            key = "<leader>a";
+            action = "<cmd>AerialToggle! left<CR>";
+            options.desc = "Toggle Outline Sidebar";
+          }
+
         ];
 
       };

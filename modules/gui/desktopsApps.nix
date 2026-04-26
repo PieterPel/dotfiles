@@ -1,15 +1,19 @@
+let
+  module = "desktopApps";
+  parent = "gui";
+in
 {
-  flake.modules.homeManager.desktop-apps =
+  flake.modules.homeManager.${module} =
     { config
     , lib
     , pkgs
     , ...
     }:
     let
-      cfg = config.modules.gui.desktop-apps;
+      cfg = config.modules.${parent}.${module};
     in
     {
-      options.modules.gui.desktop-apps = {
+      options.modules.${parent}.${module} = {
         enable = lib.mkEnableOption "Enable desktop apps module";
       };
       config = lib.mkIf cfg.enable {

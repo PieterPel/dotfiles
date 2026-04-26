@@ -29,21 +29,23 @@
             cleanup = "zap";
           };
 
-          taps = [
-          ];
+          taps = [ ];
 
           # `brew install`
           brews = [
+            # Not in nixpkgs
+            "marcus/tap/td"
           ];
 
           # `brew install --cask`
           casks = [
             "raycast"
             "notion"
+            "notion-mail"
+            "notion-calendar"
             "bitwarden"
-            "cursor-cli"
-            "cursor"
             "slack"
+            "microsoft-teams"
 
             # Empty package trick (broken on nixpkgs)
             "ghostty"
@@ -51,11 +53,10 @@
             # Sometimes Broken on nixpkgs due to hash mistmatch
             "spotify"
 
-            # Not on aarch64-darwin nixpkgs
-            "beekeeper-studio"
+            # Not in nixpkgs
+            "claude"
+            # claudoscope tap is broken upstream (wrong dir structure + placeholder sha256)
 
-            # Apple container
-            "container"
           ];
         };
       };

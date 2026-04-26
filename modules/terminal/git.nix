@@ -16,11 +16,15 @@
       config = lib.mkIf cfg.enable {
         packages = with pkgs; [
           pre-commit
-          gh
         ];
+
+        programs.gh = {
+          enable = true;
+        };
 
         programs.git = {
           enable = true;
+          signing.format = null;
           settings = {
             user.name = "Pieter Pel";
             user.email = "pelpieter@gmail.com";

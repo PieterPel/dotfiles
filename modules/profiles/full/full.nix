@@ -1,4 +1,5 @@
 { lib
+, inputs
 , ...
 }:
 let
@@ -24,6 +25,7 @@ let
         internationalization = defaultEnable;
         networking = defaultEnable;
         printing = defaultEnable;
+        tailscale = defaultEnable;
         sound = defaultEnable;
         updating = defaultEnable;
       };
@@ -44,16 +46,18 @@ let
       system = {
         configuration = defaultEnable;
         fonts = defaultEnable;
+        tailscale = defaultEnable;
       };
       theming.stylix = defaultEnable;
       wm.aerospace = defaultEnable;
+      virtualization.docker-mcp = defaultEnable;
     };
   };
 
   homeManagerDefaults = {
     modules = {
       gui = {
-        "desktop-apps" = defaultEnable;
+        desktopApps = defaultEnable;
         ghostty = defaultEnable;
         kitty = defaultEnable;
         spicetify = defaultDisable; # Hash mismatch (22-12-25)
@@ -63,22 +67,27 @@ let
       package-management.flatpaks = defaultEnable;
       terminal = {
         ai = defaultEnable;
+        atuin = defaultEnable;
         direnv = defaultEnable;
         fish = defaultEnable;
         git = defaultEnable;
         nixvim = defaultEnable;
         starship = defaultEnable;
         tmux = defaultEnable;
-        "terminal-apps" = defaultEnable;
+        terminalApps = defaultEnable;
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
+        gh-dash = defaultEnable;
         lazygit = defaultEnable;
         jjui = defaultEnable;
+        nvim-popup = defaultEnable;
+        git-session-layout = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
       };
       theming.stylix = defaultEnable;
+      security.sops = defaultEnable;
       wayland = {
         hyprlock = defaultEnable;
         rofi = defaultEnable;
@@ -101,7 +110,9 @@ let
     };
 in
 {
-  flake.modules.nixos.full = mkFullProfileModule nixosDefaults;
-  flake.modules.darwin.full = mkFullProfileModule darwinDefaults;
-  flake.modules.homeManager.full = mkFullProfileModule homeManagerDefaults;
+  flake.modules = {
+    nixos.full = mkFullProfileModule nixosDefaults;
+    darwin.full = mkFullProfileModule darwinDefaults;
+    homeManager.full = mkFullProfileModule homeManagerDefaults;
+  };
 }

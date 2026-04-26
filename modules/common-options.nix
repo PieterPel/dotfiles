@@ -25,13 +25,15 @@ let
   };
 in
 {
-  flake.modules.nixos.common-options = {
-    options = commonOptions;
-  };
-  flake.modules.darwin.common-options = {
-    options = commonOptions;
-  };
-  flake.modules.homeManager.common-options = {
-    options = commonOptions;
+  flake.modules = {
+    nixos.common-options = {
+      options = commonOptions;
+    };
+    darwin.common-options = {
+      options = commonOptions;
+    };
+    homeManager.common-options = {
+      options = commonOptions;
+    };
   };
 }

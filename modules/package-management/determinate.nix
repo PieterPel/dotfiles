@@ -8,7 +8,6 @@
     }:
     let
       cfg = config.modules.package-management.determinate;
-      jq = lib.getExe pkgs.jq;
     in
     {
       imports = [
@@ -20,8 +19,10 @@
       config = lib.mkIf cfg.enable {
         nix.enable = lib.mkForce false;
         modules.package-management.nix.enable = lib.mkForce false;
-        #determinate-nix.customSettings = {};
-
+        determinateNix.customSettings.trusted-users = [
+          "root"
+          "pieterpel"
+        ];
       };
     };
 }

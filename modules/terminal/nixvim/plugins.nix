@@ -12,6 +12,7 @@
           pkgs.prettierd
           pkgs.nixfmt
           pkgs.fzf
+          pkgs.jq
         ];
         programs.nixvim.plugins = {
           # General
@@ -93,7 +94,7 @@
             };
           };
           nvim-tree = {
-            enable = true; # File explorer
+            enable = false; # File explorer
             settings = {
               diagnostics = {
                 enable = true;
@@ -107,13 +108,61 @@
           harpoon.enable = true; # Mark files to go back to
           trouble.enable = true; # Give diagnostics overview
           lazygit.enable = true; # Lazygit from within nvim
-          flash.enable = true; # Jump to anywhere
+          flash = {
+            enable = true; # Jump to anywhere
+            settings = {
+              highlight = {
+                backdrop = true;
+              };
+            };
+          };
           smart-splits.enable = true; # Seamless navigation between nvim and tmux
           yazi = {
             # Yazi file explorer
             enable = true;
             settings = {
               open_for_directories = true;
+            };
+          };
+
+          aerial = {
+            enable = true;
+            settings = {
+              # Use these backends in order
+              backends = [
+                "treesitter"
+                "lsp"
+                "markdown"
+                "man"
+              ];
+
+              # Layout settings to make it feel like a sidebar
+              layout = {
+                min_width = 30;
+                default_direction = "left";
+                placement = "window";
+              };
+
+              attach_mode = "global";
+
+              icons = {
+                # You can customize icons here or use defaults
+              };
+
+              highlight_on_hover = true;
+              manage_folds = true;
+
+              filter_kind = [
+                "Class"
+                "Constructor"
+                "Constant"
+                "Enum"
+                "Function"
+                "Interface"
+                "Method"
+                "Module"
+                "Struct"
+              ];
             };
           };
 
@@ -225,21 +274,18 @@
             servers = {
               nil_ls.enable = true;
               dockerls.enable = true;
-              ty.enable = true;
+              ty.enable = false; # Not production ready at all in jan '26
               basedpyright = {
-                # Keep as fallback for ty
-                enable = false;
+                enable = true;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
                 ];
-                settings = {
-                  disableOrganizeImports = true;
-                  analysis = {
-                    # Let ty do all type checking
-                    typeCheckingMode = "off";
-                  };
-                };
+                rootMarkers = [
+                  "pyrightconfig.json"
+                  "pyproject.toml"
+                  ".git"
+                ];
               };
               ruff.enable = true;
               bashls.enable = true;
@@ -248,7 +294,7 @@
               ts_ls.enable = true;
               eslint.enable = true;
               lua_ls.enable = true;
-              gleam.enable = true;
+              gleam.enable = false; # Issue with deno
               bicep.enable = false; # Requires manual stuff to get working https://nix-community.github.io/nixvim/plugins/lsp/servers/bicep/index.html
               terraformls.enable = true;
               rust_analyzer = {
@@ -258,6 +304,7 @@
               };
               zls.enable = true;
               dartls.enable = true;
+              statix.enable = true;
             };
             keymaps = {
               silent = true; # Makes the binds silent (no command echo)
@@ -282,6 +329,12 @@
           lspsaga = {
             enable = true;
             ui.code_action = "";
+            # Disable the code action lightbulb (flicker)
+            settings.lightbulb = {
+              enable = false;
+              sign = false;
+              virtual_text = false;
+            };
           };
 
           conform-nvim = {
@@ -331,6 +384,17 @@
               ];
 
               providers = {
+                git = {
+                  module = "blink-cmp-git";
+                  name = "git";
+                  score_offset = 100;
+                  opts = {
+                    commit = { };
+                    git_centers = {
+                      git_hub = { };
+                    };
+                  };
+                };
                 copilot = {
                   async = true;
                   module = "blink-copilot";
@@ -407,7 +471,33 @@
             enable = true;
             settings = {
               bigfile.enabled = true;
-              dashboard.enabled = true; # Beautiful startup screen
+              dashboard = {
+                enabled = true; # Beautiful startup screen
+                # Avoid lazy.nvim startup stats to prevent `lazy.stats` module errors.
+                sections = [
+                  {
+                    text.__raw = ''
+                      { {
+                        "██████╗ ███████╗██████╗ ███████╗██╗      ██████╗ █████╗ ██╗\n"
+                        .. "██╔══██╗██╔════╝██╔══██╗██╔════╝██║     ██╔════╝██╔══██╗██║\n"
+                        .. "██████╔╝█████╗  ██████╔╝█████╗  ██║     ╚█████╗ ███████║██║\n"
+                        .. "██╔══██╗██╔══╝  ██╔══██╗██╔══╝  ██║      ╚═══██╗██╔══██║██║\n"
+                        .. "██║  ██║███████╗██████╔╝███████╗███████╗██████╔╝██║  ██║██║\n"
+                        .. "╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝",
+                        hl = "SnacksDashboardHeader"
+                      } }
+                    '';
+                    align = "center";
+                    padding = 1;
+                  }
+                  {
+                    section = "keys";
+                    gap = 1;
+                    padding = 1;
+                  }
+                  { section = "recent_files"; }
+                ];
+              };
               input.enabled = true; # Better rename/input dialogs
               notifier.enabled = true; # Better notifications
               quickfile.enabled = true;
@@ -420,13 +510,26 @@
         programs.nixvim.extraPlugins = with pkgs; [
 
           (vimUtils.buildVimPlugin {
-            name = "venv-selector";
+            pname = "venv-selector";
+            version = "2025-02-02";
             src = pkgs.fetchFromGitHub {
               owner = "pieterpel";
               repo = "venv-selector.nvim";
               # 02-02-2025
               rev = "268cbdf1feaa99f88e9e1cd636e40b4af986e100";
               hash = "sha256-UXKlVn4D6Qj4s01mcFRUsIgXh8c9KmAX5E16Z/RenYE=";
+            };
+          })
+
+          (vimUtils.buildVimPlugin {
+            pname = "claude-preview-nvim";
+            version = "2026-03-28";
+            src = pkgs.fetchFromGitHub {
+              owner = "Cannon07";
+              repo = "claude-preview.nvim";
+              # 2026-03-28
+              rev = "4aee3b003ce806900de22986efe96dba44ec91e7";
+              hash = "sha256-n8cDNQwF6uoNKZtKSlRMtxvbTAbYIlRl6ZdlrahCIog=";
             };
           })
 

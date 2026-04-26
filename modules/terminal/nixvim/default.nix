@@ -7,9 +7,6 @@ flakeArgs: {
       };
       imports = [
         flakeArgs.inputs.nixvim.homeModules.nixvim
-        flakeArgs.config.flake.modules.homeManager."nixvim-binds"
-        flakeArgs.config.flake.modules.homeManager."nixvim-plugins"
-        flakeArgs.config.flake.modules.homeManager."nixvim-settings"
       ];
     };
 

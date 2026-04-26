@@ -13,10 +13,45 @@
         programs.direnv = {
           enable = true;
           nix-direnv.enable = true;
+          enableFishIntegration = false; # replaced by async hook below
+          silent = true;
+          config = {
+            global = {
+              warn_timeout = "0s";
+            };
+          };
         };
 
         programs.fish = {
           enable = true;
+
+          # Async direnv hook. enableFishIntegration=false prevents the default
+          # sync hook from being installed, so this is the only implementation.
+          # On each prompt: source the queued result, then start the next bg export.
+          # On cd: start a bg export immediately so it's ready by the next prompt.
+          interactiveShellInit = ''
+            function __direnv_export_eval --on-event fish_prompt
+                set -l prev_status $status
+                if set -q __direnv_async_file
+                    if test -f $__direnv_async_file
+                        source $__direnv_async_file 2>/dev/null
+                    end
+                    rm -f $__direnv_async_file
+                    set -e __direnv_async_file
+                end
+                set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
+                command direnv export fish >$__direnv_async_file 2>/dev/null </dev/null &
+                disown
+                return $prev_status
+            end
+
+            function __direnv_cd_hook --on-variable PWD
+                set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
+                command direnv export fish >$__direnv_async_file 2>/dev/null </dev/null &
+                disown
+            end
+          '';
+
           functions = {
             # 1. The "Space Hunter" - Your command fixed for Fish syntax
             nix-direnv-list-bloat = {

@@ -29,12 +29,8 @@
             };
 
             # language specific
-            nix_shell = {
-              disabled = false;
-              symbol = "❄️ ";
-              format = "via [$symbol$state]($style) ";
-            };
-            python.symbol = " ";
+            nix_shell.disabled = true;
+            python.disabled = true;
             rust.symbol = "󱘗 ";
             c.symbol = " ";
             cpp.symbol = " ";
@@ -45,10 +41,12 @@
               disabled = true;
             };
 
-            # Keep bun indicator without printing the runtime version number
-            bun = {
-              format = "via [$symbol]($style)";
+            # Remove Google Cloud info from prompt
+            gcloud = {
+              disabled = true;
             };
+
+            bun.disabled = true;
 
             # Module specific
             directory = {

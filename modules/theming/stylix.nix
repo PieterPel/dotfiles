@@ -41,6 +41,7 @@ let
       };
       config = lib.mkIf config.modules.theming.stylix.enable {
         packages = with pkgs; [ base16-schemes ];
+        gtk.gtk4.theme = null;
         stylix = {
           enable = true;
           override.base0F = "ff729a";
@@ -59,6 +60,7 @@ let
             nixvim.plugin = "base16-nvim";
             rofi.enable = true;
             tmux.enable = false;
+            opencode.enable = false;
           };
         };
       };
@@ -66,9 +68,11 @@ let
 
 in
 {
-  flake.modules.nixos.stylix = systemModule "nixosModules";
-  flake.modules.darwin.stylix = systemModule "darwinModules";
-  flake.modules.homeManager.stylix = homeModule;
+  flake.modules = {
+    nixos.stylix = systemModule "nixosModules";
+    darwin.stylix = systemModule "darwinModules";
+    homeManager.stylix = homeModule;
+  };
 
   flake.modules.standaloneHomeManager.stylix =
     { pkgs, ... }:

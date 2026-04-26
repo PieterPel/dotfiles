@@ -1,21 +1,28 @@
+let
+  module = "terminalApps";
+  parent = "terminal";
+in
 {
-  flake.modules.homeManager.terminal-apps =
+  flake.modules.homeManager.${module} =
     { config
     , lib
     , pkgs
     , ...
     }:
     let
-      cfg = config.modules.terminal.terminal-apps;
+      cfg = config.modules.${parent}.${module};
     in
     {
-      options.modules.terminal.terminal-apps = {
+      options.modules.${parent}.${module} = {
         enable = lib.mkEnableOption "Enable terminal apps.";
       };
       config = lib.mkIf cfg.enable {
         packages = with pkgs; [
           # Nix
           nh
+          statix
+          nil
+          nixpkgs-fmt
 
           # Languages
           python3
@@ -31,7 +38,6 @@
           # Developing
           tmux
           helix
-          devenv
 
           # File management
           yazi
@@ -60,6 +66,9 @@
           # Jujutsu
           jujutsu
           jjui
+
+          # Command runner
+          just
         ];
 
         programs.btop.enable = true;
