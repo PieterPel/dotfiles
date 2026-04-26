@@ -113,6 +113,12 @@
       sessionStatusScript = pkgs.writeShellScriptBin "tmux-session-status" ''
         set -euo pipefail
 
+        # Build pid->ppid table in one ps call instead of one subprocess per lookup
+        declare -A ppid_map
+        while read -r pid ppid; do
+          ppid_map[$pid]=$ppid
+        done < <(ps -eo pid=,ppid= 2>/dev/null)
+
         find_claude_status() {
           local pane_pid="$1"
           for sf in "$HOME/.claude/sessions/"*.json; do
@@ -125,7 +131,7 @@
                 ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
                 return
               fi
-              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+              cur="''${ppid_map[$cur]:-}"
               depth=$((depth + 1))
             done
           done
@@ -197,6 +203,11 @@
       claudeStatusScript = pkgs.writeShellScriptBin "tmux-claude-status" ''
         set -euo pipefail
 
+        declare -A ppid_map
+        while read -r pid ppid; do
+          ppid_map[$pid]=$ppid
+        done < <(ps -eo pid=,ppid= 2>/dev/null)
+
         find_claude_status() {
           local pane_pid="$1"
           for sf in "$HOME/.claude/sessions/"*.json; do
@@ -209,7 +220,7 @@
                 ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
                 return
               fi
-              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+              cur="''${ppid_map[$cur]:-}"
               depth=$((depth + 1))
             done
           done
@@ -238,71 +249,15 @@
 
       claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
 
-      sessionClickScript = pkgs.writeShellScriptBin "tmux-session-click" ''
-        set -euo pipefail
-        mouse_x="''${1:-0}"
-        map_file="/tmp/tmux-session-positions"
-        [ -f "$map_file" ] || exit 0
-        while IFS=' ' read -r start end name; do
-          [ -z "$name" ] && continue
-          if [ "$mouse_x" -ge "$start" ] && [ "$mouse_x" -lt "$end" ]; then
-            tmux switch-client -t "$name"
-            exit 0
-          fi
-        done < "$map_file"
+      # On session switch, bust the #() cache by appending the session name as a
+      # shell comment — tmux sees a new command string and runs it immediately.
+      sessionSwitchHookScript = pkgs.writeShellScriptBin "tmux-session-switch-hook" ''
+        session="''${1:-}"
+        tmux set-option -g 'status-format[1]' "#[bg=#1e1e2e]#(${sessionStatus} # $session)"
+        tmux refresh-client -S
       '';
 
-      sessionClick = lib.getExe' sessionClickScript "tmux-session-click";
-
-      # Per-session Claude badge for use inside #{S:...} format strings.
-      # Takes <session_name> <active|inactive> — outputs tmux-formatted badge.
-      sessionBadgeScript = pkgs.writeShellScriptBin "tmux-session-badge" ''
-        set -euo pipefail
-
-        find_claude_status() {
-          local pane_pid="$1"
-          for sf in "$HOME/.claude/sessions/"*.json; do
-            [ -f "$sf" ] || continue
-            local claude_pid cur depth
-            claude_pid=$(basename "$sf" .json)
-            cur="$claude_pid" depth=0
-            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
-              if [ "$cur" = "$pane_pid" ]; then
-                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
-                return
-              fi
-              cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
-              depth=$((depth + 1))
-            done
-          done
-          echo ""
-        }
-
-        session_name="''${1:-}"
-        case "''${2:-inactive}" in
-          active) seg_fg="#ffffff" ;;
-          *)      seg_fg="#bac2de" ;;
-        esac
-
-        busy=0 idle=0 waiting=0
-        while IFS= read -r pane_pid; do
-          case "$(find_claude_status "$pane_pid")" in
-            busy)    busy=$((busy + 1)) ;;
-            idle)    idle=$((idle + 1)) ;;
-            waiting) waiting=$((waiting + 1)) ;;
-          esac
-        done < <(tmux list-panes -s -t "$session_name" -F '#{pane_pid}' 2>/dev/null)
-
-        if [ "$busy" -gt 0 ]; then
-          printf ' #[fg=#a6e3a1]●%s#[fg=%s]' "$busy" "$seg_fg"
-        elif [ "$waiting" -gt 0 ]; then
-          printf ' #[fg=#f38ba8]●%s#[fg=%s]' "$waiting" "$seg_fg"
-        elif [ "$idle" -gt 0 ]; then
-          printf ' #[fg=#585b70]○%s#[fg=%s]' "$idle" "$seg_fg"
-        fi
-      '';
-
-      sessionBadge = lib.getExe' sessionBadgeScript "tmux-session-badge";
+      sessionSwitchHook = lib.getExe' sessionSwitchHookScript "tmux-session-switch-hook";
     in
     {
       options.modules.terminal.tmux = {
@@ -366,7 +321,7 @@
               set -g allow-passthrough on
               set -s extended-keys on
               set -as terminal-features 'xterm*:extkeys'
-              set -g status-interval 5
+              set -g status-interval 1
               set -g focus-events on
 
               # Two-row status bar:
@@ -386,8 +341,8 @@
               # format[1] (top): session list, numbered, with Claude status badges
               set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
 
-              # Redraw status bar immediately after switching sessions
-              set-hook -g client-session-changed 'refresh-client -S'
+              # Bust the #() cache on session switch by appending session name as a comment
+              set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
 
               # Jump to session N with Prefix+Shift+N (1-9)
               # ##S: tmux run-shell expands ## to # so shell gets #S as literal for list-sessions -F

@@ -5,6 +5,7 @@ let
 in
 {
   flake.nixosConfigurations.${hostname} = inputs.nixos-raspberrypi.lib.nixosSystem {
+    inherit (inputs) nixpkgs;
     specialArgs = {
       inherit inputs;
       self = config.flake;
