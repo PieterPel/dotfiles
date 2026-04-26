@@ -13,11 +13,10 @@
         programs.direnv = {
           enable = true;
           nix-direnv.enable = true;
-          # Suppress all direnv output (loading messages, env diff on reload)
+          enableFishIntegration = false; # replaced by async hook below
           silent = true;
           config = {
             global = {
-              # Default is 5s which is too aggressive for Nix env evaluations
               warn_timeout = "0s";
             };
           };
@@ -26,22 +25,11 @@
         programs.fish = {
           enable = true;
 
-          # Override direnv's synchronous fish hook with a non-blocking async version.
-          #
-          # direnv's default `__direnv_export_eval` runs `direnv export fish | source`
-          # synchronously on every fish_prompt event. With a warm nix-direnv cache this
-          # is only ~8ms, but on a cache miss (first enter, flake.lock change) it blocks
-          # the terminal for the full Nix evaluation — potentially 30s+.
-          #
-          # This replacement runs the export in the background and sources the result on
-          # the *next* prompt render. With a warm cache the job finishes in <50ms, so by
-          # the time you type your next command the env is already in place. On a cold
-          # cache the shell stays responsive and the env silently loads when Nix is done.
-          #
-          # Trade-off: one-prompt delay before env vars are visible. In practice this is
-          # imperceptible because the bg job almost always finishes before you type again.
-          interactiveShellInit = lib.mkOrder 9999 ''
-            # On each prompt: source the result queued by the previous bg job, then queue the next one.
+          # Async direnv hook. enableFishIntegration=false prevents the default
+          # sync hook from being installed, so this is the only implementation.
+          # On each prompt: source the queued result, then start the next bg export.
+          # On cd: start a bg export immediately so it's ready by the next prompt.
+          interactiveShellInit = ''
             function __direnv_export_eval --on-event fish_prompt
                 set -l prev_status $status
                 if set -q __direnv_async_file
@@ -57,16 +45,10 @@
                 return $prev_status
             end
 
-            # On cd: kick off a bg export (result sourced on next prompt).
             function __direnv_cd_hook --on-variable PWD
                 set -g __direnv_async_file (mktemp /tmp/direnv.XXXXXXXXXX)
                 command direnv export fish >$__direnv_async_file 2>/dev/null </dev/null &
                 disown
-            end
-
-            # Drop direnv's synchronous preexec re-run; just clean up the cd hook.
-            function __direnv_export_eval_2 --on-event fish_preexec
-                functions --erase __direnv_cd_hook
             end
           '';
 
