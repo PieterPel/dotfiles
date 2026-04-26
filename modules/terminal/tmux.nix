@@ -192,8 +192,8 @@
 
       sessionStatus = lib.getExe' sessionStatusScript "tmux-session-status";
 
-      # Claude is a child of the shell, not a parent.
-      # So we scan all session files and walk UP each claude PID to see if pane_pid is an ancestor.
+      # Receives a window_id (@N), checks all panes in that window so the status
+      # is visible regardless of which pane is currently focused.
       claudeStatusScript = pkgs.writeShellScriptBin "tmux-claude-status" ''
         set -euo pipefail
 
@@ -216,13 +216,24 @@
           echo ""
         }
 
-        status=$(find_claude_status "''${1:-}")
-        case "$status" in
-          busy)    printf '#[fg=#a6e3a1]● ' ;;
-          waiting) printf '#[fg=#f38ba8]● ' ;;
-          idle)    printf '#[fg=#585b70]○ ' ;;
-          *)       printf "" ;;
-        esac
+        window_id="''${1:-}"
+        busy=0 waiting=0 idle=0
+
+        while IFS= read -r pane_pid; do
+          case "$(find_claude_status "$pane_pid")" in
+            busy)    busy=$((busy + 1)) ;;
+            waiting) waiting=$((waiting + 1)) ;;
+            idle)    idle=$((idle + 1)) ;;
+          esac
+        done < <(tmux list-panes -t "$window_id" -F '#{pane_pid}' 2>/dev/null)
+
+        if [ "$busy" -gt 0 ]; then
+          printf '#[fg=#a6e3a1]● '
+        elif [ "$waiting" -gt 0 ]; then
+          printf '#[fg=#f38ba8]● '
+        elif [ "$idle" -gt 0 ]; then
+          printf '#[fg=#585b70]○ '
+        fi
       '';
 
       claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
@@ -318,8 +329,8 @@
                 set -g @catppuccin_flavor 'mocha'
                 set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
-                set -g @catppuccin_window_current_text '#(${claudeStatus} #{pane_pid})#W'
-                set -g @catppuccin_window_text '#(${claudeStatus} #{pane_pid})#W'
+                set -g @catppuccin_window_current_text '#(${claudeStatus} #{window_id})#W'
+                set -g @catppuccin_window_text '#(${claudeStatus} #{window_id})#W'
               '';
             }
             {
