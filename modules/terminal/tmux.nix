@@ -158,7 +158,7 @@
         }
 
         sessions=($(tmux list-sessions -F '#S' 2>/dev/null))
-        current=$(tmux display-message -p '#S')
+        current="''${TMUX_SESSION_OVERRIDE:-$(tmux display-message -p '#S')}"
         count=''${#sessions[@]}
         output=""
 
@@ -249,15 +249,28 @@
 
       claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
 
-      # On session switch, bust the #() cache by appending the session name as a
-      # shell comment — tmux sees a new command string and runs it immediately.
       sessionSwitchHookScript = pkgs.writeShellScriptBin "tmux-session-switch-hook" ''
         session="''${1:-}"
-        tmux set-option -g 'status-format[1]' "#[bg=#1e1e2e]#(${sessionStatus} # $session)"
+        bar=$(TMUX_SESSION_OVERRIDE="$session" ${sessionStatus} 2>/dev/null)
+        tmux set-option -gq @session_status_bar "$bar"
         tmux refresh-client -S
       '';
 
       sessionSwitchHook = lib.getExe' sessionSwitchHookScript "tmux-session-switch-hook";
+
+      # Precomputes the status with the target session highlighted BEFORE switching,
+      # so the variable is ready the instant tmux redraws. No #() async lag.
+      sessionSwitchToScript = pkgs.writeShellScriptBin "tmux-session-switch-to" ''
+        n="''${1:-}"
+        target=$(tmux list-sessions -F '#S' | sed -n "''${n}p")
+        [ -z "$target" ] && exit 0
+        bar=$(TMUX_SESSION_OVERRIDE="$target" ${sessionStatus} 2>/dev/null)
+        tmux set-option -gq @session_status_bar "$bar"
+        tmux switch-client -t "$target"
+        tmux refresh-client -S
+      '';
+
+      sessionSwitchTo = lib.getExe' sessionSwitchToScript "tmux-session-switch-to";
     in
     {
       options.modules.terminal.tmux = {
@@ -338,23 +351,27 @@
               # format[0] (bottom): window tabs; tmux 3.6 default is empty so set explicitly
               set -g status-format[0] "#[align=left range=left]#{E:status-left}#[norange default]#[list=on align=#{status-justify}]#[list=left-marker]<#[list=right-marker]>#[list=on]#{W:#[range=window|#{window_id} #{E:window-status-style}]#[push-default]#{T:window-status-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}},#[range=window|#{window_id} list=focus #{?#{!=:#{E:window-status-current-style},default},#{E:window-status-current-style},#{E:window-status-style}}]#[push-default]#{T:window-status-current-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}}}#[nolist align=right range=right]#{E:status-right}#[norange default]"
 
-              # format[1] (top): session list, numbered, with Claude status badges
-              set -g status-format[1] "#[bg=#1e1e2e]#(${sessionStatus})"
+              # format[1] (top): session list — read from a tmux variable updated synchronously
+              # by the hook, so session switches never show a stale/wrong highlight
+              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}"
 
-              # Bust the #() cache on session switch by appending session name as a comment
+              # Initialize on startup/reload
+              run-shell 'tmux set-option -gq @session_status_bar "$(${sessionStatus} 2>/dev/null)"'
+
+              # Update on session switch and on new session creation
               set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
+              set-hook -g after-new-session 'run-shell "${sessionSwitchHook} #{session_name}"'
 
               # Jump to session N with Prefix+Shift+N (1-9)
-              # ##S: tmux run-shell expands ## to # so shell gets #S as literal for list-sessions -F
-              bind '!' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "1p")"'
-              bind '@' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "2p")"'
-              bind '#' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "3p")"'
-              bind '$' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "4p")"'
-              bind '%' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "5p")"'
-              bind '^' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "6p")"'
-              bind '&' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "7p")"'
-              bind '*' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "8p")"'
-              bind '(' run-shell 'tmux switch-client -t "$(tmux list-sessions -F "##S" | sed -n "9p")"'
+              bind '!' run-shell '${sessionSwitchTo} 1'
+              bind '@' run-shell '${sessionSwitchTo} 2'
+              bind '#' run-shell '${sessionSwitchTo} 3'
+              bind '$' run-shell '${sessionSwitchTo} 4'
+              bind '%' run-shell '${sessionSwitchTo} 5'
+              bind '^' run-shell '${sessionSwitchTo} 6'
+              bind '&' run-shell '${sessionSwitchTo} 7'
+              bind '*' run-shell '${sessionSwitchTo} 8'
+              bind '(' run-shell '${sessionSwitchTo} 9'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session

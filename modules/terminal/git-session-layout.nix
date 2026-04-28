@@ -20,7 +20,7 @@
         tmux send-keys -t "$session:1" "nvim ." Enter
 
         tmux new-window -t "$session" -n "shell"  -c "$path"
-        tmux new-window -t "$session" -n "dash"   -c "$path" "${lib.getExe pkgs.gh-dash}"
+        tmux new-window -t "$session" -n "dash"   -c "$path" "gh relay"
         tmux new-window -t "$session" -n "claude" -c "$path" "claude"
 
         tmux select-window -t "$session:code"
