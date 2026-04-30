@@ -271,6 +271,17 @@
       '';
 
       sessionSwitchTo = lib.getExe' sessionSwitchToScript "tmux-session-switch-to";
+
+      # Runs every status-interval as a #() side effect: updates @session_status_bar
+      # without touching the display (returns ""). Keeps badges live between switches.
+      sessionLiveUpdaterScript = pkgs.writeShellScriptBin "tmux-session-live-updater" ''
+        current=$(tmux display-message -p '#S' 2>/dev/null) || exit 0
+        [ -z "$current" ] && exit 0
+        bar=$(TMUX_SESSION_OVERRIDE="$current" ${sessionStatus} 2>/dev/null) || exit 0
+        tmux set-option -gq @session_status_bar "$bar" 2>/dev/null || true
+      '';
+
+      sessionLiveUpdater = lib.getExe' sessionLiveUpdaterScript "tmux-session-live-updater";
     in
     {
       options.modules.terminal.tmux = {
@@ -353,7 +364,7 @@
 
               # format[1] (top): session list — read from a tmux variable updated synchronously
               # by the hook, so session switches never show a stale/wrong highlight
-              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}"
+              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}#(${sessionLiveUpdater})"
 
               # Initialize on startup/reload
               run-shell 'tmux set-option -gq @session_status_bar "$(${sessionStatus} 2>/dev/null)"'

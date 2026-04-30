@@ -47,6 +47,8 @@
           # Security
           claudebox # Containerize claude code easily
 
+          # LLM proxy for claude code
+          cli-proxy-api
         ];
         programs = {
           claude-code = {
