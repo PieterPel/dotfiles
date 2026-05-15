@@ -1,9 +1,10 @@
 {
   flake.modules.homeManager.nixvim-plugins =
-    { config
-    , lib
-    , pkgs
-    , ...
+    {
+      config,
+      lib,
+      pkgs,
+      ...
     }:
     {
       config = lib.mkIf config.modules.terminal.nixvim.enable {
@@ -275,8 +276,9 @@
               nil_ls.enable = true;
               dockerls.enable = true;
               ty.enable = false; # Not production ready at all in jan '26
+              pyrefly.enable = true;
               basedpyright = {
-                enable = true;
+                enable = false;
                 cmd = [
                   "basedpyright-langserver"
                   "--stdio"
