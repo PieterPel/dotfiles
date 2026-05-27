@@ -1,9 +1,10 @@
 {
   flake.modules.homeManager.tmux =
-    { config
-    , lib
-    , pkgs
-    , ...
+    {
+      config,
+      lib,
+      pkgs,
+      ...
     }:
     let
       cfg = config.modules.terminal.tmux;
@@ -23,8 +24,6 @@
 
       promote = lib.getExe' promoteScript "tmux-promote";
 
-      fzf-tmux = pkgs.lib.getExe' pkgs.fzf "fzf-tmux";
-
       claudeTmux = pkgs.rustPlatform.buildRustPackage {
         pname = "claude-tmux";
         version = "0.3.0";
@@ -36,7 +35,11 @@
         };
         cargoHash = "sha256-AKBNCHx6Ap6HKddwzxs/qfJhJDE7LdZ/tRKO94ugRkA=";
         nativeBuildInputs = [ pkgs.pkg-config ];
-        buildInputs = [ pkgs.openssl pkgs.libgit2 pkgs.libiconv ];
+        buildInputs = [
+          pkgs.openssl
+          pkgs.libgit2
+          pkgs.libiconv
+        ];
         meta.mainProgram = "claude-tmux";
       };
 
@@ -457,9 +460,3 @@
       };
     };
 }
-
-
-
-
-
-
