@@ -1,5 +1,6 @@
-{ inputs
-, ...
+{
+  inputs,
+  ...
 }:
 let
   polarity = "dark";
@@ -7,10 +8,11 @@ let
   base16Scheme = pkgs: "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
   systemModule =
     modules:
-    { lib
-    , config
-    , pkgs
-    , ...
+    {
+      lib,
+      config,
+      pkgs,
+      ...
     }:
     {
       imports = [
@@ -30,10 +32,11 @@ let
     };
 
   homeModule =
-    { lib
-    , config
-    , pkgs
-    , ...
+    {
+      lib,
+      config,
+      pkgs,
+      ...
     }:
     {
       options.modules.theming.stylix = {
@@ -41,7 +44,7 @@ let
       };
       config = lib.mkIf config.modules.theming.stylix.enable {
         packages = with pkgs; [ base16-schemes ];
-        gtk.gtk4.theme = null;
+        # gtk.gtk4.theme = null; # NOTE: had this then got an error, dont know why I had it in the first place
         stylix = {
           enable = true;
           override.base0F = "ff729a";
