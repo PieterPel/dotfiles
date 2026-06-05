@@ -4,10 +4,11 @@ let
 in
 {
   flake.modules.homeManager.${module} =
-    { config
-    , lib
-    , pkgs
-    , ...
+    {
+      config,
+      lib,
+      pkgs,
+      ...
     }:
     let
       cfg = config.modules.${parent}.${module};
@@ -51,7 +52,6 @@ in
           ripgrep
           eza
           lazysql
-          silver-searcher
           curlie
 
           # Containers
