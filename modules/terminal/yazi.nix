@@ -22,7 +22,8 @@
         enable = lib.mkEnableOption "Enable Yazi configuration.";
       };
 
-      config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable (lib.mkMerge [
+        {
         programs.yazi = {
           enable = true;
           shellWrapperName = "yy";
@@ -60,6 +61,20 @@
             bind y display-popup -w 80% -h 80% "${yazi-tmux-launcher}"
           '';
         };
-      };
+        }
+
+        (lib.mkIf config.modules.terminal.zellij.enable {
+          xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
+            keybinds {
+              tmux {
+                bind "y" {
+                  Run "${lib.getExe pkgs.yazi}" { floating true; close_on_exit true; }
+                  SwitchToMode "Normal";
+                }
+              }
+            }
+          '';
+        })
+      ]);
     };
 }

@@ -74,6 +74,7 @@ let
         nixvim = defaultEnable;
         starship = defaultEnable;
         tmux = defaultEnable;
+        zellij = defaultEnable;
         terminalApps = defaultEnable;
         yazi = defaultEnable;
         sesh = defaultEnable;

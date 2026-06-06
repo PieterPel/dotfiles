@@ -13,6 +13,21 @@
       fzf-tmux = pkgs.lib.getExe' pkgs.fzf "fzf-tmux";
       seshKey = "s";
 
+      seshPickerZellij' = pkgs.writeShellScriptBin "sesh-picker-zellij" ''
+        target=$(${sesh} list -i | ${fzf} \
+          --ansi --no-sort --border-label ' sesh ' --prompt '⚡ ' \
+          --header ' ^a all | ^t sessions | ^g configs | ^x zoxide ' \
+          --bind 'ctrl-a:change-prompt(⚡ )+reload(${sesh} list -i)' \
+          --bind 'ctrl-t:change-prompt(🪟 )+reload(${sesh} list -it)' \
+          --bind 'ctrl-g:change-prompt(⚙️ )+reload(${sesh} list -ic)' \
+          --bind 'ctrl-x:change-prompt(📁 )+reload(${sesh} list -iz)')
+
+        if [ -n "$target" ]; then
+          ${sesh} connect "$(echo "$target" | awk '{print $NF}')"
+        fi
+      '';
+      seshPickerZellij = lib.getExe' seshPickerZellij' "sesh-picker-zellij";
+
       seshPicker' = pkgs.writeShellScriptBin "sesh-picker" ''
         target=$(${sesh} list -i | ${fzf-tmux} -p 80%,70% \
           --ansi --no-sort --border-label ' sesh ' --prompt '⚡ ' \
@@ -33,8 +48,8 @@
         enable = lib.mkEnableOption "Enable Sesh configuration.";
       };
 
-      config = lib.mkIf cfg.enable {
-        programs = {
+      config = lib.mkIf cfg.enable (lib.mkMerge [
+        { programs = {
           sesh = {
             enable = true;
             settings = {
@@ -60,7 +75,20 @@
             enable = true;
             tmux.enableShellIntegration = true;
           };
-        };
-      };
+        }; }
+
+        (lib.mkIf config.modules.terminal.zellij.enable {
+          xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
+            keybinds {
+              tmux {
+                bind "s" {
+                  Run "${seshPickerZellij}" { floating true; close_on_exit true; }
+                  SwitchToMode "Normal";
+                }
+              }
+            }
+          '';
+        })
+      ]);
     };
 }
