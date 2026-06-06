@@ -63,6 +63,7 @@ let
             nixvim.plugin = "base16-nvim";
             rofi.enable = true;
             tmux.enable = false;
+            zellij.enable = false;
             opencode.enable = false;
           };
         };

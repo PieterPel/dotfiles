@@ -536,6 +536,17 @@
           })
 
           pkgs.vimPlugins.transparent-nvim
+
+          (vimUtils.buildVimPlugin {
+            pname = "vim-claude-code";
+            version = "v1.4.1";
+            src = pkgs.fetchFromGitHub {
+              owner = "rishi-opensource";
+              repo = "vim-claude-code";
+              rev = "v1.4.1";
+              hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+            };
+          })
         ];
       };
     };
