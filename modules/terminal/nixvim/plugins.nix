@@ -524,14 +524,13 @@
           })
 
           (vimUtils.buildVimPlugin {
-            pname = "claude-preview-nvim";
-            version = "2026-03-28";
+            pname = "code-preview-nvim";
+            version = "2026-06-06";
             src = pkgs.fetchFromGitHub {
               owner = "Cannon07";
-              repo = "claude-preview.nvim";
-              # 2026-03-28
-              rev = "4aee3b003ce806900de22986efe96dba44ec91e7";
-              hash = "sha256-n8cDNQwF6uoNKZtKSlRMtxvbTAbYIlRl6ZdlrahCIog=";
+              repo = "code-preview.nvim";
+              rev = "e538e6969184eb872c63fdc18407c1be5096b888";
+              hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
             };
           })
 
@@ -548,6 +547,39 @@
             };
           })
         ];
+
+        # vim-claude-code — keybindings reference:
+        #   <C-\>         toggle Claude terminal (normal + terminal mode)
+        #   <Leader>cC    reopen with --continue
+        #   <Leader>cV    reopen with --verbose
+        #   <Leader>cc    free-form chat
+        #   <Leader>ce    explain file/selection      (visual: selection)
+        #   <Leader>cf    fix bugs                    (visual: selection)
+        #   <Leader>cr    refactor                    (visual: selection)
+        #   <Leader>ct    generate tests              (visual: selection)
+        #   <Leader>cd    generate docstrings         (visual: selection)
+        #   <Leader>cn    suggest better names        (visual: selection)
+        #   <Leader>co    optimize performance        (visual: selection)
+        #   <Leader>cg    generate commit message     (remapped from Gemini in binds.nix)
+        #   <Leader>cG    generate commit message     (plugin default — both work)
+        #   <Leader>cR    code review
+        #   <Leader>cp    PR description
+        #   <Leader>cP    architectural planning
+        #   <Leader>ca    analyze complexity
+        #   <Leader>cD    debug
+        #   <Leader>cA    apply suggestion
+        #   <Leader>cx    show context
+        #   <Leader>cm    switch model
+        programs.nixvim.globals = {
+          claude_code_position          = "right";
+          claude_code_split_ratio       = 0.35;
+          claude_code_map_keys          = 1;
+          claude_code_map_extended_keys = 1;
+          claude_code_diff_preview      = 1;
+          claude_code_use_git_root      = 1;
+          claude_code_multi_instance    = 1;
+          claude_code_enter_insert      = 1;
+        };
       };
     };
 }

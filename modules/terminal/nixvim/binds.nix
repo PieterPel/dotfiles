@@ -179,16 +179,16 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # claude-preview.nvim — install hooks once per project with :ClaudePreviewInstallHooks
+          # code-preview.nvim — install hooks once per project with :CodePreviewInstallClaudeCodeHooks
           {
             key = "<leader>dq";
-            action = "<cmd>ClaudePreviewCloseDiff<CR>";
-            options.desc = "Close Claude diff preview";
+            action = "<cmd>CodePreviewCloseDiff<CR>";
+            options.desc = "Close code preview diff";
           }
           {
             key = "<leader>cg";
-            action = "<cmd>Gemini toggle<CR>";
-            options.desc = "Gemini toggle";
+            action = "<cmd>Claude commit<CR>";
+            options.desc = "Claude: generate commit message";
           }
 
           {

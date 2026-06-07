@@ -36,7 +36,6 @@
 
           [ -z "$HOOK_EVENT" ] && exit 0
 
-          SHORT_SESSION="''${SESSION_ID: -4}"
           PROJECT_NAME=$(basename "$CWD" 2>/dev/null || echo "?")
           if [ ''${#PROJECT_NAME} -gt 12 ]; then
             PROJECT_NAME="''${PROJECT_NAME:0:6}..."
@@ -135,7 +134,7 @@
             --arg time      "$TIME_FMT" \
             --arg ts        "$TIMESTAMP" \
             --arg session   "$SESSION_ID" \
-            --argjson done  "$DONE" \
+            --argjson "done" "$DONE" \
             '.[$pane] = {
               project:  $project,
               activity: $activity,
@@ -146,7 +145,7 @@
               session_id: $session,
               done: $done
             }' > "$TMP_FILE" 2>/dev/null
-          [ -s "$TMP_FILE" ] && mv "$TMP_FILE" "$STATE_FILE" || rm -f "$TMP_FILE"
+          if [ -s "$TMP_FILE" ]; then mv "$TMP_FILE" "$STATE_FILE"; else rm -f "$TMP_FILE"; fi
 
           SESSIONS=""
           while IFS= read -r line; do
