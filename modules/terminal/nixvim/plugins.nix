@@ -530,7 +530,7 @@
               owner = "Cannon07";
               repo = "code-preview.nvim";
               rev = "e538e6969184eb872c63fdc18407c1be5096b888";
-              hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+              hash = "sha256-As6RblPBbXqbGu2bruDiqHwcikIi80zSmVUAfTqc4OU=";
             };
           })
 
