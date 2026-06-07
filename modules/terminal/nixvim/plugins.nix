@@ -543,7 +543,7 @@
               owner = "rishi-opensource";
               repo = "vim-claude-code";
               rev = "v1.4.1";
-              hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+              hash = "sha256-8XaUQWB4GCWtwgPp///fpCWyINByIkldB8dAXiljVLw=";
             };
           })
         ];
