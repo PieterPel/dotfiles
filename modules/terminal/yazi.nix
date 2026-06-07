@@ -43,11 +43,11 @@
             open = {
               rules = [
                 {
-                  name = "*.{png,jpg,jpeg,gif,webp}";
+                  mime = "image/*";
                   use = "view";
-                } # Use the viewer for images
+                }
                 {
-                  name = "*";
+                  url = "**";
                   use = "edit";
                 }
               ];
