@@ -575,7 +575,7 @@
           claude_code_split_ratio       = 0.35;
           claude_code_map_keys          = 1;
           claude_code_map_extended_keys = 1;
-          claude_code_diff_preview      = 1;
+          claude_code_diff_preview      = 0; # handled by code-preview.nvim instead
           claude_code_use_git_root      = 1;
           claude_code_multi_instance    = 1;
           claude_code_enter_insert      = 1;

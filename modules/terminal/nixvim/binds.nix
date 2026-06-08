@@ -214,7 +214,7 @@
             action = "<cmd>quit<CR>";
           }
           {
-            key = "<C-e";
+            key = "<C-e>";
             action = "<cmd>lua vim.diagnostic.open_float()<CR>";
           }
 
