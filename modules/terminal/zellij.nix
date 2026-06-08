@@ -193,6 +193,7 @@
           scroll_buffer_size 10000
           copy_on_select true
           session_serialization true
+          default_layout "default"
 
           keybinds clear-defaults=true {
             normal {
