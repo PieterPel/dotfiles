@@ -25,8 +25,8 @@
 
           onActivation = {
             autoUpdate = false;
-            # 'zap': uninstalls all formulae(and related files) not listed here.
             cleanup = "uninstall";
+            extraFlags = [ "--force" ];
           };
 
           taps = [ ];
