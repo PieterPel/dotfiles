@@ -224,10 +224,10 @@
               bind "S" { SwitchToMode "Session"; }
 
               // Resize
-              bind "M-h" { Resize "Increase Left";  SwitchToMode "Normal"; }
-              bind "M-j" { Resize "Increase Down";  SwitchToMode "Normal"; }
-              bind "M-k" { Resize "Increase Up";    SwitchToMode "Normal"; }
-              bind "M-l" { Resize "Increase Right"; SwitchToMode "Normal"; }
+              bind "Alt h" { Resize "Increase Left";  SwitchToMode "Normal"; }
+              bind "Alt j" { Resize "Increase Down";  SwitchToMode "Normal"; }
+              bind "Alt k" { Resize "Increase Up";    SwitchToMode "Normal"; }
+              bind "Alt l" { Resize "Increase Right"; SwitchToMode "Normal"; }
             }
 
             shared_except "normal" "locked" {
