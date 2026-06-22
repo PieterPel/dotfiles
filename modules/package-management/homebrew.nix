@@ -34,7 +34,6 @@
           # `brew install`
           brews = [
             # Not in nixpkgs
-            "marcus/tap/td"
           ];
 
           # `brew install --cask`
