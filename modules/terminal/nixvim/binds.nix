@@ -179,16 +179,24 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # code-preview.nvim — install hooks once per project with :CodePreviewInstallClaudeCodeHooks
+          # agentic.nvim
           {
-            key = "<leader>dq";
-            action = "<cmd>CodePreviewCloseDiff<CR>";
-            options.desc = "Close code preview diff";
+            key = "<C-;>";
+            action.__raw = "function() require('agentic').toggle() end";
+            mode = [ "n" "v" "i" ];
+            options.desc = "Toggle Agentic chat";
+          }
+          {
+            key = "<C-'>";
+            action.__raw = "function() require('agentic').add_selection_or_file_to_context() end";
+            mode = [ "n" "v" ];
+            options.desc = "Add file/selection to Agentic context";
           }
           {
             key = "<leader>cg";
-            action = "<cmd>Claude commit<CR>";
-            options.desc = "Claude: generate commit message";
+            action.__raw = "function() require('agentic').new_session() end";
+            mode = [ "n" "v" "i" ];
+            options.desc = "Agentic: new session";
           }
 
           {

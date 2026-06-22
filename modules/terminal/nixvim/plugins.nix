@@ -523,63 +523,36 @@
             };
           })
 
-          (vimUtils.buildVimPlugin {
-            pname = "code-preview-nvim";
-            version = "2026-06-06";
-            src = pkgs.fetchFromGitHub {
-              owner = "Cannon07";
-              repo = "code-preview.nvim";
-              rev = "e538e6969184eb872c63fdc18407c1be5096b888";
-              hash = "sha256-As6RblPBbXqbGu2bruDiqHwcikIi80zSmVUAfTqc4OU=";
-            };
-          })
-
           pkgs.vimPlugins.transparent-nvim
 
           (vimUtils.buildVimPlugin {
-            pname = "vim-claude-code";
-            version = "v1.4.1";
+            pname = "agentic-nvim";
+            version = "2026-06-11";
             src = pkgs.fetchFromGitHub {
-              owner = "rishi-opensource";
-              repo = "vim-claude-code";
-              rev = "v1.4.1";
-              hash = "sha256-8XaUQWB4GCWtwgPp///fpCWyINByIkldB8dAXiljVLw=";
+              owner = "carlos-algms";
+              repo = "agentic.nvim";
+              rev = "a19fee663aa8be5f46f0af6fc0b46427b0e75cf2";
+              hash = "sha256-ZT1ME4E8jwC6DPLVpEgCudL8go91q7PkfJn5ylajmYA=";
             };
           })
         ];
 
-        # vim-claude-code — keybindings reference:
-        #   <C-\>         toggle Claude terminal (normal + terminal mode)
-        #   <Leader>cC    reopen with --continue
-        #   <Leader>cV    reopen with --verbose
-        #   <Leader>cc    free-form chat
-        #   <Leader>ce    explain file/selection      (visual: selection)
-        #   <Leader>cf    fix bugs                    (visual: selection)
-        #   <Leader>cr    refactor                    (visual: selection)
-        #   <Leader>ct    generate tests              (visual: selection)
-        #   <Leader>cd    generate docstrings         (visual: selection)
-        #   <Leader>cn    suggest better names        (visual: selection)
-        #   <Leader>co    optimize performance        (visual: selection)
-        #   <Leader>cg    generate commit message     (remapped from Gemini in binds.nix)
-        #   <Leader>cG    generate commit message     (plugin default — both work)
-        #   <Leader>cR    code review
-        #   <Leader>cp    PR description
-        #   <Leader>cP    architectural planning
-        #   <Leader>ca    analyze complexity
-        #   <Leader>cD    debug
-        #   <Leader>cA    apply suggestion
-        #   <Leader>cx    show context
-        #   <Leader>cm    switch model
-        programs.nixvim.globals = {
-          claude_code_position          = "right";
-          claude_code_split_ratio       = 0.35;
-          claude_code_map_keys          = 1;
-          claude_code_map_extended_keys = 1;
-          claude_code_diff_preview      = 0; # handled by code-preview.nvim instead
-          claude_code_use_git_root      = 1;
-          claude_code_multi_instance    = 1;
-          claude_code_enter_insert      = 1;
-        };
+        # agentic.nvim — requires claude-agent-acp binary installed globally:
+        #   pnpm add -g @agentclientprotocol/claude-agent-acp
+        # Auth is handled by a one-time: claude /login
+        programs.nixvim.extraConfigLua = ''
+          require("agentic").setup({
+            provider = "claude-agent-acp",
+            windows = {
+              position = "right",
+              width = "35%",
+            },
+            diff_preview = {
+              enabled = true,
+              layout = "split",
+            },
+          })
+        '';
       };
     };
 }
