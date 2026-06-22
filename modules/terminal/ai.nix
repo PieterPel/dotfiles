@@ -21,6 +21,7 @@
           code # Codex fork that also supports claude and gemini
           mistral-vibe
           sidecar # Terminal-based companion to orchestrate your AI agents alongside Neovim
+          claude-agent-acp # ACP provider for agentic.nvim
 
           # Assistant
           # picoclaw # Hash mismatch
