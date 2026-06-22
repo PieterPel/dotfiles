@@ -385,6 +385,13 @@
                 #"copilot"
               ];
 
+              per_filetype = {
+                AgenticInput = [
+                  "agentic_slash"
+                  "agentic_at"
+                ];
+              };
+
               providers = {
                 git = {
                   module = "blink-cmp-git";
@@ -537,9 +544,22 @@
           })
         ];
 
-        # agentic.nvim — requires claude-agent-acp binary installed globally:
-        #   pnpm add -g @agentclientprotocol/claude-agent-acp
-        # Auth is handled by a one-time: claude /login
+        programs.nixvim.autoCmd = [
+          {
+            event = "FileType";
+            pattern = [ "AgenticChat" "AgenticInput" ];
+            callback.__raw = ''
+              function()
+                local ss = require('smart-splits')
+                vim.keymap.set({ "n", "i" }, "<C-h>", ss.move_cursor_left,  { buffer = true, silent = true })
+                vim.keymap.set({ "n", "i" }, "<C-j>", ss.move_cursor_down,  { buffer = true, silent = true })
+                vim.keymap.set({ "n", "i" }, "<C-k>", ss.move_cursor_up,    { buffer = true, silent = true })
+                vim.keymap.set({ "n", "i" }, "<C-l>", ss.move_cursor_right, { buffer = true, silent = true })
+              end
+            '';
+          }
+        ];
+
         programs.nixvim.extraConfigLua = ''
           require("agentic").setup({
             provider = "claude-agent-acp",
@@ -549,7 +569,14 @@
             },
             diff_preview = {
               enabled = true,
-              layout = "split",
+              layout = "inline",
+              center_on_navigate_hunks = true,
+            },
+            folding = {
+              tool_calls = {
+                enabled = true,
+                threshold = 10,
+              },
             },
           })
         '';

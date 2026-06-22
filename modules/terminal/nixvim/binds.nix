@@ -46,21 +46,25 @@
           {
             key = "<C-h>";
             action.__raw = "require('smart-splits').move_cursor_left";
+            mode = [ "n" "t" ];
             options.desc = "Move to left split";
           }
           {
             key = "<C-j>";
             action.__raw = "require('smart-splits').move_cursor_down";
+            mode = [ "n" "t" ];
             options.desc = "Move to split below";
           }
           {
             key = "<C-k>";
             action.__raw = "require('smart-splits').move_cursor_up";
+            mode = [ "n" "t" ];
             options.desc = "Move to split above";
           }
           {
             key = "<C-l>";
             action.__raw = "require('smart-splits').move_cursor_right";
+            mode = [ "n" "t" ];
             options.desc = "Move to right split";
           }
 
