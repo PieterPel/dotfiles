@@ -563,6 +563,11 @@
         programs.nixvim.extraConfigLua = ''
           require("agentic").setup({
             provider = "claude-agent-acp",
+            acp_providers = {
+              ["claude-agent-acp"] = {
+                env = { MAX_THINKING_TOKENS = "10000" },
+              },
+            },
             windows = {
               position = "right",
               width = "35%",
