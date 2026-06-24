@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.zellij =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.terminal.zellij;
@@ -166,17 +165,22 @@
         '';
       };
 
-      claudeZellijSwitch = pkgs.writers.writePython3Bin "claude-zellij-switch" {} ''
-        import json, os, subprocess, sys, time
+      claudeZellijSwitch = pkgs.writers.writePython3Bin "claude-zellij-switch" { } ''
+        import json
+        import os
+        import subprocess
+        import sys
+        import time
         from pathlib import Path
 
-        STATE_DIR  = Path("/tmp/claude-zellij-status")
+        STATE_DIR = Path("/tmp/claude-zellij-status")
         QUEUE_FILE = STATE_DIR / ".attention.json"
-        SESSION    = os.environ.get("ZELLIJ_SESSION_NAME", "")
-        ZELLIJ     = "${lib.getExe pkgs.zellij}"
+        SESSION = os.environ.get("ZELLIJ_SESSION_NAME", "")
+        ZELLIJ = "${lib.getExe pkgs.zellij}"
 
         if not SESSION:
             sys.exit(0)
+
 
         def read_queue():
             try:
@@ -184,46 +188,51 @@
             except Exception:
                 return []
 
+
         def write_queue(queue):
             QUEUE_FILE.write_text(json.dumps(queue))
 
+
         def live_sessions():
-            out = subprocess.run([ZELLIJ, "list-sessions"], capture_output=True, text=True).stdout
+            out = subprocess.run(
+                [ZELLIJ, "list-sessions"],
+                capture_output=True,
+                text=True,
+            ).stdout
             return [
                 line.split()[0]
                 for line in out.splitlines()
                 if line.strip() and "EXITED" not in line
             ]
 
+
         def switch(target, via=None):
             cmd = [ZELLIJ, "-s", via] if via else [ZELLIJ]
-            subprocess.run(cmd + ["action", "switch-session", target], capture_output=True)
+            subprocess.run(
+                cmd + ["action", "switch-session", target],
+                capture_output=True,
+            )
+
 
         mode = sys.argv[1] if len(sys.argv) > 1 else ""
 
         if mode == "stop":
-            queue     = read_queue()
+            queue = read_queue()
             was_empty = len(queue) == 0
-
-            # Record this session as needing attention
             queue = [e for e in queue if e["session"] != SESSION]
             queue.append({"session": SESSION, "ts": int(time.time())})
             write_queue(queue)
-
-            # Nothing else was waiting — pull other sessions here immediately
             if was_empty:
                 for other in live_sessions():
                     if other != SESSION:
                         switch(SESSION, via=other)
 
         elif mode == "prompt":
-            queue   = read_queue()
+            queue = read_queue()
             waiting = [e for e in queue if e["session"] != SESSION]
-
             if waiting:
-                # Go to the most recently finished session
                 target = max(waiting, key=lambda e: e["ts"])
-                queue  = [e for e in queue if e["session"] != target["session"]]
+                queue = [e for e in queue if e["session"] != target["session"]]
                 write_queue(queue)
                 switch(target["session"])
 
@@ -231,7 +240,7 @@
             write_queue([e for e in read_queue() if e["session"] != SESSION])
       '';
 
-      hookCmd   = lib.getExe claudeZellijHook;
+      hookCmd = lib.getExe claudeZellijHook;
       statusCmd = lib.getExe claudeZellijStatus;
       switchCmd = lib.getExe claudeZellijSwitch;
 
@@ -363,15 +372,15 @@
 
         # Claude Code hooks — write activity to zjstatus pipe
         programs.claude-code.settings.hooks = {
-          PreToolUse      = [ hookEntry ];
-          PostToolUse     = [ hookEntry ];
+          PreToolUse = [ hookEntry ];
+          PostToolUse = [ hookEntry ];
           UserPromptSubmit = [ hookEntry ];
           PermissionRequest = [ hookEntry ];
-          Notification    = [ hookEntry ];
-          Stop            = [ hookEntry ];
-          SubagentStop    = [ hookEntry ];
-          SessionStart    = [ hookEntry ];
-          SessionEnd      = [ hookEntry ];
+          Notification = [ hookEntry ];
+          Stop = [ hookEntry ];
+          SubagentStop = [ hookEntry ];
+          SessionStart = [ hookEntry ];
+          SessionEnd = [ hookEntry ];
         };
       };
     };
