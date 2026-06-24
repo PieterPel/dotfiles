@@ -96,22 +96,7 @@
                 jq --arg pane "$ZELLIJ_PANE" 'del(.[$pane])' "$STATE_FILE" > "$TMP_FILE" 2>/dev/null && mv "$TMP_FILE" "$STATE_FILE"
                 rm -f "$TMP_FILE"
               fi
-              if [ -f "$STATE_FILE" ] && [ -s "$STATE_FILE" ]; then
-                SESSIONS=""
-                while IFS= read -r line; do
-                  [ -z "$line" ] && continue
-                  [ -n "$SESSIONS" ] && SESSIONS="''${SESSIONS}  "
-                  SESSIONS="''${SESSIONS}''${line}"
-                done < <(jq -r '
-                  to_entries | sort_by(.key)[] |
-                  "#[fg=\(.value.color)]\(.value.symbol) #[fg=#4166F5]\(.value.project)"
-                ' "$STATE_FILE" 2>/dev/null)
-                if [ -z "$SESSIONS" ]; then
-                  ${zellijBin} -s "$ZELLIJ_SESSION" pipe "zjstatus::pipe::pipe_status::" 2>/dev/null || true
-                else
-                  ${zellijBin} -s "$ZELLIJ_SESSION" pipe "zjstatus::pipe::pipe_status::''${SESSIONS}" 2>/dev/null || true
-                fi
-              fi
+              ${switchCmd} end 2>/dev/null || true
               exit 0 ;;
             *)
               ACTIVITY="..."; COLOR="$C_GRAY"; SYMBOL="○" ;;
@@ -147,6 +132,26 @@
             }' > "$TMP_FILE" 2>/dev/null
           if [ -s "$TMP_FILE" ]; then mv "$TMP_FILE" "$STATE_FILE"; else rm -f "$TMP_FILE"; fi
 
+          case "$HOOK_EVENT" in
+            Stop)             ${switchCmd} stop   2>/dev/null || true ;;
+            UserPromptSubmit) ${switchCmd} prompt 2>/dev/null || true ;;
+          esac
+
+          case "$HOOK_EVENT" in
+            Notification|Stop|SubagentStop|AskUserQuestion|PermissionRequest)
+              ${zellijBin} -s "$ZELLIJ_SESSION" pipe "zjstatus::notify::''${PROJECT_NAME} ''${SYMBOL} ''${ACTIVITY}" 2>/dev/null || true ;;
+          esac
+        '';
+      };
+
+      claudeZellijStatus = pkgs.writeShellApplication {
+        name = "claude-zellij-status";
+        runtimeInputs = [ pkgs.jq ];
+        text = ''
+          STATE_FILE="/tmp/claude-zellij-status/''${ZELLIJ_SESSION_NAME:-}.json"
+          [ -z "''${ZELLIJ_SESSION_NAME:-}" ] && exit 0
+          [ ! -f "$STATE_FILE" ] && exit 0
+
           SESSIONS=""
           while IFS= read -r line; do
             [ -z "$line" ] && continue
@@ -157,16 +162,78 @@
             "#[fg=\(.value.color)]\(.value.symbol) #[fg=#4166F5]\(.value.project)"
           ' "$STATE_FILE" 2>/dev/null)
 
-          [ -n "$SESSIONS" ] && ${zellijBin} -s "$ZELLIJ_SESSION" pipe "zjstatus::pipe::pipe_status::''${SESSIONS}" 2>/dev/null || true
-
-          case "$HOOK_EVENT" in
-            Notification|Stop|SubagentStop|AskUserQuestion|PermissionRequest)
-              ${zellijBin} -s "$ZELLIJ_SESSION" pipe "zjstatus::notify::''${PROJECT_NAME} ''${SYMBOL} ''${ACTIVITY}" 2>/dev/null || true ;;
-          esac
+          [ -n "$SESSIONS" ] && printf '%s' "$SESSIONS"
         '';
       };
 
-      hookCmd = lib.getExe claudeZellijHook;
+      claudeZellijSwitch = pkgs.writers.writePython3Bin "claude-zellij-switch" {} ''
+        import json, os, subprocess, sys, time
+        from pathlib import Path
+
+        STATE_DIR  = Path("/tmp/claude-zellij-status")
+        QUEUE_FILE = STATE_DIR / ".attention.json"
+        SESSION    = os.environ.get("ZELLIJ_SESSION_NAME", "")
+        ZELLIJ     = "${lib.getExe pkgs.zellij}"
+
+        if not SESSION:
+            sys.exit(0)
+
+        def read_queue():
+            try:
+                return json.loads(QUEUE_FILE.read_text())
+            except Exception:
+                return []
+
+        def write_queue(queue):
+            QUEUE_FILE.write_text(json.dumps(queue))
+
+        def live_sessions():
+            out = subprocess.run([ZELLIJ, "list-sessions"], capture_output=True, text=True).stdout
+            return [
+                line.split()[0]
+                for line in out.splitlines()
+                if line.strip() and "EXITED" not in line
+            ]
+
+        def switch(target, via=None):
+            cmd = [ZELLIJ, "-s", via] if via else [ZELLIJ]
+            subprocess.run(cmd + ["action", "switch-session", target], capture_output=True)
+
+        mode = sys.argv[1] if len(sys.argv) > 1 else ""
+
+        if mode == "stop":
+            queue     = read_queue()
+            was_empty = len(queue) == 0
+
+            # Record this session as needing attention
+            queue = [e for e in queue if e["session"] != SESSION]
+            queue.append({"session": SESSION, "ts": int(time.time())})
+            write_queue(queue)
+
+            # Nothing else was waiting — pull other sessions here immediately
+            if was_empty:
+                for other in live_sessions():
+                    if other != SESSION:
+                        switch(SESSION, via=other)
+
+        elif mode == "prompt":
+            queue   = read_queue()
+            waiting = [e for e in queue if e["session"] != SESSION]
+
+            if waiting:
+                # Go to the most recently finished session
+                target = max(waiting, key=lambda e: e["ts"])
+                queue  = [e for e in queue if e["session"] != target["session"]]
+                write_queue(queue)
+                switch(target["session"])
+
+        elif mode == "end":
+            write_queue([e for e in read_queue() if e["session"] != SESSION])
+      '';
+
+      hookCmd   = lib.getExe claudeZellijHook;
+      statusCmd = lib.getExe claudeZellijStatus;
+      switchCmd = lib.getExe claudeZellijSwitch;
 
       hookEntry = {
         hooks = [
@@ -188,6 +255,7 @@
         # Main config — theme + keybinds
         xdg.configFile."zellij/config.kdl".text = ''
           theme "catppuccin-mocha"
+          default_shell "${lib.getExe pkgs.fish}"
           pane_frames false
           mouse_mode true
           scroll_buffer_size 10000
@@ -250,11 +318,11 @@
                 plugin location="file:${pkgs.zellijPlugins.zjstatus}" {
                   format_left   "{mode}#[fg=#6A18D1,bold] {session} {tabs}"
                   format_center ""
-                  format_right  "{command_git_branch} {pipe_status} {notifications} {datetime}"
+                  format_right  "{command_git_branch} {command_claude_status} {notifications} {datetime}"
                   format_space  ""
 
                   border_enabled  "false"
-                  hide_frame_for_single_pane "true"
+                  hide_frame_for_single_pane "false"
 
                   mode_normal  "#[bg=#6A18D1,fg=#cdd6f4,bold]  "
                   mode_tmux    "#[bg=#f38ba8,fg=#1e1e2e,bold]  "
@@ -283,8 +351,10 @@
                   notifications_format_no_notifications ""
                   notifications_show_interval "10"
 
-                  pipe_status_format     "#[fg=#585b70]│ {output}"
-                  pipe_status_rendermode "dynamic"
+                  command_claude_status_command    "${statusCmd}"
+                  command_claude_status_format     "#[fg=#585b70]│ {stdout}"
+                  command_claude_status_interval   "2"
+                  command_claude_status_rendermode "dynamic"
                 }
               }
             }

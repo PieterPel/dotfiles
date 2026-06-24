@@ -13,6 +13,8 @@
       fzf-tmux = pkgs.lib.getExe' pkgs.fzf "fzf-tmux";
       seshKey = "s";
 
+      zellijBin = lib.getExe pkgs.zellij;
+
       seshPickerZellij' = pkgs.writeShellScriptBin "sesh-picker-zellij" ''
         target=$(${sesh} list -i | ${fzf} \
           --ansi --no-sort --border-label ' sesh ' --prompt '⚡ ' \
@@ -22,8 +24,16 @@
           --bind 'ctrl-g:change-prompt(⚙️ )+reload(${sesh} list -ic)' \
           --bind 'ctrl-x:change-prompt(📁 )+reload(${sesh} list -iz)')
 
-        if [ -n "$target" ]; then
-          ${sesh} connect "$(echo "$target" | awk '{print $NF}')"
+        [ -z "$target" ] && exit 0
+
+        name="$(echo "$target" | awk '{print $NF}')"
+
+        # Check if this is an existing Zellij session
+        if ${zellijBin} list-sessions 2>/dev/null | grep -q "^$name"; then
+          ${zellijBin} action switch-session "$name"
+        else
+          # New session for a directory — let sesh handle it
+          ${sesh} connect "$name"
         fi
       '';
       seshPickerZellij = lib.getExe' seshPickerZellij' "sesh-picker-zellij";

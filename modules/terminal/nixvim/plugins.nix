@@ -385,12 +385,6 @@
                 #"copilot"
               ];
 
-              per_filetype = {
-                AgenticInput = [
-                  "agentic_slash"
-                  "agentic_at"
-                ];
-              };
 
               providers = {
                 git = {
