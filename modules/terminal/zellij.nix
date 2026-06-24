@@ -132,7 +132,10 @@
           if [ -s "$TMP_FILE" ]; then mv "$TMP_FILE" "$STATE_FILE"; else rm -f "$TMP_FILE"; fi
 
           case "$HOOK_EVENT" in
-            Stop)             ${switchCmd} stop   2>/dev/null || true ;;
+            Stop)
+              ${zellijBin} action focus-pane-id "$ZELLIJ_PANE" 2>/dev/null || true
+              ${switchCmd} stop 2>/dev/null || true ;;
+
             UserPromptSubmit) ${switchCmd} prompt 2>/dev/null || true ;;
           esac
 
@@ -298,8 +301,8 @@
               bind "n" { GoToNextTab;       SwitchToMode "Normal"; }
               bind "w" { SwitchToMode "Tab"; }
 
-              // Sessions (S = built-in picker; s = sesh via sesh.nix)
-              bind "S" { SwitchToMode "Session"; }
+              // Sessions
+              bind "S" { LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }; SwitchToMode "Normal"; }
 
               // Resize
               bind "Alt h" { Resize "Increase Left";  SwitchToMode "Normal"; }
