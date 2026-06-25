@@ -275,7 +275,7 @@
           session_serialization true
           default_layout "default"
 
-          keybinds clear-defaults=true {
+          keybinds {
             normal {
               bind "Ctrl a" { SwitchToMode "tmux"; }
             }
