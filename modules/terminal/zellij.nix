@@ -259,6 +259,11 @@
     {
       options.modules.terminal.zellij = {
         enable = lib.mkEnableOption "Enable Zellij configuration.";
+        extraTmuxKeybinds = lib.mkOption {
+          type = lib.types.lines;
+          default = "";
+          description = "Extra keybinds added inside the tmux {} block.";
+        };
       };
 
       config = lib.mkIf cfg.enable {
@@ -309,6 +314,8 @@
               bind "Alt j" { Resize "Increase Down";  SwitchToMode "Normal"; }
               bind "Alt k" { Resize "Increase Up";    SwitchToMode "Normal"; }
               bind "Alt l" { Resize "Increase Right"; SwitchToMode "Normal"; }
+
+              ${cfg.extraTmuxKeybinds}
             }
 
             shared_except "normal" "locked" {

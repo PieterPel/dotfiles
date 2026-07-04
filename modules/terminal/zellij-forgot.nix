@@ -42,14 +42,10 @@ in
       };
 
       config = lib.mkIf (cfg.enable && config.modules.terminal.zellij.enable) {
-        xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
-          keybinds {
-            tmux {
-              bind "?" {
-                Run "${lib.getExe keybinds}" { floating true; close_on_exit true; }
-                SwitchToMode "Normal";
-              }
-            }
+        modules.terminal.zellij.extraTmuxKeybinds = ''
+          bind "?" {
+            Run "${lib.getExe keybinds}" { floating true; close_on_exit true; }
+            SwitchToMode "Normal";
           }
         '';
       };

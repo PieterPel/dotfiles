@@ -90,14 +90,10 @@
         }
 
         (lib.mkIf config.modules.terminal.zellij.enable {
-          xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
-            keybinds {
-              tmux {
-                bind "s" {
-                  LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }
-                  SwitchToMode "Normal";
-                }
-              }
+          modules.terminal.zellij.extraTmuxKeybinds = ''
+            bind "s" {
+              LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }
+              SwitchToMode "Normal";
             }
           '';
         })

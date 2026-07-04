@@ -26,14 +26,10 @@ in
         }
 
         (lib.mkIf config.modules.terminal.zellij.enable {
-          xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
-            keybinds {
-              tmux {
-                bind "g" {
-                  Run "${lazygitBin}" { floating true; close_on_exit true; }
-                  SwitchToMode "Normal";
-                }
-              }
+          modules.terminal.zellij.extraTmuxKeybinds = ''
+            bind "g" {
+              Run "${lazygitBin}" { floating true; close_on_exit true; }
+              SwitchToMode "Normal";
             }
           '';
         })
