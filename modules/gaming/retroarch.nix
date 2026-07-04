@@ -1,14 +1,24 @@
 {
   flake.modules.nixos.retroarch =
-    { config, lib, pkgs, ... }:
+    { config, lib, pkgs, inputs, ... }:
     let
       cfg = config.modules.gaming.retroarch;
 
+      # Un-optimized nixpkgs. RetroArch + cores + cage (and their large dependency
+      # trees: ffmpeg, SDL, wlroots, ...) come from here so they fetch prebuilt from
+      # cache.nixos.org, instead of recompiling against nixos-raspberrypi's
+      # ARM-optimized stdenv — whose variants of these aren't in any binary cache, so
+      # they'd build from source on the Pi (~400 pkgs, infeasible on a Pi 400).
+      # Verified: stock retroarch+cores+cage = ~all fetched vs 414 built optimized.
+      pkgsStock = import inputs.nixpkgs {
+        inherit (pkgs.stdenv.hostPlatform) system;
+        config.allowUnfree = true; # some libretro cores (e.g. snes9x) are unfree
+      };
+
       # Curated libretro core set. Adjust to taste — verify names against
       # `nix search nixpkgs libretro` (a wrong attr is an eval error).
-      # For an everything-included build, swap the whole `retroarch` let-binding
-      # below for `pkgs.retroarchFull` (much larger closure to build on the Pi).
-      retroarch = pkgs.retroarch.withCores (
+      # For an everything-included build, swap this for `pkgsStock.retroarchFull`.
+      retroarch = pkgsStock.retroarch.withCores (
         cores: with cores; [
           snes9x # SNES
           nestopia # NES
@@ -64,6 +74,7 @@
         services.cage = lib.mkIf cfg.kiosk.enable {
           enable = true;
           user = cfg.user;
+          package = pkgsStock.cage; # stock cage/wlroots -> fetched, not ARM-rebuilt
           program = "${retroarch}/bin/retroarch";
         };
       };
