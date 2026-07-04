@@ -24,16 +24,6 @@ let
           enable = true;
           wheelNeedsPassword = false;
         };
-
-        system.nixos.tags =
-          let
-            rpiCfg = config.boot.loader.raspberryPi;
-          in
-          lib.mkIf (config.boot.loader.raspberryPi ? variant) [
-            "raspberry-pi-${rpiCfg.variant}"
-            rpiCfg.bootloader
-            config.boot.kernelPackages.kernel.version
-          ];
       };
     };
 in
