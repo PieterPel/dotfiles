@@ -81,6 +81,7 @@ let
         zoxide = defaultEnable;
         gh-dash = defaultEnable;
         lazygit = defaultEnable;
+        zellij-forgot = defaultEnable;
         jjui = defaultEnable;
         nvim-popup = defaultEnable;
         git-session-layout = defaultEnable;

@@ -330,7 +330,7 @@
 
             lspsaga = {
               enable = true;
-              ui.codeAction = "";
+              settings.ui.code_action = "";
               # Disable the code action lightbulb (flicker)
               settings.lightbulb = {
                 enable = false;

@@ -23,6 +23,7 @@
           "root"
           "pieterpel"
         ];
+        determinateNix.customSettings.download-buffer-size = 524288000;
       };
     };
 }
