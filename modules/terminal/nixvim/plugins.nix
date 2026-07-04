@@ -527,6 +527,17 @@
             pkgs.vimPlugins.transparent-nvim
 
             (vimUtils.buildVimPlugin {
+              pname = "code-preview-nvim";
+              version = "2026-07-04";
+              src = pkgs.fetchFromGitHub {
+                owner = "Cannon07";
+                repo = "code-preview.nvim";
+                rev = "998deddb57135c4c0634682ca0dd33054bcced59";
+                hash = "sha256-V/V6gYexosGWa2vt6cd0Gg1RZNEMRZvFLgsoQNnKzbk=";
+              };
+            })
+
+            (vimUtils.buildVimPlugin {
               pname = "agentic-nvim";
               version = "2026-06-11";
               src = pkgs.fetchFromGitHub {

@@ -59,40 +59,42 @@
       };
 
       config = lib.mkIf cfg.enable (lib.mkMerge [
-        { programs = {
-          sesh = {
-            enable = true;
-            settings = {
-              session = [
-                {
-                  name = "Downloads";
-                  path = "~/Downloads";
-                  startup_command = "yazi";
-                }
-              ];
+        {
+          programs = {
+            sesh = {
+              enable = true;
+              settings = {
+                session = [
+                  {
+                    name = "Downloads";
+                    path = "~/Downloads";
+                    startup_command = "yazi";
+                  }
+                ];
+              };
+            };
+
+            fish.shellAbbrs = {
+              "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
+            };
+
+            tmux.extraConfig = lib.mkAfter ''
+              bind s run-shell "${seshPicker}";
+            '';
+
+            fzf = {
+              enable = true;
+              tmux.enableShellIntegration = true;
             };
           };
-
-          fish.shellAbbrs = {
-            "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
-          };
-
-          tmux.extraConfig = lib.mkAfter ''
-            bind s run-shell "${seshPicker}";
-          '';
-
-          fzf = {
-            enable = true;
-            tmux.enableShellIntegration = true;
-          };
-        }; }
+        }
 
         (lib.mkIf config.modules.terminal.zellij.enable {
           xdg.configFile."zellij/config.kdl".text = lib.mkAfter ''
             keybinds {
               tmux {
                 bind "s" {
-                  Run "${seshPickerZellij}" { floating true; close_on_exit true; }
+                  LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }
                   SwitchToMode "Normal";
                 }
               }
