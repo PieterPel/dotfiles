@@ -26,9 +26,7 @@ in
           keybinds {
             tmux {
               bind "?" {
-                LaunchOrFocusPlugin "file:${zellijForgotWasm}" {
-                  floating true
-                }
+                LaunchOrFocusPlugin "file:${zellijForgotWasm}" { floating true; }
                 SwitchToMode "Normal";
               }
             }
