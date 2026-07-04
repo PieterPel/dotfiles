@@ -27,7 +27,8 @@
           mupen64plus # N64
           pcsx-rearmed # PS1 (ARM-optimised)
           beetle-psx-hw # PS1 (accurate, HW-rendered)
-          fbneo # arcade
+          # fbneo (arcade) omitted for now: its stock aarch64 build isn't cached,
+          # so it compiles on the Pi. Re-add once you want arcade + can wait on it.
         ]
       );
     in
