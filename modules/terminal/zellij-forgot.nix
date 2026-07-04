@@ -11,14 +11,34 @@ in
     }:
     let
       cfg = config.modules.${parent}.${module};
-      zellijForgotWasm = pkgs.fetchurl {
-        url = "https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm";
-        sha256 = "1ns9wjn1ncjapqpp9nn9kyhqydvl0fbnyiavd0lc3gcxa52l269i";
-      };
+      keybinds = pkgs.writeShellScriptBin "zellij-keybinds" ''
+        ${lib.getExe pkgs.bat} --style=plain --language=markdown --paging=never <<'EOF'
+        # Zellij Keybindings
+
+        ## Prefix: ctrl+a
+
+        | Key                  | Action           |
+        |----------------------|------------------|
+        | prefix + d           | split right      |
+        | prefix + v           | split down       |
+        | prefix + h/j/k/l     | focus pane       |
+        | prefix + c           | new tab          |
+        | prefix + x           | close pane/tab   |
+        | prefix + p           | prev tab         |
+        | prefix + n           | next tab         |
+        | prefix + w           | tab mode         |
+        | prefix + S           | session manager  |
+        | prefix + s           | sesh picker      |
+        | prefix + y           | yazi             |
+        | prefix + g           | lazygit          |
+        | prefix + alt+h/j/k/l | resize pane      |
+        | prefix + ?           | this cheat sheet |
+        EOF
+      '';
     in
     {
       options.modules.${parent}.${module} = {
-        enable = lib.mkEnableOption "Enable zellij-forgot keybinding reference plugin.";
+        enable = lib.mkEnableOption "Enable zellij keybind cheat sheet.";
       };
 
       config = lib.mkIf (cfg.enable && config.modules.terminal.zellij.enable) {
@@ -26,7 +46,7 @@ in
           keybinds {
             tmux {
               bind "?" {
-                LaunchOrFocusPlugin "file:${zellijForgotWasm}" { floating true; }
+                Run "${lib.getExe keybinds}" { floating true; close_on_exit true; }
                 SwitchToMode "Normal";
               }
             }
