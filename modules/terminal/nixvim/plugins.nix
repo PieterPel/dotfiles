@@ -181,7 +181,7 @@
 
             which-key = {
               enable = true;
-              lazyload.enable = false;
+              lazyLoad.enable = false;
               settings = {
                 # This effectively disables the "auto" popup behavior
                 # formatting it like this ensures it overrides default "auto"
@@ -330,7 +330,7 @@
 
             lspsaga = {
               enable = true;
-              ui.code_action = "";
+              ui.codeAction = "";
               # Disable the code action lightbulb (flicker)
               settings.lightbulb = {
                 enable = false;
