@@ -8,7 +8,6 @@ let
     }:
     let
       cfg = config.modules.profiles.rpi;
-      SSIDpasswordFile = "/run/secrets/wifi/HomeNetwork/password";
     in
     {
       options.modules.profiles.rpi = {
@@ -24,11 +23,6 @@ let
         security.sudo = {
           enable = true;
           wheelNeedsPassword = false;
-        };
-
-        networking.wireless = {
-          enable = true;
-          interfaces = [ "wlan0" ];
         };
 
         system.nixos.tags =

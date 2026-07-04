@@ -26,6 +26,7 @@ in
       {
         modules = {
           profiles.rpi.enable = true;
+          gaming.retroarch.enable = true;
           system = {
             configuration.enable = true;
             internationalization.enable = true;

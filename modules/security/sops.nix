@@ -9,7 +9,6 @@ let
     }:
     let
       cfg = config.modules.security.sops;
-      wifiSecrets = ../../secrets/wifi.yaml;
     in
     {
       options.modules.security.sops = {
@@ -59,11 +58,7 @@ let
 
         sops =
           {
-            secrets = {
-              "wifi/HomeNetwork/password" = {
-                sopsFile = wifiSecrets;
-              };
-            };
+            secrets = { };
           }
           // lib.optionalAttrs (cfg.ageKeyFile != null) {
             age.keyFile = cfg.ageKeyFile;
