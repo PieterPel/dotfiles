@@ -31,6 +31,20 @@
           # so it compiles on the Pi. Re-add once you want arcade + can wait on it.
         ]
       );
+
+      # Kiosk entrypoint. If a mode is forced, set it via wlr-randr (which talks to
+      # cage's wlr-output-management) before launching RetroArch — wlroots otherwise
+      # picks the display's preferred mode (often 4K on a TV), which a Pi 400 can't
+      # composite smoothly, and its refresh rate also throws off frame pacing.
+      # Runs inside the cage session, so the compositor socket already exists.
+      kioskProgram =
+        if cfg.kiosk.mode == null then
+          "${retroarch}/bin/retroarch"
+        else
+          pkgs.writeShellScript "retroarch-kiosk" ''
+            ${pkgsStock.wlr-randr}/bin/wlr-randr --output ${cfg.kiosk.output} --mode ${cfg.kiosk.mode} || true
+            exec ${retroarch}/bin/retroarch
+          '';
     in
     {
       options.modules.gaming.retroarch = {
@@ -55,6 +69,24 @@
           enable = lib.mkEnableOption "Boot straight into the RetroArch UI (cage kiosk)" // {
             default = true;
           };
+
+          output = lib.mkOption {
+            type = lib.types.str;
+            default = "HDMI-A-1";
+            description = "wlr-randr output name that `mode` is applied to.";
+          };
+
+          mode = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            example = "1920x1080@60";
+            description = ''
+              If set, force this wlr-randr mode on the kiosk output before launching
+              RetroArch. wlroots otherwise picks the display's preferred mode (often
+              4K), which a Pi 400 can't drive smoothly and whose refresh rate breaks
+              RetroArch's frame pacing.
+            '';
+          };
         };
       };
 
@@ -76,7 +108,7 @@
           enable = true;
           user = cfg.user;
           package = pkgsStock.cage; # stock cage/wlroots -> fetched, not ARM-rebuilt
-          program = "${retroarch}/bin/retroarch";
+          program = kioskProgram;
         };
       };
     };
