@@ -547,6 +547,17 @@
                 hash = "sha256-ZT1ME4E8jwC6DPLVpEgCudL8go91q7PkfJn5ylajmYA=";
               };
             })
+
+            (vimUtils.buildVimPlugin {
+              pname = "claudecode-nvim";
+              version = "2026-07-05";
+              src = pkgs.fetchFromGitHub {
+                owner = "coder";
+                repo = "claudecode.nvim";
+                rev = "2390c6e45c4789072c293ac69de051d169668b29";
+                hash = "sha256-oMBPSRQFDmJ9Lq+ZP8vFMHaocm4sPX3D/orVMNwVXuM=";
+              };
+            })
           ];
 
           autoCmd = [
@@ -566,6 +577,8 @@
           ];
 
           extraConfigLua = ''
+            require("claudecode").setup({})
+
             require("agentic").setup({
               provider = "claude-agent-acp",
               acp_providers = {

@@ -203,6 +203,44 @@
             options.desc = "Agentic: new session";
           }
 
+          # claudecode.nvim
+          {
+            key = "<leader>cc";
+            action = "<cmd>ClaudeCode<CR>";
+            options.desc = "Claude Code: toggle";
+          }
+          {
+            key = "<leader>cf";
+            action = "<cmd>ClaudeCodeFocus<CR>";
+            options.desc = "Claude Code: focus";
+          }
+          {
+            key = "<leader>cm";
+            action = "<cmd>ClaudeCodeSelectModel<CR>";
+            options.desc = "Claude Code: select model";
+          }
+          {
+            key = "<leader>cb";
+            action = "<cmd>ClaudeCodeAdd %<CR>";
+            options.desc = "Claude Code: add current buffer";
+          }
+          {
+            key = "<leader>cs";
+            action = "<cmd>ClaudeCodeSend<CR>";
+            mode = [ "v" ];
+            options.desc = "Claude Code: send selection";
+          }
+          {
+            key = "<leader>ca";
+            action = "<cmd>ClaudeCodeDiffAccept<CR>";
+            options.desc = "Claude Code: accept diff";
+          }
+          {
+            key = "<leader>cx";
+            action = "<cmd>ClaudeCodeDiffDeny<CR>";
+            options.desc = "Claude Code: deny diff";
+          }
+
           {
             key = "<leader>lg";
             action = "<cmd>LazyGit<CR>";
