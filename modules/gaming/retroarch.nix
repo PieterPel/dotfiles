@@ -32,18 +32,43 @@
         ]
       );
 
-      # Kiosk entrypoint. If a mode is forced, set it via wlr-randr (which talks to
+      # Config overlays layered on top of retroarch.cfg via --appendconfig: appended
+      # config takes precedence and is NOT written back, so it pins settings without
+      # fighting RetroArch's own config_save_on_exit.
+      #
+      # The save/state overlay is a plain store file (non-secret). Additional overlays
+      # come in via `extraAppendConfigs` as raw path strings — so the private layer
+      # can point at a file rendered at runtime (e.g. a sops template holding the
+      # cloud-sync WebDAV password) that must never land in the world-readable store.
+      overrideCfg = pkgs.writeText "retroarch-overrides.cfg" (
+        lib.concatStringsSep "\n" (
+          lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
+          ++ lib.optional (cfg.stateDir != null) ''savestate_directory = "${cfg.stateDir}"''
+        )
+      );
+      appendConfigPaths =
+        lib.optional (cfg.saveDir != null || cfg.stateDir != null) "${overrideCfg}"
+        ++ cfg.extraAppendConfigs;
+      appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
+        " --appendconfig ${lib.concatStringsSep "," appendConfigPaths}"
+      );
+
+      # Kiosk entrypoint. When a mode is forced, set it via wlr-randr (which talks to
       # cage's wlr-output-management) before launching RetroArch — wlroots otherwise
       # picks the display's preferred mode (often 4K on a TV), which a Pi 400 can't
-      # composite smoothly, and its refresh rate also throws off frame pacing.
-      # Runs inside the cage session, so the compositor socket already exists.
+      # composite smoothly, and its refresh rate also throws off frame pacing. Also
+      # carries the save/state overlay. Runs inside the cage session, so the
+      # compositor socket already exists.
+      useWrapper = cfg.kiosk.mode != null || appendFlag != "";
       kioskProgram =
-        if cfg.kiosk.mode == null then
-          "${retroarch}/bin/retroarch"
+        if !useWrapper then
+          lib.getExe retroarch
         else
           pkgs.writeShellScript "retroarch-kiosk" ''
-            ${pkgsStock.wlr-randr}/bin/wlr-randr --output ${cfg.kiosk.output} --mode ${cfg.kiosk.mode} || true
-            exec ${retroarch}/bin/retroarch
+            ${lib.optionalString (
+              cfg.kiosk.mode != null
+            ) "${lib.getExe pkgsStock.wlr-randr} --output ${cfg.kiosk.output} --mode ${cfg.kiosk.mode} || true"}
+            exec ${lib.getExe retroarch}${appendFlag}
           '';
     in
     {
@@ -62,6 +87,35 @@
           description = ''
             Directory RetroArch reads ROMs from. The private layer's sync job
             writes here; kept as an option so both sides agree on one path.
+          '';
+        };
+
+        saveDir = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = ''
+            If set, pin RetroArch's savefile_directory (battery/.srm saves) here.
+            Pinning makes the location deterministic so the private layer can back
+            it up (otherwise saves can land next to the ROMs, non-deterministically).
+          '';
+        };
+
+        stateDir = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = "If set, pin RetroArch's savestate_directory (.state snapshots) here.";
+        };
+
+        extraAppendConfigs = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [ "/run/secrets/retroarch-cloud.cfg" ];
+          description = ''
+            Extra config files to layer on via RetroArch's `--appendconfig` (in
+            addition to the save/state overlay). Given as raw path strings, not store
+            paths, so a caller can point at a file rendered at runtime — e.g. a sops
+            template holding cloud-sync WebDAV credentials — that must stay out of the
+            world-readable Nix store.
           '';
         };
 
@@ -100,7 +154,9 @@
         # and RetroArch can read it.
         systemd.tmpfiles.rules = [
           "d ${cfg.romDir} 0775 ${cfg.user} users - -"
-        ];
+        ]
+        ++ lib.optional (cfg.saveDir != null) "d ${cfg.saveDir} 0775 ${cfg.user} users - -"
+        ++ lib.optional (cfg.stateDir != null) "d ${cfg.stateDir} 0775 ${cfg.user} users - -";
 
         # Kiosk: a minimal Wayland compositor (cage) that launches RetroArch
         # fullscreen on boot. RetroArch's own Ozone UI is the "easy UI".
