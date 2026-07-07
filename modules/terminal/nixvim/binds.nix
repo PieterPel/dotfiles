@@ -240,6 +240,30 @@
             action = "<cmd>ClaudeCodeDiffDeny<CR>";
             options.desc = "Claude Code: deny diff";
           }
+          {
+            key = "<leader>cX";
+            action = "<cmd>ClaudeCodeCloseAllDiffs<CR>";
+            options.desc = "Claude Code: close all diffs";
+          }
+          {
+            key = "<C-,>";
+            action = "<cmd>ClaudeCodeFocus<CR>";
+            mode = [
+              "n"
+              "v"
+            ];
+            options.desc = "Claude Code: focus (float toggle)";
+          }
+          {
+            key = "<leader>cd";
+            action.__raw = ''
+              function()
+                local diff = vim.fn.system("git diff HEAD")
+                require("claudecode.terminal").send_to_terminal("Review this diff:\n" .. diff, { submit = false })
+              end
+            '';
+            options.desc = "Claude Code: send git diff";
+          }
 
           {
             key = "<leader>lg";
@@ -409,7 +433,7 @@
           }
 
           {
-            key = "<leader>a";
+            key = "<leader>ao";
             action = "<cmd>AerialToggle! left<CR>";
             options.desc = "Toggle Outline Sidebar";
           }

@@ -574,10 +574,44 @@
                 end
               '';
             }
+            {
+              event = "FileType";
+              pattern = [ "oil" ];
+              callback.__raw = ''
+                function()
+                  vim.keymap.set("n", "<leader>cs", "<cmd>ClaudeCodeTreeAdd<CR>", { buffer = true, silent = true, desc = "Claude Code: add file" })
+                end
+              '';
+            }
           ];
 
           extraConfigLua = ''
-            require("claudecode").setup({})
+            require("claudecode").setup({
+              focus_after_send = true,
+              git_repo_cwd = true,
+              terminal = {
+                provider = "snacks",
+                auto_insert = false,
+                snacks_win_opts = {
+                  position = "float",
+                  width = 0.92,
+                  height = 0.92,
+                  border = "rounded",
+                  keys = {
+                    claude_hide = {
+                      "<C-,>",
+                      function(self) self:hide() end,
+                      mode = "t",
+                      desc = "Hide",
+                    },
+                  },
+                },
+              },
+              diff_opts = {
+                layout = "vertical",
+                keep_terminal_focus = true,
+              },
+            })
 
             require("agentic").setup({
               provider = "claude-agent-acp",
