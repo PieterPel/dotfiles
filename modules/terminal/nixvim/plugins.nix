@@ -593,16 +593,26 @@
                 provider = "snacks",
                 auto_insert = false,
                 snacks_win_opts = {
-                  position = "float",
-                  width = 0.92,
-                  height = 0.92,
+                  position = "right",
+                  width = 0.40,
                   border = "rounded",
                   keys = {
-                    claude_hide = {
-                      "<C-,>",
-                      function(self) self:hide() end,
+                    claude_hide = { "<C-,>", function(self) self:hide() end, mode = "t", desc = "Hide" },
+                    claude_zoom = {
+                      "<C-f>",
+                      function(self)
+                        local win = self.win
+                        if not (win and vim.api.nvim_win_is_valid(win)) then return end
+                        local current = vim.api.nvim_win_get_width(win)
+                        local total = vim.o.columns
+                        if current > total * 0.6 then
+                          vim.api.nvim_win_set_width(win, math.floor(total * 0.40))
+                        else
+                          vim.api.nvim_win_set_width(win, total)
+                        end
+                      end,
                       mode = "t",
-                      desc = "Hide",
+                      desc = "Zoom",
                     },
                   },
                 },
