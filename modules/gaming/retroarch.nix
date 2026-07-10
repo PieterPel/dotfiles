@@ -45,9 +45,17 @@
           lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
           ++ lib.optional (cfg.stateDir != null) ''savestate_directory = "${cfg.stateDir}"''
           ++ lib.optional (cfg.colorTheme != null) ''ozone_menu_color_theme = "${toString cfg.colorTheme}"''
+          ++ lib.optionals cfg.retroachievements.enable [
+            ''cheevos_enable = "true"''
+            ''cheevos_username = "${cfg.retroachievements.username}"''
+          ]
         )
       );
-      hasOverrides = cfg.saveDir != null || cfg.stateDir != null || cfg.colorTheme != null;
+      hasOverrides =
+        cfg.saveDir != null
+        || cfg.stateDir != null
+        || cfg.colorTheme != null
+        || cfg.retroachievements.enable;
       appendConfigPaths =
         lib.optional hasOverrides "${overrideCfg}"
         ++ cfg.extraAppendConfigs;
@@ -106,6 +114,15 @@
           type = lib.types.nullOr lib.types.path;
           default = null;
           description = "If set, pin RetroArch's savestate_directory (.state snapshots) here.";
+        };
+
+        retroachievements = {
+          enable = lib.mkEnableOption "RetroAchievements integration";
+          username = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = "RetroAchievements account username.";
+          };
         };
 
         colorTheme = lib.mkOption {
