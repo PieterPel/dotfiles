@@ -44,10 +44,12 @@
         lib.concatStringsSep "\n" (
           lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
           ++ lib.optional (cfg.stateDir != null) ''savestate_directory = "${cfg.stateDir}"''
+          ++ lib.optional (cfg.colorTheme != null) ''ozone_menu_color_theme = "${toString cfg.colorTheme}"''
         )
       );
+      hasOverrides = cfg.saveDir != null || cfg.stateDir != null || cfg.colorTheme != null;
       appendConfigPaths =
-        lib.optional (cfg.saveDir != null || cfg.stateDir != null) "${overrideCfg}"
+        lib.optional hasOverrides "${overrideCfg}"
         ++ cfg.extraAppendConfigs;
       appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
         " --appendconfig ${lib.concatStringsSep "," appendConfigPaths}"
@@ -104,6 +106,18 @@
           type = lib.types.nullOr lib.types.path;
           default = null;
           description = "If set, pin RetroArch's savestate_directory (.state snapshots) here.";
+        };
+
+        colorTheme = lib.mkOption {
+          type = lib.types.nullOr lib.types.int;
+          default = null;
+          example = 2;
+          description = ''
+            Ozone menu color theme index. Common values:
+              0 = Default (dark), 1 = Basic White, 2 = Dracula (purple),
+              3 = Nord, 4 = Gruvbox Dark, 5 = Boysenberry.
+            Null leaves the setting at RetroArch's default.
+          '';
         };
 
         extraAppendConfigs = lib.mkOption {
