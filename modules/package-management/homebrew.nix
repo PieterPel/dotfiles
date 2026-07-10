@@ -45,6 +45,7 @@
             "bitwarden"
             "slack"
             "microsoft-teams"
+            "azure-cli"
 
             # Empty package trick (broken on nixpkgs)
             "ghostty"

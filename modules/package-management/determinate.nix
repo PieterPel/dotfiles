@@ -25,6 +25,12 @@
             "pieterpel"
           ];
           download-buffer-size = 524288000;
+
+          # Let the native Linux builder VM fetch prebuilt deps straight from the
+          # binary caches instead of the Mac downloading them and relaying them in.
+          # Without this the whole aarch64-linux closure is shuttled host->VM on
+          # every build, which is the main reason cross-builds felt slow.
+          builders-use-substitutes = true;
         };
       };
     };
