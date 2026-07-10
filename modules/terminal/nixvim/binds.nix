@@ -246,6 +246,28 @@
             options.desc = "Claude Code: close all diffs";
           }
           {
+            key = "<leader>cz";
+            action.__raw = ''
+              function()
+                local bufnr = require("claudecode.terminal").get_active_bufnr()
+                if not bufnr then return end
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                  if vim.api.nvim_win_get_buf(win) == bufnr then
+                    local current = vim.api.nvim_win_get_width(win)
+                    local total = vim.o.columns
+                    if current > total * 0.6 then
+                      vim.api.nvim_win_set_width(win, math.floor(total * 0.40))
+                    else
+                      vim.api.nvim_win_set_width(win, total)
+                    end
+                    break
+                  end
+                end
+              end
+            '';
+            options.desc = "Claude Code: zoom toggle";
+          }
+          {
             key = "<C-,>";
             action = "<cmd>ClaudeCodeFocus<CR>";
             mode = [
