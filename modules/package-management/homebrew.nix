@@ -33,7 +33,7 @@
 
           # `brew install`
           brews = [
-            # Not in nixpkgs
+            "azure-cli"
           ];
 
           # `brew install --cask`
@@ -45,7 +45,6 @@
             "bitwarden"
             "slack"
             "microsoft-teams"
-            "azure-cli"
 
             # Empty package trick (broken on nixpkgs)
             "ghostty"
