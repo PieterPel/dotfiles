@@ -64,10 +64,11 @@
         lib.optional hasOverrides "${overrideCfg}"
         ++ cfg.extraAppendConfigs;
       appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
-        # RetroArch delimits multiple --appendconfig files with '|' (NOT ','); a
-        # comma-joined list is read as one bogus filename and silently ignored, so
-        # none of the overlays (save/state, cloud-sync, cheevos) apply.
-        " --appendconfig ${lib.concatStringsSep "|" appendConfigPaths}"
+        # RetroArch delimits multiple --appendconfig files with '|' (NOT ','). The
+        # value MUST be shell-quoted: unquoted, the '|' is parsed as a shell pipe,
+        # so only the first overlay reaches RetroArch and the rest are run as
+        # commands ("Permission denied"). Quoting passes the whole list literally.
+        " --appendconfig \"${lib.concatStringsSep "|" appendConfigPaths}\""
       );
 
       # RetroArch launch script (no display-mode logic — the shared kiosk module
