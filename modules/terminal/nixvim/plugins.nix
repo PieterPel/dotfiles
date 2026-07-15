@@ -48,6 +48,7 @@
             };
 
             # Git
+            octo.enable = true; # GitHub issues/PRs (uses gh cli)
             gitsigns = {
               enable = true;
               settings = {

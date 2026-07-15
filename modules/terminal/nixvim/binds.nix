@@ -292,6 +292,38 @@
             action = "<cmd>LazyGit<CR>";
           }
 
+          # Octo (GitHub) — inside octo buffers it adds its own local maps
+          {
+            key = "<leader>op";
+            action = "<cmd>Octo pr list<CR>";
+            options.desc = "Octo: list PRs";
+          }
+          {
+            key = "<leader>oi";
+            action = "<cmd>Octo issue list<CR>";
+            options.desc = "Octo: list issues";
+          }
+          {
+            key = "<leader>oP";
+            action = "<cmd>Octo pr<CR>";
+            options.desc = "Octo: PR for current branch";
+          }
+          {
+            key = "<leader>or";
+            action = "<cmd>Octo review<CR>";
+            options.desc = "Octo: start/resume review";
+          }
+          {
+            key = "<leader>os";
+            action = "<cmd>Octo search<CR>";
+            options.desc = "Octo: search GitHub";
+          }
+          {
+            key = "<leader>oo";
+            action = ":Octo "; # Note the space at the end!
+            options.desc = "Octo: command prompt";
+          }
+
           # Render markdown
           {
             key = "<leader>md";

@@ -34,6 +34,7 @@
           # `brew install`
           brews = [
             "azure-cli"
+            "github-mcp-server"
           ];
 
           # `brew install --cask`
