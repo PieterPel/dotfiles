@@ -13,6 +13,7 @@
           pkgs.nixfmt
           pkgs.fzf
           pkgs.jq
+          pkgs.mdx-language-server
         ];
         programs.nixvim = {
           plugins = {
@@ -255,6 +256,9 @@
               autoLoad = true;
               enable = true;
               nixvimInjections = true;
+              grammarPackages =
+                pkgs.vimPlugins.nvim-treesitter.allGrammars
+                ++ (with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [ mdx ]);
               settings = {
                 auto_install = false;
                 highlight = {
@@ -296,6 +300,7 @@
                 taplo.enable = true;
                 ts_ls.enable = true;
                 eslint.enable = true;
+                mdx_analyzer.enable = true;
                 lua_ls.enable = true;
                 gleam.enable = false; # Issue with deno
                 bicep.enable = false; # Requires manual stuff to get working https://nix-community.github.io/nixvim/plugins/lsp/servers/bicep/index.html
@@ -348,6 +353,7 @@
                   javascript = [ "prettier" ];
                   typescript = [ "prettier" ];
                   typescriptreact = [ "prettier" ];
+                  mdx = [ "prettier" ];
                   nix = [ "nixfmt" ];
                   # For everything else, this list is empty, so it hits the fallback
                   "_" = [ "trim_whitespace" ];
@@ -587,6 +593,8 @@
           ];
 
           extraConfigLua = ''
+            vim.filetype.add({ extension = { mdx = "mdx" } })
+
             require("claudecode").setup({
               focus_after_send = true,
               git_repo_cwd = true,
