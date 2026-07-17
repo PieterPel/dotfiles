@@ -49,7 +49,26 @@
             };
 
             # Git
-            octo.enable = true; # GitHub issues/PRs (uses gh cli)
+            octo = {
+              enable = true; # GitHub issues/PRs (uses gh cli)
+              settings.mappings = {
+                # Default bracket-key navigation is awkward on a split keyboard
+                file_panel = {
+                  select_next_entry = "<leader>oj";
+                  select_prev_entry = "<leader>ok";
+                  select_first_entry = "<leader>oJ";
+                  select_last_entry = "<leader>oK";
+                };
+                review_diff = {
+                  select_next_entry = "<leader>oj";
+                  select_prev_entry = "<leader>ok";
+                  select_first_entry = "<leader>oJ";
+                  select_last_entry = "<leader>oK";
+                  next_thread = "<leader>on";
+                  prev_thread = "<leader>oN";
+                };
+              };
+            };
             gitsigns = {
               enable = true;
               settings = {
