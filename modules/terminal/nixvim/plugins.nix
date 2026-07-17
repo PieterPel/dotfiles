@@ -52,20 +52,34 @@
             octo = {
               enable = true; # GitHub issues/PRs (uses gh cli)
               settings.mappings = {
-                # Default bracket-key navigation is awkward on a split keyboard
-                file_panel = {
-                  select_next_entry = "<leader>oj";
-                  select_prev_entry = "<leader>ok";
-                  select_first_entry = "<leader>oJ";
-                  select_last_entry = "<leader>oK";
-                };
+                # file_panel already navigates with plain j/k by default, no bracket issue there.
+                # review_diff's changed-file/thread navigation defaults to bracket keys, which
+                # are awkward on a split keyboard, so remap those specifically.
                 review_diff = {
-                  select_next_entry = "<leader>oj";
-                  select_prev_entry = "<leader>ok";
-                  select_first_entry = "<leader>oJ";
-                  select_last_entry = "<leader>oK";
-                  next_thread = "<leader>on";
-                  prev_thread = "<leader>oN";
+                  select_next_entry = {
+                    lhs = "<leader>oj";
+                    desc = "move to next changed file";
+                  };
+                  select_prev_entry = {
+                    lhs = "<leader>ok";
+                    desc = "move to previous changed file";
+                  };
+                  select_first_entry = {
+                    lhs = "<leader>oJ";
+                    desc = "move to first changed file";
+                  };
+                  select_last_entry = {
+                    lhs = "<leader>oK";
+                    desc = "move to last changed file";
+                  };
+                  next_thread = {
+                    lhs = "<leader>on";
+                    desc = "move to next thread";
+                  };
+                  prev_thread = {
+                    lhs = "<leader>oN";
+                    desc = "move to previous thread";
+                  };
                 };
               };
             };
