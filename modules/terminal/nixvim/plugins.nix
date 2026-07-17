@@ -256,9 +256,7 @@
               autoLoad = true;
               enable = true;
               nixvimInjections = true;
-              grammarPackages =
-                pkgs.vimPlugins.nvim-treesitter.allGrammars
-                ++ (with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [ mdx ]);
+
               settings = {
                 auto_install = false;
                 highlight = {
