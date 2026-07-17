@@ -298,7 +298,10 @@
                 taplo.enable = true;
                 ts_ls.enable = true;
                 eslint.enable = true;
-                mdx_analyzer.enable = true;
+                mdx_analyzer = {
+                  enable = true;
+                  package = null; # provided externally via home.packages
+                };
                 lua_ls.enable = true;
                 gleam.enable = false; # Issue with deno
                 bicep.enable = false; # Requires manual stuff to get working https://nix-community.github.io/nixvim/plugins/lsp/servers/bicep/index.html
