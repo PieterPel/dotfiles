@@ -301,6 +301,7 @@
                 mdx_analyzer = {
                   enable = true;
                   package = null; # provided externally via home.packages
+                  extraOptions.init_options.typescript.tsdk = "${pkgs.typescript}/lib/node_modules/typescript/lib";
                 };
                 lua_ls.enable = true;
                 gleam.enable = false; # Issue with deno
