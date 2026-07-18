@@ -629,6 +629,8 @@
 
           extraConfigLua = ''
             vim.filetype.add({ extension = { mdx = "mdx" } })
+            -- nixpkgs' nvim-treesitter ships no mdx grammar; reuse markdown's for highlighting
+            vim.treesitter.language.register("markdown", "mdx")
 
             require("claudecode").setup({
               focus_after_send = true,
