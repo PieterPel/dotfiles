@@ -41,7 +41,7 @@ let
       };
       config = lib.mkIf config.modules.theming.stylix.enable {
         packages = with pkgs; [ base16-schemes ];
-        gtk.gtk4.theme = null;
+        # gtk.gtk4.theme = null; # NOTE: had this then got an error, dont know why I had it in the first place
         stylix = {
           enable = true;
           override.base0F = "ff729a";
@@ -60,6 +60,7 @@ let
             nixvim.plugin = "base16-nvim";
             rofi.enable = true;
             tmux.enable = false;
+            zellij.enable = false;
             opencode.enable = false;
           };
         };

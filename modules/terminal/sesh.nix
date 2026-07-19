@@ -13,6 +13,31 @@
       fzf-tmux = pkgs.lib.getExe' pkgs.fzf "fzf-tmux";
       seshKey = "s";
 
+      zellijBin = lib.getExe pkgs.zellij;
+
+      seshPickerZellij' = pkgs.writeShellScriptBin "sesh-picker-zellij" ''
+        target=$(${sesh} list -i | ${fzf} \
+          --ansi --no-sort --border-label ' sesh ' --prompt '⚡ ' \
+          --header ' ^a all | ^t sessions | ^g configs | ^x zoxide ' \
+          --bind 'ctrl-a:change-prompt(⚡ )+reload(${sesh} list -i)' \
+          --bind 'ctrl-t:change-prompt(🪟 )+reload(${sesh} list -it)' \
+          --bind 'ctrl-g:change-prompt(⚙️ )+reload(${sesh} list -ic)' \
+          --bind 'ctrl-x:change-prompt(📁 )+reload(${sesh} list -iz)')
+
+        [ -z "$target" ] && exit 0
+
+        name="$(echo "$target" | awk '{print $NF}')"
+
+        # Check if this is an existing Zellij session
+        if ${zellijBin} list-sessions 2>/dev/null | grep -q "^$name"; then
+          ${zellijBin} action switch-session "$name"
+        else
+          # New session for a directory — let sesh handle it
+          ${sesh} connect "$name"
+        fi
+      '';
+      seshPickerZellij = lib.getExe' seshPickerZellij' "sesh-picker-zellij";
+
       seshPicker' = pkgs.writeShellScriptBin "sesh-picker" ''
         target=$(${sesh} list -i | ${fzf-tmux} -p 80%,70% \
           --ansi --no-sort --border-label ' sesh ' --prompt '⚡ ' \
@@ -33,34 +58,45 @@
         enable = lib.mkEnableOption "Enable Sesh configuration.";
       };
 
-      config = lib.mkIf cfg.enable {
-        programs = {
-          sesh = {
-            enable = true;
-            settings = {
-              session = [
-                {
-                  name = "Downloads";
-                  path = "~/Downloads";
-                  startup_command = "yazi";
-                }
-              ];
+      config = lib.mkIf cfg.enable (lib.mkMerge [
+        {
+          programs = {
+            sesh = {
+              enable = true;
+              settings = {
+                session = [
+                  {
+                    name = "Downloads";
+                    path = "~/Downloads";
+                    startup_command = "yazi";
+                  }
+                ];
+              };
+            };
+
+            fish.shellAbbrs = {
+              "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
+            };
+
+            tmux.extraConfig = lib.mkAfter ''
+              bind s run-shell "${seshPicker}";
+            '';
+
+            fzf = {
+              enable = true;
+              tmux.enableShellIntegration = true;
             };
           };
+        }
 
-          fish.shellAbbrs = {
-            "${seshKey}" = "${sesh} connect (${sesh} list | ${fzf})";
-          };
-
-          tmux.extraConfig = lib.mkAfter ''
-            bind s run-shell "${seshPicker}";
+        (lib.mkIf config.modules.terminal.zellij.enable {
+          modules.terminal.zellij.extraTmuxKeybinds = ''
+            bind "s" {
+              LaunchOrFocusPlugin "zellij:session-manager" { floating true; move_to_focused_tab true; }
+              SwitchToMode "Normal";
+            }
           '';
-
-          fzf = {
-            enable = true;
-            tmux.enableShellIntegration = true;
-          };
-        };
-      };
+        })
+      ]);
     };
 }

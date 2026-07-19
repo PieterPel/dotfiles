@@ -74,12 +74,14 @@ let
         nixvim = defaultEnable;
         starship = defaultEnable;
         tmux = defaultEnable;
+        zellij = defaultEnable;
         terminalApps = defaultEnable;
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
         gh-dash = defaultEnable;
         lazygit = defaultEnable;
+        zellij-forgot = defaultEnable;
         jjui = defaultEnable;
         nvim-popup = defaultEnable;
         git-session-layout = defaultEnable;

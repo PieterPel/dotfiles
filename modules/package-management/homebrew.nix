@@ -25,16 +25,16 @@
 
           onActivation = {
             autoUpdate = false;
-            # 'zap': uninstalls all formulae(and related files) not listed here.
-            cleanup = "zap";
+            cleanup = "uninstall";
+            extraFlags = [ "--force" ];
           };
 
           taps = [ ];
 
           # `brew install`
           brews = [
-            # Not in nixpkgs
-            "marcus/tap/td"
+            "azure-cli"
+            "github-mcp-server"
           ];
 
           # `brew install --cask`

@@ -16,14 +16,12 @@
         cd "$path" 2>/dev/null || exit 0
         git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
-        tmux rename-window -t "$session:1" "code"
+        tmux rename-window -t "$session:1" "nvim"
         tmux send-keys -t "$session:1" "nvim ." Enter
 
         tmux new-window -t "$session" -n "shell"  -c "$path"
-        tmux new-window -t "$session" -n "dash"   -c "$path" "${lib.getExe pkgs.gh-dash}"
-        tmux new-window -t "$session" -n "claude" -c "$path" "claude"
 
-        tmux select-window -t "$session:code"
+        tmux select-window -t "$session:nvim"
       '';
 
       layout = lib.getExe' layoutScript "tmux-git-layout";

@@ -46,21 +46,25 @@
           {
             key = "<C-h>";
             action.__raw = "require('smart-splits').move_cursor_left";
+            mode = [ "n" "t" ];
             options.desc = "Move to left split";
           }
           {
             key = "<C-j>";
             action.__raw = "require('smart-splits').move_cursor_down";
+            mode = [ "n" "t" ];
             options.desc = "Move to split below";
           }
           {
             key = "<C-k>";
             action.__raw = "require('smart-splits').move_cursor_up";
+            mode = [ "n" "t" ];
             options.desc = "Move to split above";
           }
           {
             key = "<C-l>";
             action.__raw = "require('smart-splits').move_cursor_right";
+            mode = [ "n" "t" ];
             options.desc = "Move to right split";
           }
 
@@ -179,21 +183,145 @@
             action = "<cmd>tabnew<CR>";
           }
 
-          # claude-preview.nvim — install hooks once per project with :ClaudePreviewInstallHooks
+          # agentic.nvim
           {
-            key = "<leader>dq";
-            action = "<cmd>ClaudePreviewCloseDiff<CR>";
-            options.desc = "Close Claude diff preview";
+            key = "<C-;>";
+            action.__raw = "function() require('agentic').toggle() end";
+            mode = [ "n" "v" "i" ];
+            options.desc = "Toggle Agentic chat";
+          }
+          {
+            key = "<C-'>";
+            action.__raw = "function() require('agentic').add_selection_or_file_to_context() end";
+            mode = [ "n" "v" ];
+            options.desc = "Add file/selection to Agentic context";
           }
           {
             key = "<leader>cg";
-            action = "<cmd>Gemini toggle<CR>";
-            options.desc = "Gemini toggle";
+            action.__raw = "function() require('agentic').new_session() end";
+            mode = [ "n" "v" "i" ];
+            options.desc = "Agentic: new session";
+          }
+
+          # claudecode.nvim
+          {
+            key = "<leader>cc";
+            action = "<cmd>ClaudeCode<CR>";
+            options.desc = "Claude Code: toggle";
+          }
+          {
+            key = "<leader>cf";
+            action = "<cmd>ClaudeCodeFocus<CR>";
+            options.desc = "Claude Code: focus";
+          }
+          {
+            key = "<leader>cm";
+            action = "<cmd>ClaudeCodeSelectModel<CR>";
+            options.desc = "Claude Code: select model";
+          }
+          {
+            key = "<leader>cb";
+            action = "<cmd>ClaudeCodeAdd %<CR>";
+            options.desc = "Claude Code: add current buffer";
+          }
+          {
+            key = "<leader>cs";
+            action = "<cmd>ClaudeCodeSend<CR>";
+            mode = [ "v" ];
+            options.desc = "Claude Code: send selection";
+          }
+          {
+            key = "<leader>ca";
+            action = "<cmd>ClaudeCodeDiffAccept<CR>";
+            options.desc = "Claude Code: accept diff";
+          }
+          {
+            key = "<leader>cx";
+            action = "<cmd>ClaudeCodeDiffDeny<CR>";
+            options.desc = "Claude Code: deny diff";
+          }
+          {
+            key = "<leader>cX";
+            action = "<cmd>ClaudeCodeCloseAllDiffs<CR>";
+            options.desc = "Claude Code: close all diffs";
+          }
+          {
+            key = "<leader>cz";
+            action.__raw = ''
+              function()
+                local bufnr = require("claudecode.terminal").get_active_bufnr()
+                if not bufnr then return end
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                  if vim.api.nvim_win_get_buf(win) == bufnr then
+                    local current = vim.api.nvim_win_get_width(win)
+                    local total = vim.o.columns
+                    if current > total * 0.6 then
+                      vim.api.nvim_win_set_width(win, math.floor(total * 0.40))
+                    else
+                      vim.api.nvim_win_set_width(win, total)
+                    end
+                    break
+                  end
+                end
+              end
+            '';
+            options.desc = "Claude Code: zoom toggle";
+          }
+          {
+            key = "<C-,>";
+            action = "<cmd>ClaudeCodeFocus<CR>";
+            mode = [
+              "n"
+              "v"
+            ];
+            options.desc = "Claude Code: focus (float toggle)";
+          }
+          {
+            key = "<leader>cd";
+            action.__raw = ''
+              function()
+                local diff = vim.fn.system("git diff HEAD")
+                require("claudecode.terminal").send_to_terminal("Review this diff:\n" .. diff, { submit = false })
+              end
+            '';
+            options.desc = "Claude Code: send git diff";
           }
 
           {
             key = "<leader>lg";
             action = "<cmd>LazyGit<CR>";
+          }
+
+          # Octo (GitHub) — inside octo buffers it adds its own local maps
+          {
+            key = "<leader>op";
+            action = "<cmd>Octo pr list<CR>";
+            options.desc = "Octo: list PRs";
+          }
+          {
+            key = "<leader>oi";
+            action = "<cmd>Octo issue list<CR>";
+            options.desc = "Octo: list issues";
+          }
+          {
+            key = "<leader>oP";
+            action = "<cmd>Octo pr<CR>";
+            options.desc = "Octo: PR for current branch";
+          }
+          {
+            key = "<leader>or";
+            action = "<cmd>Octo review<CR>";
+            options.desc = "Octo: start/resume review";
+          }
+          {
+            key = "<leader>os";
+            action = "<cmd>Octo search<CR>";
+            options.desc = "Octo: search GitHub";
+          }
+          {
+            key = "<leader>oo";
+            action = ":Octo "; # Note the space at the end!
+            options.desc = "Octo: command prompt";
           }
 
           # Render markdown
@@ -214,7 +342,7 @@
             action = "<cmd>quit<CR>";
           }
           {
-            key = "<C-e";
+            key = "<C-e>";
             action = "<cmd>lua vim.diagnostic.open_float()<CR>";
           }
 
@@ -359,7 +487,7 @@
           }
 
           {
-            key = "<leader>a";
+            key = "<leader>ao";
             action = "<cmd>AerialToggle! left<CR>";
             options.desc = "Toggle Outline Sidebar";
           }

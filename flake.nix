@@ -55,7 +55,10 @@
     };
 
     nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
+      # Track the nixos-unstable branch to match our 26.11 nixpkgs: `main`
+      # pins an older nixpkgs whose kernel lacks `kernel.buildDTBs`, which the
+      # newer device-tree module now reads by default (nixos-raspberrypi #201).
+      url = "github:nvmd/nixos-raspberrypi/nixos-unstable";
       # WARNING: do not follow nixpkgs here!
     };
 

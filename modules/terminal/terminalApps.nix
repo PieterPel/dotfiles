@@ -51,7 +51,6 @@ in
           ripgrep
           eza
           lazysql
-          silver-searcher
           curlie
 
           # Containers

@@ -1,9 +1,10 @@
 {
   flake.modules.homeManager.aliases =
-    { config
-    , lib
-    , pkgs
-    , ...
+    {
+      config,
+      lib,
+      pkgs,
+      ...
     }:
     let
       eza = lib.getExe pkgs.eza;
@@ -26,6 +27,9 @@
 
         # Direnv
         da = "${lib.getExe pkgs.direnv} allow .";
+
+        # Nix
+        nd = "nix develop";
 
         # CLI dropins
         cat = lib.getExe pkgs.bat;
@@ -60,6 +64,10 @@
         # Git
         gs = "git status";
         ga = "git add";
+        gc = "git commit";
+        gf = "git fetch";
+        gp = "git push";
+        gd = "git diff";
       };
     };
 }
