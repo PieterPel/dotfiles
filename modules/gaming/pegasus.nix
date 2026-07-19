@@ -114,9 +114,11 @@
           "d /var/lib/pegasus/data 0755 ${cfg.user} users - -"
           # Always-current symlink to the Nix-generated metadata file.
           "L+ /var/lib/pegasus/apps/metadata.pegasus.txt - - - - ${metadataFile}"
-          # Single-line settings file telling Pegasus where to find our apps collection.
+          # game_dirs.txt (not settings.txt — there is no `game_dir` settings key;
+          # Pegasus silently ignores it) tells Pegasus which directories to scan
+          # for metadata.pegasus.txt collections: one absolute path per line.
           # f+ truncates and rewrites on each activation so it tracks rebuilds.
-          "f+ /var/lib/pegasus/config/pegasus-frontend/settings.txt 0644 ${cfg.user} users - game_dir: /var/lib/pegasus/apps"
+          "f+ /var/lib/pegasus/config/pegasus-frontend/game_dirs.txt 0644 ${cfg.user} users - /var/lib/pegasus/apps"
         ];
 
         # Take over the shared kiosk: a normal-priority `program` overrides the
