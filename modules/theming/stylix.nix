@@ -1,6 +1,5 @@
-{
-  inputs,
-  ...
+{ inputs
+, ...
 }:
 let
   polarity = "dark";
@@ -8,11 +7,10 @@ let
   base16Scheme = pkgs: "${pkgs.base16-schemes}/share/themes/purpledream.yaml";
   systemModule =
     modules:
-    {
-      lib,
-      config,
-      pkgs,
-      ...
+    { lib
+    , config
+    , pkgs
+    , ...
     }:
     {
       imports = [
@@ -32,11 +30,10 @@ let
     };
 
   homeModule =
-    {
-      lib,
-      config,
-      pkgs,
-      ...
+    { lib
+    , config
+    , pkgs
+    , ...
     }:
     {
       options.modules.theming.stylix = {

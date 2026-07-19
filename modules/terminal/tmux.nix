@@ -1,10 +1,9 @@
 {
   flake.modules.homeManager.tmux =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.terminal.tmux;
