@@ -175,6 +175,9 @@
         security.wrappers.chvt = {
           source = "${pkgs.kbd}/bin/chvt";
           capabilities = "cap_sys_tty_config+ep";
+          owner = "root";
+          group = "root";
+          permissions = "u+rx,g+x,o+x";
         };
 
         # Mirrors nixpkgs' services.cage module (nixos/modules/services/wayland/cage.nix)
