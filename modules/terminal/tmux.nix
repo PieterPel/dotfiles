@@ -260,6 +260,33 @@
 
       sessionSwitchHook = lib.getExe' sessionSwitchHookScript "tmux-session-switch-hook";
 
+      agentSidebarSrc = pkgs.fetchFromGitHub {
+        owner = "hiroppy";
+        repo = "tmux-agent-sidebar";
+        rev = "ae45bbae16f44c0b229913eef995065ad9969fe0";
+        hash = "sha256-ZAjTaAWq7guImUD+7td88dUBQeSerVzRF7m2okdVR3w=";
+      };
+
+      agentSidebarBin = pkgs.rustPlatform.buildRustPackage {
+        pname = "tmux-agent-sidebar";
+        version = "0.13.0";
+        src = agentSidebarSrc;
+        cargoHash = "sha256-OerkrbT2O0ga47f9rIURWrLoiODGwuRgjLiG7VcbZ+c=";
+        nativeBuildInputs = [ pkgs.pkg-config ];
+        buildInputs = lib.optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
+      };
+
+      agentSidebarPlugin = pkgs.tmuxPlugins.mkTmuxPlugin {
+        pluginName = "tmux-agent-sidebar";
+        version = "0.13.0";
+        src = agentSidebarSrc;
+        rtpFilePath = "tmux-agent-sidebar.tmux";
+        postInstall = ''
+          install -Dm755 ${agentSidebarBin}/bin/tmux-agent-sidebar \
+            $out/share/tmux-plugins/tmux-agent-sidebar/bin/tmux-agent-sidebar
+        '';
+      };
+
       # Precomputes the status with the target session highlighted BEFORE switching,
       # so the variable is ready the instant tmux redraws. No #() async lag.
       sessionSwitchToScript = pkgs.writeShellScriptBin "tmux-session-switch-to" ''
@@ -304,6 +331,7 @@
             continuum
             resurrect
             yank
+            agentSidebarPlugin
             {
               plugin = catppuccin;
               extraConfig = ''
@@ -374,6 +402,7 @@
               # Update on session switch and on new session creation
               set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
               set-hook -g after-new-session 'run-shell "${sessionSwitchHook} #{session_name}"'
+              set-hook -ga after-new-session 'send-keys "nvim" Enter'
 
               # Jump to session N with Prefix+Shift+N (1-9)
               bind '!' run-shell '${sessionSwitchTo} 1'
