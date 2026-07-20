@@ -4,21 +4,13 @@
       config,
       lib,
       pkgs,
-      inputs,
+      self,
       ...
     }:
     let
       cfg = config.modules.gaming.retroarch;
 
-      # Un-optimized nixpkgs. RetroArch + cores (and their large dependency trees:
-      # ffmpeg, SDL, ...) come from here so they fetch prebuilt from cache.nixos.org,
-      # instead of recompiling against nixos-raspberrypi's ARM-optimized stdenv —
-      # whose variants aren't in any binary cache, so they'd build from source on the
-      # Pi (~400 pkgs, infeasible on a Pi 400).
-      pkgsStock = import inputs.nixpkgs {
-        inherit (pkgs.stdenv.hostPlatform) system;
-        config.allowUnfree = true; # some libretro cores (e.g. snes9x) are unfree
-      };
+      pkgsStock = self.lib.mkStockPkgs pkgs.stdenv.hostPlatform.system;
 
       # Curated libretro core set. Adjust to taste — verify names against
       # `nix search nixpkgs libretro` (a wrong attr is an eval error).

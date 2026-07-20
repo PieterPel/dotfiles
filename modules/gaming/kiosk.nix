@@ -1,26 +1,21 @@
 {
   # Shared cage-based kiosk. Owns the Wayland compositor (cage) and the one-time
   # display-mode force (wlr-randr), then launches whatever frontend sets
-  # `program`. Decoupled from the frontend so the mode is applied exactly once,
-  # regardless of whether RetroArch or Pegasus is the active frontend — enabling
-  # one or the other no longer shuffles the wlr-randr logic around.
+  # `program`. Decoupled from the frontend so the mode is applied exactly once
+  # regardless of which frontend is active — enabling a different one no
+  # longer shuffles the wlr-randr logic around.
   flake.modules.nixos.kiosk =
     {
       config,
       lib,
       pkgs,
-      inputs,
+      self,
       ...
     }:
     let
       cfg = config.modules.gaming.kiosk;
 
-      # Stock nixpkgs so cage/wlroots fetch prebuilt from cache.nixos.org instead
-      # of rebuilding against nixos-raspberrypi's ARM-optimized stdenv (infeasible
-      # on a Pi 400).
-      pkgsStock = import inputs.nixpkgs {
-        inherit (pkgs.stdenv.hostPlatform) system;
-      };
+      pkgsStock = self.lib.mkStockPkgs pkgs.stdenv.hostPlatform.system;
 
       # Force the mode via wlr-randr (talks to cage's wlr-output-management), then
       # exec the frontend. Runs inside the cage session, so the socket exists.
