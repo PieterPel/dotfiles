@@ -29,9 +29,28 @@
           ${app.command}
         '';
 
+      # Pegasus owns tty1/DRM directly via EGLFS (see launchScript below) — it
+      # does NOT run inside cage. RetroArch still needs cage (bare DRM/KMS
+      # crashes for it, per retroarch.nix), so launching it means handing the
+      # display off to a second, temporary session on a different VT:
+      #   1. chvt away from Pegasus's VT. Qt's EGLFS KMS backend has built-in
+      #      VT-switch support and releases DRM master + pauses rendering when
+      #      its VT is deactivated — this is the documented mechanism for
+      #      exactly this handoff, not a hack.
+      #   2. cage (on the new, now-active VT) acquires DRM master uncontested
+      #      and runs RetroArch, applying the same wlr-randr mode force the
+      #      shared kiosk module would have (Pegasus's own launch bypasses that
+      #      module entirely, so it has to happen here instead).
+      #   3. On exit, chvt back — Qt/EGLFS resumes automatically on
+      #      reactivation.
       retroarchLaunch = pkgs.writeShellScript "pegasus-retroarch-launch" ''
         unset XDG_CONFIG_HOME XDG_DATA_HOME
-        exec ${retroCfg.kioskScript}
+        /run/wrappers/bin/chvt 2
+        ${lib.getExe pkgsStock.cage} -- ${pkgs.writeShellScript "pegasus-retroarch-cage-session" ''
+          ${lib.getExe pkgsStock.wlr-randr} --output ${config.modules.gaming.kiosk.output} --mode ${config.modules.gaming.kiosk.mode} || true
+          exec ${retroCfg.kioskScript}
+        ''}
+        /run/wrappers/bin/chvt 1
       '';
 
       retroarchEntry = lib.optionalString retroCfg.enable ''
@@ -62,12 +81,26 @@
         ${retroarchEntry}${extraEntries}
       '';
 
-      # Launch script (no display-mode logic — the shared kiosk module forces the
-      # mode via wlr-randr before running this).
+      # EGLFS (direct KMS/DRM, no separate Wayland compositor) rather than the
+      # shared cage/Wayland kiosk path RetroArch uses. Per Pegasus's own Pi
+      # setup docs, and confirmed on this hardware: running Pegasus as a
+      # Wayland *client* under cage adds an extra compositing hop (Pegasus's
+      # buffers -> cage's own wlroots scanout) that measurably worsens the
+      # vc4 driver's known swiotlb/DMA-bounce-buffer exhaustion bug
+      # (raspberrypi/linux#3416 — the GPU can only DMA within the first 1GiB,
+      # everything above bounces through a small pool) under Pegasus's
+      # continuously-animated Grid theme: black screen within ~3 minutes,
+      # vs. ~5.5 hours of plain RetroArch at the old 64M swiotlb default.
+      # EGLFS removes that extra hop entirely.
       launchScript = pkgs.writeShellScript "pegasus-launch" ''
         export XDG_CONFIG_HOME=/var/lib/pegasus/config
         export XDG_DATA_HOME=/var/lib/pegasus/data
-        export QT_QPA_PLATFORM=wayland
+        export QT_QPA_PLATFORM=eglfs
+        # Pi4-class (incl. Pi 400) GPU driver quirks, per Pegasus's own docs:
+        # KMS_ATOMIC avoids "Could not queue DRM page flip" errors; FORCE888
+        # improves gradient banding.
+        export QT_QPA_EGLFS_KMS_ATOMIC=1
+        export QT_QPA_EGLFS_FORCE888=1
         exec ${lib.getExe pkgsStock.pegasus-frontend}
       '';
     in
@@ -132,12 +165,67 @@
           "f+ /var/lib/pegasus/config/pegasus-frontend/game_dirs.txt 0644 ${cfg.user} users - /var/lib/pegasus/apps"
         ];
 
-        # Take over the shared kiosk: a normal-priority `program` overrides the
-        # RetroArch module's mkDefault, so Pegasus becomes the launched frontend.
-        modules.gaming.kiosk = {
-          enable = lib.mkDefault true;
-          user = lib.mkDefault cfg.user;
-          program = launchScript;
+        # Pegasus does NOT join the shared cage/Wayland kiosk (see launchScript)
+        # — force it off so cage-tty1.service doesn't also try to claim tty1.
+        modules.gaming.kiosk.enable = lib.mkForce false;
+
+        # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. A capability
+        # wrapper grants it narrowly (just this one binary) rather than full
+        # root via sudo — used by retroarchLaunch's VT handoff above.
+        security.wrappers.chvt = {
+          source = "${pkgs.kbd}/bin/chvt";
+          capabilities = "cap_sys_tty_config+ep";
+        };
+
+        # Mirrors nixpkgs' services.cage module (nixos/modules/services/wayland/cage.nix)
+        # almost exactly, since that's the known-working pattern for a
+        # kiosk-on-tty1 systemd unit — just running pegasus-launch (EGLFS)
+        # directly instead of `cage -- <program>`.
+        security.polkit.enable = true;
+        security.pam.services.pegasus.text = ''
+          auth    required pam_unix.so nullok
+          account required pam_unix.so
+          session required pam_unix.so
+          session required pam_env.so conffile=/etc/pam/environment readenv=0
+          session required ${config.systemd.package}/lib/security/pam_systemd.so
+        '';
+        hardware.graphics.enable = lib.mkDefault true;
+        systemd.defaultUnit = "graphical.target";
+        systemd.targets.graphical.wants = [ "pegasus-tty1.service" ];
+        systemd.services.pegasus-tty1 = {
+          enable = true;
+          after = [
+            "systemd-user-sessions.service"
+            "plymouth-start.service"
+            "plymouth-quit.service"
+            "systemd-logind.service"
+            "getty@tty1.service"
+          ];
+          before = [ "graphical.target" ];
+          wants = [
+            "dbus.socket"
+            "systemd-logind.service"
+            "plymouth-quit.service"
+          ];
+          wantedBy = [ "graphical.target" ];
+          conflicts = [ "getty@tty1.service" ];
+          restartIfChanged = false;
+          unitConfig.ConditionPathExists = "/dev/tty1";
+          serviceConfig = {
+            ExecStart = "${launchScript}";
+            User = cfg.user;
+            IgnoreSIGPIPE = "no";
+            UtmpIdentifier = "%n";
+            UtmpMode = "user";
+            TTYPath = "/dev/tty1";
+            TTYReset = "yes";
+            TTYVHangup = "yes";
+            TTYVTDisallocate = "yes";
+            StandardInput = "tty-fail";
+            StandardOutput = "journal";
+            StandardError = "journal";
+            PAMName = "pegasus";
+          };
         };
       };
     };
