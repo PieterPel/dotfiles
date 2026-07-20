@@ -64,6 +64,17 @@
         ${lib.concatMapStrings favouriteEntry allHandoffs}
         </favourites>
       '';
+
+      # Mesa's v3d driver reports GL 3.1 (compat profile), but this kodi
+      # package only ships shader sources for GLSL 1.20/1.50/4.00 -- nothing
+      # for 3.1's corresponding 1.40, so Kodi can't find
+      # gl_shader_frag_texture_lim.glsl and silently falls back to a "fixed
+      # pipeline" mode GLES doesn't support at all (black screen). Force Mesa
+      # to report a version that has a matching shader directory.
+      launchScript = pkgs.writeShellScript "kodi-standalone-launch" ''
+        export MESA_GL_VERSION_OVERRIDE=4.0COMPAT
+        exec ${pkgs.kodi-wayland}/bin/kodi-standalone
+      '';
     in
     {
       options.modules.gaming.kodiLauncher = {
@@ -113,7 +124,7 @@
         modules.gaming.kiosk = {
           enable = lib.mkDefault true;
           user = lib.mkDefault cfg.user;
-          program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
+          program = launchScript;
         };
       };
     };
