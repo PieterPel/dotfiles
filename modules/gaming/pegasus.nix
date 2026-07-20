@@ -19,14 +19,25 @@
       };
 
       # Generate a tiny launch script in the Nix store for each extra app.
+      # Unsets the XDG_*_HOME overrides pegasus-launch exports for itself
+      # (below) before exec'ing — otherwise every launched app inherits them
+      # and reads/writes its config under Pegasus's dirs instead of its own.
       mkAppScript =
         app:
-        pkgs.writeShellScript "pegasus-app-${builtins.replaceStrings [ " " ] [ "-" ] (lib.toLower app.name)}" app.command;
+        pkgs.writeShellScript "pegasus-app-${builtins.replaceStrings [ " " ] [ "-" ] (lib.toLower app.name)}" ''
+          unset XDG_CONFIG_HOME XDG_DATA_HOME
+          ${app.command}
+        '';
+
+      retroarchLaunch = pkgs.writeShellScript "pegasus-retroarch-launch" ''
+        unset XDG_CONFIG_HOME XDG_DATA_HOME
+        exec ${retroCfg.kioskScript}
+      '';
 
       retroarchEntry = lib.optionalString retroCfg.enable ''
 
         game: RetroArch
-        file: ${retroCfg.kioskScript}
+        file: ${retroarchLaunch}
         launch: {file.path}
         description: Play your retro game collection
       '';
