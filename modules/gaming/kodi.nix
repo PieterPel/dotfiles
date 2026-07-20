@@ -104,6 +104,9 @@
       config = lib.mkIf cfg.enable {
         systemd.tmpfiles.rules = [
           "d /home/${cfg.user}/.kodi/userdata 0755 ${cfg.user} users - -"
+          # Kodi doesn't create this itself on first run -- it tries to open
+          # temp/kodi.log for writing before that point and aborts if missing.
+          "d /home/${cfg.user}/.kodi/temp 0755 ${cfg.user} users - -"
           "L+ /home/${cfg.user}/.kodi/userdata/favourites.xml - - - - ${favouritesXml}"
         ];
 
