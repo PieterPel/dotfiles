@@ -96,6 +96,12 @@
         export XDG_CONFIG_HOME=/var/lib/pegasus/config
         export XDG_DATA_HOME=/var/lib/pegasus/data
         export QT_QPA_PLATFORM=eglfs
+        # This Qt build doesn't ship the classic GBM-based `eglfs_kms`
+        # integration at all -- only eglfs_emu, eglfs_kms_egldevice, eglfs_x11
+        # (confirmed via QT_LOGGING_RULES="qt.qpa.*=true"). Left to
+        # auto-detect, Qt picked eglfs_emu, which tried to connect to X11 and
+        # failed ("Could not initialize egl display"). Force the correct one.
+        export QT_QPA_EGLFS_INTEGRATION=eglfs_kms_egldevice
         # Pi4-class (incl. Pi 400) GPU driver quirks, per Pegasus's own docs:
         # KMS_ATOMIC avoids "Could not queue DRM page flip" errors; FORCE888
         # improves gradient banding.
