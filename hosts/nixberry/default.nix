@@ -17,6 +17,13 @@ in
         imports = with inputs.nixos-raspberrypi.nixosModules; [
           raspberry-pi-4.base
           usb-gadget-ethernet # Configures USB Gadget/Ethernet - Ethernet emulation over USB
+          # RPi-optimized packages (kodi, ffmpeg, libcamera, vlc, ...) into the
+          # global pkgs scope, per the flake's own README -- without this,
+          # `pkgs.kodi*` was always plain generic nixpkgs, not their tuned build.
+          inputs.nixos-raspberrypi.lib.inject-overlays
+          trusted-nix-caches
+          nixpkgs-rpi
+          inputs.nixos-raspberrypi.lib.inject-overlays-global
         ];
         inherit hostname;
         system.stateVersion = "25.05"; # Do not change this !

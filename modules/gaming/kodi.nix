@@ -11,10 +11,10 @@
       cfg = config.modules.gaming.kodiLauncher;
       retroCfg = config.modules.gaming.retroarch;
 
-      # kodi-wayland is one of the few packages nixos-raspberrypi specifically
-      # optimizes and caches for this hardware, so it comes from the ambient
-      # (RPi-optimized) pkgs, unlike retroarch/cage/ES-DE which need stock
-      # nixpkgs to avoid an uncached ARM rebuild.
+      # kodi-wayland comes from the ambient pkgs (RPi-optimized via
+      # nixos-raspberrypi's inject-overlays-global, see hosts/nixberry), not
+      # pkgsStock -- unlike retroarch/cage, which need stock nixpkgs to avoid
+      # an uncached ARM rebuild.
       pkgsStock = self.lib.mkStockPkgs pkgs.stdenv.hostPlatform.system;
 
       slugify = name: builtins.replaceStrings [ " " ] [ "-" ] (lib.toLower name);
@@ -65,15 +65,18 @@
         </favourites>
       '';
 
-      # Mesa's v3d driver reports GL 3.1 (compat profile), but this kodi
-      # package only ships shader sources for GLSL 1.20/1.50/4.00 -- nothing
-      # for 3.1's corresponding 1.40, so Kodi can't find
-      # gl_shader_frag_texture_lim.glsl and silently falls back to a "fixed
-      # pipeline" mode GLES doesn't support at all (black screen). Force Mesa
-      # to report a version that has a matching shader directory.
+      # renderSystem defaults to "gl" (desktop GL) for kodi-wayland in
+      # nixpkgs/nixos-raspberrypi's overlay -- LibreELEC, the actual proven
+      # Kodi-on-Pi reference, uses "gles" instead (the v3d driver is
+      # fundamentally GLES-only hardware). On "gl", Mesa's compat-profile
+      # emulation was enough for Kodi to pass its shader-loading checks but
+      # not enough to actually render content (black screen despite an
+      # active render loop). Override to match what actually works on this
+      # hardware.
+      kodiWayland = pkgs.kodi-wayland.override { renderSystem = "gles"; };
+
       launchScript = pkgs.writeShellScript "kodi-standalone-launch" ''
-        export MESA_GL_VERSION_OVERRIDE=4.0COMPAT
-        exec ${pkgs.kodi-wayland}/bin/kodi-standalone
+        exec ${kodiWayland}/bin/kodi-standalone
       '';
     in
     {
