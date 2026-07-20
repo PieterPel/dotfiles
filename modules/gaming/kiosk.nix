@@ -72,9 +72,24 @@
         assertions = [
           {
             assertion = cfg.program != null;
-            message = "modules.gaming.kiosk.enable is set but no frontend set modules.gaming.kiosk.program (enable retroarch or pegasus).";
+            message = "modules.gaming.kiosk.enable is set but no frontend set modules.gaming.kiosk.program.";
           }
         ];
+
+        # `chvt` needs CAP_SYS_TTY_CONFIG, which the kiosk user has none of. A
+        # capability wrapper grants it narrowly (just this one binary) rather
+        # than full root via sudo -- used by frontends that need to hand off
+        # the display to a second, temporary session on another VT (e.g.
+        # Kodi launching RetroArch) and back. The kernel pauses/resumes a
+        # GBM/DRM client automatically on VT deactivation/reactivation, so
+        # the frontend that owns VT1 doesn't need to stop.
+        security.wrappers.chvt = {
+          source = "${pkgs.kbd}/bin/chvt";
+          capabilities = "cap_sys_tty_config+ep";
+          owner = "root";
+          group = "root";
+          permissions = "u+rx,g+x,o+x";
+        };
 
         services.cage = {
           enable = true;
