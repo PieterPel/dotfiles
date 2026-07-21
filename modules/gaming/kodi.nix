@@ -65,18 +65,22 @@
         </favourites>
       '';
 
-      # renderSystem defaults to "gl" (desktop GL) for kodi-wayland in
-      # nixpkgs/nixos-raspberrypi's overlay -- LibreELEC, the actual proven
-      # Kodi-on-Pi reference, uses "gles" instead (the v3d driver is
-      # fundamentally GLES-only hardware). On "gl", Mesa's compat-profile
-      # emulation was enough for Kodi to pass its shader-loading checks but
-      # not enough to actually render content (black screen despite an
-      # active render loop). Override to match what actually works on this
-      # hardware.
-      kodiWayland = pkgs.kodi-wayland.override { renderSystem = "gles"; };
+      # kodi-wayland can never get GLES: nixpkgs hardcodes
+      # `-DAPP_RENDER_SYSTEM=${if gbmSupport then "gles" else "gl"}` --
+      # tied to gbmSupport, not waylandSupport, and not exposed as any
+      # separate override. The v3d driver is GLES-only hardware (this is
+      # also what LibreELEC, the proven Kodi-on-Pi reference, uses), so
+      # kodi-wayland's desktop-GL build only ever got far enough to pass
+      # Kodi's shader-loading checks via Mesa's compat-profile emulation,
+      # not to actually render content (black screen despite an active
+      # render loop). kodi-gbm already sets gbmSupport = true and needs no
+      # override -- but it talks to DRM/KMS directly, so it can't run as a
+      # Wayland client inside cage; it needs to own tty1's DRM master
+      # itself, same as the EGLFS approach this replaces.
+      kodiGbm = pkgs.kodi-gbm;
 
       launchScript = pkgs.writeShellScript "kodi-standalone-launch" ''
-        exec ${kodiWayland}/bin/kodi-standalone
+        exec ${kodiGbm}/bin/kodi-standalone
       '';
     in
     {
@@ -124,10 +128,72 @@
           "L+ /home/${cfg.user}/.kodi/userdata/favourites.xml - - - - ${favouritesXml}"
         ];
 
-        modules.gaming.kiosk = {
-          enable = lib.mkDefault true;
-          user = lib.mkDefault cfg.user;
-          program = launchScript;
+        # kodi-gbm owns tty1's DRM master directly (see kodiGbm above) --
+        # it does NOT run inside cage. Force the shared kiosk off so
+        # cage-tty1.service doesn't also try to claim tty1.
+        modules.gaming.kiosk.enable = lib.mkForce false;
+
+        # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. Duplicated here
+        # (rather than relying on kiosk.nix's copy) because kiosk is forced
+        # off above -- used by mkHandoff's VT switch to/from RetroArch.
+        security.wrappers.chvt = {
+          source = "${pkgs.kbd}/bin/chvt";
+          capabilities = "cap_sys_tty_config+ep";
+          owner = "root";
+          group = "root";
+          permissions = "u+rx,g+x,o+x";
+        };
+
+        # Mirrors nixpkgs' services.cage module (and this repo's earlier
+        # EGLFS/Pegasus attempt) -- the known-working pattern for a
+        # kiosk-on-tty1 systemd unit that gets DRM access via a logind
+        # session, just running kodi-standalone directly instead of
+        # `cage -- <program>`.
+        security.polkit.enable = true;
+        security.pam.services.kodi.text = ''
+          auth    required pam_unix.so nullok
+          account required pam_unix.so
+          session required pam_unix.so
+          session required pam_env.so conffile=/etc/pam/environment readenv=0
+          session required ${config.systemd.package}/lib/security/pam_systemd.so
+        '';
+        hardware.graphics.enable = lib.mkDefault true;
+        systemd.defaultUnit = "graphical.target";
+        systemd.targets.graphical.wants = [ "kodi-tty1.service" ];
+        systemd.services.kodi-tty1 = {
+          enable = true;
+          after = [
+            "systemd-user-sessions.service"
+            "plymouth-start.service"
+            "plymouth-quit.service"
+            "systemd-logind.service"
+            "getty@tty1.service"
+          ];
+          before = [ "graphical.target" ];
+          wants = [
+            "dbus.socket"
+            "systemd-logind.service"
+            "plymouth-quit.service"
+          ];
+          wantedBy = [ "graphical.target" ];
+          conflicts = [ "getty@tty1.service" ];
+          restartIfChanged = false;
+          unitConfig.ConditionPathExists = "/dev/tty1";
+          serviceConfig = {
+            ExecStart = "${launchScript}";
+            User = cfg.user;
+            IgnoreSIGPIPE = "no";
+            UtmpIdentifier = "%n";
+            UtmpMode = "user";
+            TTYPath = "/dev/tty1";
+            TTYReset = "yes";
+            TTYVHangup = "yes";
+            TTYVTDisallocate = "yes";
+            StandardInput = "tty-fail";
+            StandardOutput = "journal";
+            StandardError = "journal";
+            PAMName = "kodi";
+          };
         };
       };
     };
