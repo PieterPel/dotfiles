@@ -319,6 +319,11 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # Put the sidebar binary on PATH so the Claude Code plugin's hook.sh
+        # (`command -v tmux-agent-sidebar`) resolves it — otherwise hooks fire
+        # but silently no-op and the sidebar shows no sessions.
+        home.packages = [ agentSidebarBin ];
+
         programs.tmux = {
           enable = true;
           terminal = "tmux-256color";
