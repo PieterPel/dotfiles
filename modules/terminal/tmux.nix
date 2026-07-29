@@ -319,10 +319,15 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # Put the sidebar binary on PATH so the Claude Code plugin's hook.sh
-        # (`command -v tmux-agent-sidebar`) resolves it — otherwise hooks fire
-        # but silently no-op and the sidebar shows no sessions.
-        home.packages = [ agentSidebarBin ];
+        # Enable the tmux-agent-sidebar Claude Code plugin declaratively. The
+        # home-manager module turns each entry into a `--plugin-dir` wrapper
+        # arg, so Claude loads the plugin's hooks/hooks.json (which report each
+        # session to the sidebar) without writing to the read-only settings.json.
+        # The dir must be the one holding .claude-plugin/plugin.json; the plugin's
+        # own bin/ resolves the binary via CLAUDE_PLUGIN_ROOT, so no PATH entry.
+        programs.claude-code.plugins = [
+          "${agentSidebarPlugin}/share/tmux-plugins/tmux-agent-sidebar"
+        ];
 
         programs.tmux = {
           enable = true;
