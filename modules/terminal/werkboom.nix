@@ -1,8 +1,11 @@
-{ moduleWithSystem, ... }:
+{ inputs, ... }:
 {
-  flake.modules.homeManager.werkboom = moduleWithSystem (
-    { inputs', ... }:
-    { config, lib, ... }:
+  flake.modules.homeManager.werkboom =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.terminal.werkboom;
     in
@@ -12,8 +15,7 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = [ inputs'.mono.packages.werkboom ];
+        packages = [ inputs.mono.packages.${pkgs.stdenv.hostPlatform.system}.werkboom ];
       };
-    }
-  );
+    };
 }
