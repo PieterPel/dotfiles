@@ -87,6 +87,7 @@ let
         git-session-layout = defaultEnable;
         jujutsu = defaultEnable;
         delta = defaultEnable;
+        werkboom = defaultEnable;
       };
       theming.stylix = defaultEnable;
       security.sops = defaultEnable;

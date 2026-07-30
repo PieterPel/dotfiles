@@ -78,6 +78,11 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    mono = {
+      url = "git+ssh://git@codeberg.org/PieterPel/mono.git?ref=trunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
