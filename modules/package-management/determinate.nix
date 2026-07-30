@@ -20,6 +20,10 @@
         nix.enable = lib.mkForce false;
         modules.package-management.nix.enable = lib.mkForce false;
         determinateNix.customSettings = {
+          # `mightyiam/files` uses `|>` in its module definitions, so the
+          # evaluating Nix needs pipe-operators enabled.
+          extra-experimental-features = [ "pipe-operators" ];
+
           trusted-users = [
             "root"
             "pieterpel"
