@@ -1018,11 +1018,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785436841,
-        "narHash": "sha256-+U+3XupZnf/ipHdg+yUVVix6OP7626cKTMLBUN72zgU=",
+        "lastModified": 1785443688,
+        "narHash": "sha256-T+r6VvMuHV3NGHfu/svYC2jTh6zEsvGk3zVxz4tKD34=",
         "ref": "trunk",
-        "rev": "5e3403232f5721633b1b6f175968eb3dfb30f9b3",
-        "revCount": 17,
+        "rev": "5dc8ecf3165436e834c8ac76c6d9eefb353d9d62",
+        "revCount": 18,
         "type": "git",
         "url": "ssh://git@codeberg.org/PieterPel/mono.git"
       },
