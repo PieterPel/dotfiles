@@ -104,21 +104,6 @@ in
               };
             };
             raspberrypiWirelessFirmware_20260321 = final.raspberrypiWirelessFirmware;
-
-            # nixos-raspberrypi's overlays/pkgs.nix globally swaps
-            # `libcamera` for `libcamera_rpi` (its own fork, pinned to an
-            # obscure version -- 0.7.0+rpt20260205) so kodi/ffmpeg get RPi
-            # camera support. Nothing here uses a camera; the only thing
-            # that actually pulls `libcamera` into the closure is pipewire
-            # (confirmed via `nix why-depends`), which builds camera-source
-            # support whenever *any* libcamera package is present in scope
-            # (nixpkgs' pipewire has no plain on/off flag for this -- see
-            # `libcameraSupport = lib.meta.availableOn stdenv.hostPlatform
-            # libcamera;`). `libcamera_rpi` isn't in nixos-raspberrypi's
-            # cachix, so it compiles from source (very slow on a Pi 400).
-            # Point `libcamera` back at stock nixpkgs' own package instead
-            # -- ubiquitous enough to always be cached on cache.nixos.org.
-            libcamera = final.callPackage "${final.path}/pkgs/by-name/li/libcamera/package.nix" { };
           })
         ];
       }
