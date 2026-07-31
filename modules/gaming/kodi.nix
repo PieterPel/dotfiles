@@ -11,10 +11,9 @@
       cfg = config.modules.gaming.kodiLauncher;
       retroCfg = config.modules.gaming.retroarch;
 
-      # kodi-wayland comes from the ambient pkgs (RPi-optimized via
-      # nixos-raspberrypi's inject-overlays-global, see hosts/nixberry), not
-      # pkgsStock -- unlike retroarch/cage, which need stock nixpkgs to avoid
-      # an uncached ARM rebuild.
+      # retroarch/cage need stock nixpkgs to avoid an uncached ARM rebuild.
+      # (Kodi itself no longer comes from ambient pkgs at all -- see the
+      # `package` option below.)
       pkgsStock = self.lib.mkStockPkgs pkgs.stdenv.hostPlatform.system;
 
       slugify = name: builtins.replaceStrings [ " " ] [ "-" ] (lib.toLower name);
@@ -77,7 +76,7 @@
       # override -- but it talks to DRM/KMS directly, so it can't run as a
       # Wayland client inside cage; it needs to own tty1's DRM master
       # itself, same as the EGLFS approach this replaces.
-      kodiGbm = pkgs.kodi-gbm;
+      kodiGbm = cfg.package;
 
       launchScript = pkgs.writeShellScript "kodi-standalone-launch" ''
         exec ${kodiGbm}/bin/kodi-standalone
@@ -86,6 +85,27 @@
     {
       options.modules.gaming.kodiLauncher = {
         enable = lib.mkEnableOption "Kodi kiosk launcher";
+
+        package = lib.mkOption {
+          type = lib.types.package;
+          default = pkgs.kodi-gbm;
+          defaultText = lib.literalExpression "pkgs.kodi-gbm";
+          description = ''
+            The kodi-gbm package to run. Must be a GBM build (gbmSupport =
+            true), which is what forces APP_RENDER_SYSTEM=gles -- see the
+            note above kodiGbm.
+
+            Set this explicitly to a package from a flake whose binary cache
+            actually has it prebuilt. Pulling nixos-raspberrypi's RPi-tuned
+            kodi in via their `inject-overlays-global` instead looks
+            equivalent but is not: that overlay replaces ffmpeg/libcamera for
+            the *entire* package set, so everything downstream of them
+            (pipewire, gtk4, ...) gets a hash no cache has, and the Pi then
+            compiles all of it. Upstream flags this themselves in
+            lib/default.nix: "!!! causes _lots_ of rebuilds for graphical
+            stuff via ffmpeg, pipewire".
+          '';
+        };
 
         user = lib.mkOption {
           type = lib.types.str;
