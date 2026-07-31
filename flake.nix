@@ -55,20 +55,10 @@
     };
 
     nixos-raspberrypi = {
-      # Track `develop`, pinned to a commit matching a *successful* cachix
-      # push (github actions run 2026-07-26). `nixos-unstable` looks like the
-      # obviously-correct branch name but nixos-raspberrypi's own CI
-      # (.github/workflows/cachix.yaml) only ever builds+pushes `develop` --
-      # every cachix push run that's targeted `nixos-unstable` is entirely
-      # absent from their Actions history. Building against `nixos-unstable`
-      # meant every package that isn't independently cached elsewhere
-      # (confirmed via `nix why-depends`: libcamera_rpi, then transitively
-      # pipewire/gtk4 once that got patched) had to compile from source on
-      # the Pi itself -- the whole point of this flake is to avoid that.
-      # `develop` pins nixos-26.05 internally (vs. nixos-unstable's rolling
-      # pin) -- newer than the nixos-25.11 that caused the original
-      # kernel.buildDTBs breakage on `main`, so that issue shouldn't recur.
-      url = "github:nvmd/nixos-raspberrypi/7a988e466a9a98196bf1a85d0d594bcc4aa2b82d";
+      # Track the nixos-unstable branch to match our 26.11 nixpkgs: `main`
+      # pins an older nixpkgs whose kernel lacks `kernel.buildDTBs`, which the
+      # newer device-tree module now reads by default (nixos-raspberrypi #201).
+      url = "github:nvmd/nixos-raspberrypi/nixos-unstable";
       # WARNING: do not follow nixpkgs here!
     };
 
