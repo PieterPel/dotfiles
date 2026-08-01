@@ -125,8 +125,16 @@ in
           # note in the imports above, and the `package` option's docs).
           # Verified: `nix build --dry-run` on this package resolves to
           # 0 derivations built, 357 paths fetched.
+          # `.withPackages` adds binary addons without rebuilding Kodi -- the
+          # package itself still substitutes; only the addon and its
+          # kodi-platform helper build (both small). The base package ships
+          # no binary addons at all (it has no lib/kodi/addons directory),
+          # and Kodi cannot read joysticks without peripheral.joystick, so
+          # without this a connected gamepad does nothing in the Kodi UI
+          # even though the kernel exposes it fine as /dev/input/js0.
           gaming.kodiLauncher.package =
-            inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm;
+            inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm.withPackages
+              (p: [ p.joystick ]);
           system = {
             configuration.enable = true;
             internationalization.enable = true;
