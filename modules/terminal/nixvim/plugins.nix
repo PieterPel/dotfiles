@@ -600,21 +600,6 @@
                 hash = "sha256-oMBPSRQFDmJ9Lq+ZP8vFMHaocm4sPX3D/orVMNwVXuM=";
               };
             })
-
-            (vimUtils.buildVimPlugin {
-              pname = "harnt-nvim";
-              version = "dev";
-              # DEV MODE: points at the local checkout so `home-manager switch`
-              # picks up changes without a hash bump. Once harnt.nvim stabilizes,
-              # swap this for a pinned rev like venv-selector/claudecode above:
-              #   src = pkgs.fetchFromGitHub {
-              #     owner = "PieterPel";
-              #     repo = "harnt.nvim";
-              #     rev = "<commit>";
-              #     hash = "sha256-...";
-              #   };
-              src = /. + (config.home.homeDirectory + "/home/private-projects/harnt.nvim");
-            })
           ];
 
           autoCmd = [
@@ -669,6 +654,17 @@
             })
 
             require("harnt").setup({})
+
+            -- DEV MODE: harnt.nvim isn't packaged via Nix yet, so edits to the
+            -- local checkout show up after just restarting nvim (no
+            -- home-manager switch needed). Once it stabilizes, replace this
+            -- with a pinned vimUtils.buildVimPlugin + fetchFromGitHub entry
+            -- in extraPlugins, like venv-selector/claudecode above.
+            local harnt_dev_path = os.getenv("HOME") .. "/home/private-projects/harnt.nvim"
+            if vim.fn.isdirectory(harnt_dev_path) == 1 then
+              vim.opt.rtp:prepend(harnt_dev_path)
+              require("harnt").setup({})
+            end
 
             require("agentic").setup({
               provider = "claude-agent-acp",
