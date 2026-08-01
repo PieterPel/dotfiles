@@ -653,8 +653,6 @@
               },
             })
 
-            require("harnt").setup({})
-
             -- DEV MODE: harnt.nvim isn't packaged via Nix yet, so edits to the
             -- local checkout show up after just restarting nvim (no
             -- home-manager switch needed). Once it stabilizes, replace this
