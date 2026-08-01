@@ -142,34 +142,6 @@
               }
             })
 
-            require("code-preview").setup({
-              diff = {
-                layout = "tab",
-              },
-            })
-
-            -- Warn when opening a git repo that doesn't have code-preview hooks installed
-            vim.api.nvim_create_autocmd({ "VimEnter", "DirChanged" }, {
-              callback = function()
-                local git_root = vim.fn.finddir(".git", vim.fn.getcwd() .. ";")
-                if git_root == "" then return end
-
-                local settings_path = vim.fn.getcwd() .. "/.claude/settings.local.json"
-                local f = io.open(settings_path, "r")
-                if f then
-                  local content = f:read("*a")
-                  f:close()
-                  if content:find("code%-preview") or content:find("CodePreview") then return end
-                end
-
-                vim.notify(
-                  "code-preview hooks not installed.\nRun :CodePreviewInstallClaudeCodeHooks",
-                  vim.log.levels.WARN,
-                  { title = "code-preview.nvim" }
-                )
-              end,
-            })
-
             -- https://stackoverflow.com/questions/62100785/auto-reload-file-and-in-neovim-and-auto-reload-nerbtree
             vim.o.autoread = true
             vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {

@@ -569,17 +569,6 @@
             pkgs.vimPlugins.transparent-nvim
 
             (vimUtils.buildVimPlugin {
-              pname = "code-preview-nvim";
-              version = "2026-07-04";
-              src = pkgs.fetchFromGitHub {
-                owner = "Cannon07";
-                repo = "code-preview.nvim";
-                rev = "998deddb57135c4c0634682ca0dd33054bcced59";
-                hash = "sha256-V/V6gYexosGWa2vt6cd0Gg1RZNEMRZvFLgsoQNnKzbk=";
-              };
-            })
-
-            (vimUtils.buildVimPlugin {
               pname = "agentic-nvim";
               version = "2026-06-11";
               src = pkgs.fetchFromGitHub {
@@ -633,6 +622,12 @@
             vim.treesitter.language.register("markdown", "mdx")
 
             require("claudecode").setup({
+              -- harnt.nvim now owns Claude's IDE-integration lockfile; if this
+              -- also auto-starts, both register competing "Neovim" IDE entries
+              -- for the same workspace and the CLI's /ide picker can't tell
+              -- them apart (confirmed: it silently connects to whichever
+              -- registered first, i.e. this one, ignoring harnt entirely).
+              auto_start = false,
               focus_after_send = true,
               git_repo_cwd = true,
               terminal = {
