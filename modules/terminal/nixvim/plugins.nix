@@ -613,7 +613,7 @@
               #     rev = "<commit>";
               #     hash = "sha256-...";
               #   };
-              src = config.home.homeDirectory + "/home/private-projects/harnt.nvim";
+              src = /. + (config.home.homeDirectory + "/home/private-projects/harnt.nvim");
             })
           ];
 
