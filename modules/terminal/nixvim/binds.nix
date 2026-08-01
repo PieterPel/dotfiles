@@ -203,6 +203,28 @@
             options.desc = "Agentic: new session";
           }
 
+          # harnt.nvim
+          {
+            key = "<leader>ac";
+            action = "<cmd>Harnt toggle claude<CR>";
+            options.desc = "Harnt: toggle Claude";
+          }
+          {
+            key = "<leader>ax";
+            action = "<cmd>Harnt toggle codex<CR>";
+            options.desc = "Harnt: toggle Codex";
+          }
+          {
+            key = "<leader>ag";
+            action = "<cmd>Harnt toggle antigravity<CR>";
+            options.desc = "Harnt: toggle Antigravity";
+          }
+          {
+            key = "<leader>av";
+            action = "<cmd>Harnt toggle opencode<CR>";
+            options.desc = "Harnt: toggle OpenCode";
+          }
+
           # claudecode.nvim
           {
             key = "<leader>cc";
