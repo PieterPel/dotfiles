@@ -675,7 +675,16 @@
             require("atlas").setup({
               pulls = {
                 providers = {
-                  github = { }, -- uses `gh` cli auth, same as Octo
+                  github = {
+                    -- uses `gh` cli auth, same as Octo. Default view (no
+                    -- `views` set) is a single catch-all "involves:@me" tab,
+                    -- so define these explicitly to get a real assignee view.
+                    views = {
+                      { name = "Assigned", key = "1", search = "is:pr assignee:@me archived:false" },
+                      { name = "Authored", key = "2", search = "is:pr author:@me archived:false" },
+                      { name = "Reviewing", key = "3", search = "is:pr review-requested:@me archived:false" },
+                    },
+                  },
                 },
               },
               issues = {

@@ -437,6 +437,11 @@
             action = ":AtlasDiff "; # Note the space at the end!
             options.desc = "Atlas: diff (base...head or PR url)";
           }
+          {
+            key = "<leader>Ac";
+            action = "<cmd>AtlasClearCache<CR>";
+            options.desc = "Atlas: clear cache (e.g. after gh auth switch)";
+          }
 
           # Render markdown
           {
