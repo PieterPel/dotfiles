@@ -129,18 +129,6 @@
                 };
               };
             };
-            nvim-tree = {
-              enable = false; # File explorer
-              settings = {
-                diagnostics = {
-                  enable = true;
-                  show_on_dirs = true;
-                };
-                git = {
-                  ignore = false;
-                };
-              };
-            };
             harpoon.enable = true; # Mark files to go back to
             trouble.enable = true; # Give diagnostics overview
             lazygit.enable = true; # Lazygit from within nvim
@@ -217,27 +205,24 @@
             which-key = {
               enable = true;
               lazyLoad.enable = false;
-              settings = {
-                # This effectively disables the "auto" popup behavior
-                # formatting it like this ensures it overrides default "auto"
-                triggers = [ ];
-                delay = 10000; # leader leader is set in binds.nix
-              };
+              # No trigger/delay overrides: use which-key's own defaults so the
+              # popup actually appears on <leader> etc. <leader><leader> manual
+              # trigger is still set in binds.nix.
             };
 
             # Language specific
             /*
-            rustaceanvim = {
-                   enable = true;
-                   settings = {
-                     tools.enable_clippy = true;
-                     server.default_settings = {
-                       rust_analyzer = {
-                         check.command = "clippy";
+              rustaceanvim = {
+                     enable = true;
+                     settings = {
+                       tools.enable_clippy = true;
+                       server.default_settings = {
+                         rust_analyzer = {
+                           check.command = "clippy";
+                         };
                        };
                      };
                    };
-                 };
             */
 
             nix.enable = true; # Tools for Nix
@@ -427,7 +412,6 @@
                   #"copilot"
                 ];
 
-
                 providers = {
                   git = {
                     module = "blink-cmp-git";
@@ -543,6 +527,10 @@
                     { section = "recent_files"; }
                   ];
                 };
+                explorer = {
+                  # Sidebar file viewer with git status; oil/yazi already own netrw
+                  replace_netrw = false;
+                };
                 input.enabled = true; # Better rename/input dialogs
                 notifier.enabled = true; # Better notifications
                 quickfile.enabled = true;
@@ -589,12 +577,37 @@
                 hash = "sha256-oMBPSRQFDmJ9Lq+ZP8vFMHaocm4sPX3D/orVMNwVXuM=";
               };
             })
+
+            (vimUtils.buildVimPlugin {
+              pname = "atlas-nvim";
+              version = "2026-08-02";
+              src = pkgs.fetchFromGitHub {
+                owner = "emrearmagan";
+                repo = "atlas.nvim";
+                rev = "d67faec8c6da7743d60f9afdc87722f44a3eb010";
+                hash = "sha256-A6jH53sa753FCDoc+GkdU98rU3ROquznvpxVTNw/sK4=";
+              };
+            })
+
+            (vimUtils.buildVimPlugin {
+              pname = "satellite-nvim";
+              version = "2026-08-02";
+              src = pkgs.fetchFromGitHub {
+                owner = "lewis6991";
+                repo = "satellite.nvim";
+                rev = "87843c9c8f28b54332497302de380a6d94c9e82b";
+                hash = "sha256-2kvs9HgNcLy7ym2C2XZRv3Qa2ttNLdpa9l7oRYy8KLQ=";
+              };
+            })
           ];
 
           autoCmd = [
             {
               event = "FileType";
-              pattern = [ "AgenticChat" "AgenticInput" ];
+              pattern = [
+                "AgenticChat"
+                "AgenticInput"
+              ];
               callback.__raw = ''
                 function()
                   local ss = require('smart-splits')
@@ -658,6 +671,33 @@
               vim.opt.rtp:prepend(harnt_dev_path)
               require("harnt").setup({})
             end
+
+            require("atlas").setup({
+              pulls = {
+                providers = {
+                  github = { }, -- uses `gh` cli auth, same as Octo
+                },
+              },
+              issues = {
+                providers = {
+                  github = { },
+                },
+              },
+              keymaps = {
+                pulls = {
+                  review = {
+                    -- Same rationale as Octo's remap above: bracket-key nav is
+                    -- awkward on a split keyboard.
+                    next_file = "<leader>Aj",
+                    previous_file = "<leader>Ak",
+                    next_comment = "<leader>An",
+                    previous_comment = "<leader>AN",
+                  },
+                },
+              },
+            })
+
+            require("satellite").setup({})
 
             require("agentic").setup({
               provider = "claude-agent-acp",

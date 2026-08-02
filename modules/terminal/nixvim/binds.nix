@@ -46,25 +46,37 @@
           {
             key = "<C-h>";
             action.__raw = "require('smart-splits').move_cursor_left";
-            mode = [ "n" "t" ];
+            mode = [
+              "n"
+              "t"
+            ];
             options.desc = "Move to left split";
           }
           {
             key = "<C-j>";
             action.__raw = "require('smart-splits').move_cursor_down";
-            mode = [ "n" "t" ];
+            mode = [
+              "n"
+              "t"
+            ];
             options.desc = "Move to split below";
           }
           {
             key = "<C-k>";
             action.__raw = "require('smart-splits').move_cursor_up";
-            mode = [ "n" "t" ];
+            mode = [
+              "n"
+              "t"
+            ];
             options.desc = "Move to split above";
           }
           {
             key = "<C-l>";
             action.__raw = "require('smart-splits').move_cursor_right";
-            mode = [ "n" "t" ];
+            mode = [
+              "n"
+              "t"
+            ];
             options.desc = "Move to right split";
           }
 
@@ -145,10 +157,11 @@
             options.desc = "Delete buffer";
           }
 
-          # Nvimtree
+          # Sidebar file viewer (snacks.explorer)
           {
             key = "<leader>e";
-            action = "<cmd>NvimTreeToggle<CR>";
+            action.__raw = "function() Snacks.explorer() end";
+            options.desc = "Toggle file explorer sidebar";
           }
 
           # venv-select
@@ -169,6 +182,35 @@
 
           # Debug
 
+          # Page up/down, centered. J/K are already taken (join lines,
+          # Lspsaga hover_doc below), so this is the idiomatic swap instead
+          # of clobbering those: half-page scroll + recenter on the cursor.
+          {
+            key = "<C-d>";
+            action = "<C-d>zz";
+            mode = [
+              "n"
+              "v"
+            ];
+            options.desc = "Page down (centered)";
+          }
+          {
+            key = "<C-u>";
+            action = "<C-u>zz";
+            mode = [
+              "n"
+              "v"
+            ];
+            options.desc = "Page up (centered)";
+          }
+
+          # Folding
+          {
+            key = "<leader>zf";
+            action = "zi";
+            options.desc = "Toggle folding";
+          }
+
           # Splits and tabs
           {
             key = "<leader>h";
@@ -187,19 +229,30 @@
           {
             key = "<C-;>";
             action.__raw = "function() require('agentic').toggle() end";
-            mode = [ "n" "v" "i" ];
+            mode = [
+              "n"
+              "v"
+              "i"
+            ];
             options.desc = "Toggle Agentic chat";
           }
           {
             key = "<C-'>";
             action.__raw = "function() require('agentic').add_selection_or_file_to_context() end";
-            mode = [ "n" "v" ];
+            mode = [
+              "n"
+              "v"
+            ];
             options.desc = "Add file/selection to Agentic context";
           }
           {
             key = "<leader>cg";
             action.__raw = "function() require('agentic').new_session() end";
-            mode = [ "n" "v" "i" ];
+            mode = [
+              "n"
+              "v"
+              "i"
+            ];
             options.desc = "Agentic: new session";
           }
 
@@ -344,6 +397,45 @@
             key = "<leader>oo";
             action = ":Octo "; # Note the space at the end!
             options.desc = "Octo: command prompt";
+          }
+
+          # Atlas (GitHub PRs/issues) — buffer-local review nav (next/prev
+          # changed file, next/prev thread) is set in plugins.nix's
+          # require("atlas").setup() to match Octo's split-keyboard remap.
+          {
+            key = "<leader>Ap";
+            action = "<cmd>AtlasPulls<CR>";
+            options.desc = "Atlas: list PRs";
+          }
+          {
+            key = "<leader>Ai";
+            action = "<cmd>AtlasIssues<CR>";
+            options.desc = "Atlas: list issues";
+          }
+          {
+            key = "<leader>AP";
+            action = "<cmd>AtlasCreatePR<CR>";
+            options.desc = "Atlas: create PR";
+          }
+          {
+            key = "<leader>AI";
+            action = "<cmd>AtlasCreateIssue<CR>";
+            options.desc = "Atlas: create issue";
+          }
+          {
+            key = "<leader>As";
+            action = "<cmd>AtlasSearch<CR>";
+            options.desc = "Atlas: search";
+          }
+          {
+            key = "<leader>Ao";
+            action = "<cmd>AtlasNotes<CR>";
+            options.desc = "Atlas: local review notes";
+          }
+          {
+            key = "<leader>Ad";
+            action = ":AtlasDiff "; # Note the space at the end!
+            options.desc = "Atlas: diff (base...head or PR url)";
           }
 
           # Render markdown

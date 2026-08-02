@@ -168,6 +168,31 @@
               end,
             })
             set_transparent_bg()
+
+            -- Line number color per mode
+            local mode_linenr_colors = {
+              n = "#61AFEF", -- Normal
+              i = "#98C379", -- Insert
+              v = "#C678DD", -- Visual
+              V = "#C678DD", -- Visual line
+              ["\22"] = "#C678DD", -- Visual block (<C-v>)
+              R = "#E06C75", -- Replace
+              c = "#E5C07B", -- Command-line
+              t = "#56B6C2", -- Terminal
+            }
+            local function set_mode_linenr_color()
+              local color = mode_linenr_colors[vim.fn.mode()] or mode_linenr_colors.n
+              vim.api.nvim_set_hl(0, "LineNr", { fg = color, bg = "none" })
+              vim.api.nvim_set_hl(0, "CursorLineNr", { fg = color, bg = "none", bold = true })
+            end
+            vim.api.nvim_create_autocmd("ModeChanged", {
+              pattern = "*:*",
+              callback = set_mode_linenr_color,
+            })
+            vim.api.nvim_create_autocmd("ColorScheme", {
+              callback = set_mode_linenr_color,
+            })
+            set_mode_linenr_color()
           '';
         };
       };
