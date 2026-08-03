@@ -672,6 +672,62 @@
               require("harnt").setup({})
             end
 
+            -- Atlas has no cwd fallback: reviewing a PR checks out its
+            -- branch, so it needs to know where every repo lives on disk,
+            -- even one you're already sitting inside. Rather than
+            -- hand-maintain that map (folder layout under ~/home doesn't
+            -- follow one convention), walk it once and read each repo's
+            -- real GitHub remote out of .git/config. Stops descending the
+            -- moment it finds a .git, so it never walks into a repo's own
+            -- working tree.
+            local function discover_github_repo_paths(root, max_depth)
+              local paths = {}
+              root = vim.fn.expand(root)
+
+              local function parse_github_remote(dir)
+                local f = io.open(dir .. "/.git/config", "r")
+                if not f then
+                  return nil, nil
+                end
+                local content = f:read("*a")
+                f:close()
+                local owner, repo = content:match("github%.com[:/]+([%w%-%._]+)/([%w%-%._]+)")
+                if not owner then
+                  return nil, nil
+                end
+                return owner, (repo:gsub("%.git%s*$", ""))
+              end
+
+              local function scan(dir, depth)
+                if vim.loop.fs_stat(dir .. "/.git") then
+                  local owner, repo = parse_github_remote(dir)
+                  if owner and repo then
+                    paths[owner .. "/" .. repo] = dir
+                  end
+                  return
+                end
+                if depth >= max_depth then
+                  return
+                end
+                local handle = vim.loop.fs_scandir(dir)
+                if not handle then
+                  return
+                end
+                while true do
+                  local name, typ = vim.loop.fs_scandir_next(handle)
+                  if not name then
+                    break
+                  end
+                  if typ == "directory" then
+                    scan(dir .. "/" .. name, depth + 1)
+                  end
+                end
+              end
+
+              scan(root, 0)
+              return paths
+            end
+
             require("atlas").setup({
               pulls = {
                 providers = {
@@ -686,10 +742,11 @@
                     },
                   },
                 },
+                repo_config = { paths = { } }, -- populated below, after startup
               },
               issues = {
                 providers = {
-                  github = { },
+                  github = { };
                 },
               },
               keymaps = {
@@ -705,6 +762,13 @@
                 },
               },
             })
+
+            -- Deferred so the filesystem walk above doesn't block startup;
+            -- atlas.config.options is a plain mutable table it re-reads on
+            -- every PR-review action, so patching it in after setup() is safe.
+            vim.defer_fn(function()
+              require("atlas.config").options.pulls.repo_config.paths = discover_github_repo_paths("~/home", 6)
+            end, 0)
 
             require("satellite").setup({})
 
