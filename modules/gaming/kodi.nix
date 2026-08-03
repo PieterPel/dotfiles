@@ -294,7 +294,13 @@
           ];
           wantedBy = [ "graphical.target" ];
           conflicts = [ "getty@tty1.service" ];
-          restartIfChanged = false;
+          # Must be true. With `false`, switch-to-configuration still *stops*
+          # this unit when its definition changes but is then forbidden from
+          # starting it again -- so every deploy left the box with Kodi dead
+          # and a getty squatting on tty1, needing a manual start. Restarting
+          # costs a few seconds of black screen during a deploy, which is a
+          # deliberate act anyway.
+          restartIfChanged = true;
           unitConfig.ConditionPathExists = "/dev/tty1";
           serviceConfig = {
             ExecStart = "${launchScript}";
