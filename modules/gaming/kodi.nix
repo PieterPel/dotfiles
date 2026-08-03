@@ -85,6 +85,11 @@
       retroarchHandoff = lib.optional retroCfg.enable {
         slug = "retroarch";
         fullname = "RetroArch";
+        # RetroArch ships its logo as SVG only, which Kodi cannot render.
+        icon = self.lib.svgToPng pkgs {
+          name = "retroarch-icon";
+          src = "${pkgsStock.retroarch}/share/icons/hicolor/scalable/apps/com.libretro.RetroArch.svg";
+        };
         command = "${lib.getExe pkgsStock.cage} -- ${
           pkgs.writeShellScript "kodi-retroarch-kiosk" ''
             ${forceMode}
@@ -96,13 +101,18 @@
       appHandoffs = map (app: {
         slug = slugify app.name;
         fullname = app.name;
-        inherit (app) command;
+        inherit (app) command icon;
       }) cfg.apps;
 
       allHandoffs = retroarchHandoff ++ appHandoffs;
 
+      # An empty thumb is what makes Kodi fall back to the generic star, so
+      # only emit the attribute when there is actually an image. Kodi's image
+      # loader does not render SVG, so these must be raster files.
       favouriteEntry = h: ''
-        <favourite name="${h.fullname}" thumb="">System.Exec("${mkHandoffLauncher h}")</favourite>
+        <favourite name="${h.fullname}"${
+          lib.optionalString (h.icon != null) " thumb=\"${toString h.icon}\""
+        }>System.Exec("${mkHandoffLauncher h}")</favourite>
       '';
 
       favouritesXml = pkgs.writeText "favourites.xml" ''
@@ -171,6 +181,16 @@
                 command = lib.mkOption {
                   type = lib.types.str;
                   description = "Shell command executed when this Favourite is selected.";
+                };
+                icon = lib.mkOption {
+                  type = lib.types.nullOr lib.types.path;
+                  default = null;
+                  description = ''
+                    Image shown as the Favourite's thumbnail. Kodi falls back
+                    to a generic star when unset. Must be a raster format --
+                    Kodi's image loader does not render SVG, so convert first
+                    (e.g. with `rsvg-convert`) if all you have is vector art.
+                  '';
                 };
               };
             }
