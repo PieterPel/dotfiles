@@ -54,7 +54,6 @@
 
             # Not in nixpkgs
             "claude"
-            "apm"
           ];
         };
       };

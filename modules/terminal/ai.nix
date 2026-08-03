@@ -33,6 +33,9 @@
           gitnexus # Repo as KG for agents
           codegraph # Graph for code
 
+          # Skills
+          apm-cli
+
           # Appearance
           ccstatusline # statusline for claude
 
