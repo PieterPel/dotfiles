@@ -15,33 +15,37 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = with inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}; [
-          # TUI
-          gemini-cli
-          code # Codex fork that also supports claude and gemini
-          claude-agent-acp # ACP provider for agentic.nvim
+        packages =
+          with inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+          [
+            # TUI
+            gemini-cli
+            code # Codex fork that also supports claude and gemini
+            claude-agent-acp # ACP provider for agentic.nvim
 
-          # Assistant
-          # picoclaw # Hash mismatch
+            # Assistant
+            # picoclaw # Hash mismatch
 
-          # Dev
-          tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
+            # Dev
+            tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
 
-          # Util
-          rtk # Reduce input tokens
-          ccusage # Usage for claude code
-          gitnexus # Repo as KG for agents
-          codegraph # Graph for code
+            # Util
+            rtk # Reduce input tokens
+            ccusage # Usage for claude code
+            gitnexus # Repo as KG for agents
+            codegraph # Graph for code
 
-          # Skills
-          apm-cli
+            # Skills
 
-          # Appearance
-          ccstatusline # statusline for claude
+            # Appearance
+            ccstatusline # statusline for claude
 
-          # Security
-          claudebox # Containerize claude code easily
-        ];
+            # Security
+            claudebox # Containerize claude code easily
+          ]
+          ++ [
+            pkgs.apm-cli
+          ];
         programs = {
           claude-code = {
             enable = true;
