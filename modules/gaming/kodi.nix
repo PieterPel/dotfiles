@@ -56,7 +56,14 @@
           ExecStart = h.command;
           # `+` runs this with full privileges regardless of User=, so
           # bringing Kodi back needs no polkit rule of its own.
-          ExecStopPost = "+${config.systemd.package}/bin/systemctl start kodi-tty1.service";
+          #
+          # --no-block is load-bearing, not a nicety: a plain `systemctl
+          # start` waits for the job to finish, and starting kodi-tty1
+          # requires stopping *this* unit (they conflict) -- which cannot
+          # finish while its own ExecStopPost is still running. That deadlocks
+          # until systemd's stop-post timeout fires and fails the unit, which
+          # in turn fails the whole nixos-rebuild switch. Queue it instead.
+          ExecStopPost = "+${config.systemd.package}/bin/systemctl start --no-block kodi-tty1.service";
           User = cfg.user;
           PAMName = "kodi";
           TTYPath = "/dev/tty1";
