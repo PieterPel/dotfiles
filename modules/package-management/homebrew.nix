@@ -55,8 +55,7 @@
 
             # Not in nixpkgs
             "claude"
-            # claudoscope tap is broken upstream (wrong dir structure + placeholder sha256)
-
+            "apm"
           ];
         };
       };
