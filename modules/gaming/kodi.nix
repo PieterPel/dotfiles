@@ -18,44 +18,91 @@
 
       slugify = name: builtins.replaceStrings [ " " ] [ "-" ] (lib.toLower name);
 
-      # Kodi's own GBM/DRM session stays on VT1 the whole time (it pauses on
-      # VT deactivation, resumes on reactivation -- standard kernel VT_PROCESS
-      # behaviour, not something we have to implement). A Favourite hands off
-      # by switching to VT2, running the target there in a fresh cage session,
-      # then switching back.
-      mkHandoff =
-        {
-          slug,
-          command,
-        }:
-        pkgs.writeShellScript "kodi-handoff-${slug}" ''
-          /run/wrappers/bin/chvt 2
-          ${command}
-          /run/wrappers/bin/chvt 1
+      kioskCfg = config.modules.gaming.kiosk;
+
+      # wlroots takes the display's *preferred* mode, which on a TV is
+      # typically 4K -- and a Pi 4 can't clock 4K@60 without
+      # hdmi_enable_4kp60, so it settles on 4K@30. That's a bad trade for
+      # emulation: 30Hz doesn't divide 60/50Hz retro content cleanly, and the
+      # Pi burns its GPU budget compositing 8.3 MPix to draw a 240p game.
+      # Reuses the shared kiosk's mode/output (already set for this host)
+      # instead of adding a second place to configure the display.
+      forceMode = lib.optionalString (kioskCfg.mode != null) ''
+        ${lib.getExe pkgsStock.wlr-randr} --output ${kioskCfg.output} --mode ${kioskCfg.mode} || true
+      '';
+
+      # A Favourite starts a systemd unit; it must NOT run the target as a
+      # child of Kodi. Both of these were verified on the box:
+      #
+      #  * A `System.Exec` child inherits Kodi's logind session, which is
+      #    bound to VT1 (`loginctl`: it is the only seat0 session, VTNr=1).
+      #    Switching VT away marks that session inactive, logind revokes its
+      #    device access, and the child dies instantly. A unit with PAMName +
+      #    TTYPath gets a session of its own instead.
+      #  * Kodi opens /dev/dri/card0 directly rather than through logind, so
+      #    logind cannot take DRM master away from it on a VT switch. cage
+      #    then fails with "Could not take device: Device or resource busy"
+      #    even from a correct, *active* session on another VT. So Kodi has to
+      #    genuinely stop for the GPU to be free -- hence `conflicts`, with
+      #    ExecStopPost bringing it back when the target exits. A pleasant
+      #    consequence: no VT switching is involved at all.
+      handoffUnit = h: "kodi-handoff-${h.slug}";
+
+      mkHandoffService = h: {
+        conflicts = [ "kodi-tty1.service" ];
+        restartIfChanged = false;
+        unitConfig.ConditionPathExists = "/dev/tty1";
+        serviceConfig = {
+          ExecStart = h.command;
+          # `+` runs this with full privileges regardless of User=, so
+          # bringing Kodi back needs no polkit rule of its own.
+          ExecStopPost = "+${config.systemd.package}/bin/systemctl start kodi-tty1.service";
+          User = cfg.user;
+          PAMName = "kodi";
+          TTYPath = "/dev/tty1";
+          TTYReset = "yes";
+          TTYVHangup = "yes";
+          TTYVTDisallocate = "yes";
+          StandardInput = "tty-fail";
+          StandardOutput = "journal";
+          StandardError = "journal";
+          IgnoreSIGPIPE = "no";
+          UtmpIdentifier = "%n";
+          UtmpMode = "user";
+        };
+      };
+
+      mkHandoffLauncher =
+        h:
+        pkgs.writeShellScript "kodi-handoff-${h.slug}" ''
+          exec ${config.systemd.package}/bin/systemctl start ${handoffUnit h}.service
         '';
+
+      handoffServices = lib.listToAttrs (
+        map (h: lib.nameValuePair (handoffUnit h) (mkHandoffService h)) allHandoffs
+      );
 
       retroarchHandoff = lib.optional retroCfg.enable {
         slug = "retroarch";
         fullname = "RetroArch";
-        script = mkHandoff {
-          slug = "retroarch";
-          command = "${lib.getExe pkgsStock.cage} -- ${retroCfg.kioskScript}";
-        };
+        command = "${lib.getExe pkgsStock.cage} -- ${
+          pkgs.writeShellScript "kodi-retroarch-kiosk" ''
+            ${forceMode}
+            exec ${retroCfg.kioskScript}
+          ''
+        }";
       };
 
       appHandoffs = map (app: {
         slug = slugify app.name;
         fullname = app.name;
-        script = mkHandoff {
-          slug = slugify app.name;
-          command = app.command;
-        };
+        inherit (app) command;
       }) cfg.apps;
 
       allHandoffs = retroarchHandoff ++ appHandoffs;
 
       favouriteEntry = h: ''
-        <favourite name="${h.fullname}" thumb="">System.Exec("${h.script}")</favourite>
+        <favourite name="${h.fullname}" thumb="">System.Exec("${mkHandoffLauncher h}")</favourite>
       '';
 
       favouritesXml = pkgs.writeText "favourites.xml" ''
@@ -139,7 +186,14 @@
         };
       };
 
-      config = lib.mkIf cfg.enable {
+      config = lib.mkIf cfg.enable (lib.mkMerge [
+        # Handoff targets (RetroArch, plus anything in `apps`) each get their
+        # own unit -- see the note above mkHandoffService for why running them
+        # as a child of Kodi cannot work. Kept as a separate mkMerge member
+        # because the block below defines systemd.services.kodi-tty1, and a
+        # single attrset cannot define both that and `systemd.services`.
+        { systemd.services = handoffServices; }
+        {
         systemd.tmpfiles.rules = [
           "d /home/${cfg.user}/.kodi/userdata 0755 ${cfg.user} users - -"
           # Kodi doesn't create this itself on first run -- it tries to open
@@ -153,9 +207,25 @@
         # cage-tty1.service doesn't also try to claim tty1.
         modules.gaming.kiosk.enable = lib.mkForce false;
 
+        # Kodi runs as an unprivileged user, so starting a handoff unit needs
+        # authorisation. Scoped to exactly the handoff units by name -- not
+        # blanket manage-units rights.
+        security.polkit.extraConfig = lib.mkIf (allHandoffs != [ ]) ''
+          polkit.addRule(function(action, subject) {
+            if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                subject.user == "${cfg.user}") {
+              var handoffUnits = ${builtins.toJSON (map (h: "${handoffUnit h}.service") allHandoffs)};
+              if (handoffUnits.indexOf(action.lookup("unit")) !== -1) {
+                return polkit.Result.YES;
+              }
+            }
+          });
+        '';
+
         # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. Duplicated here
         # (rather than relying on kiosk.nix's copy) because kiosk is forced
-        # off above -- used by mkHandoff's VT switch to/from RetroArch.
+        # off above. The handoff no longer switches VTs, but leaving this in
+        # place keeps a manual escape hatch to a console.
         security.wrappers.chvt = {
           source = "${pkgs.kbd}/bin/chvt";
           capabilities = "cap_sys_tty_config+ep";
@@ -215,6 +285,7 @@
             PAMName = "kodi";
           };
         };
-      };
+        }
+      ]);
     };
 }
