@@ -155,7 +155,9 @@ in
       )
       ./_users
       ./_hardware-configuration.nix
-      {
+      (
+        { pkgs, ... }:
+        {
         modules = {
           profiles.rpi.enable = true;
           gaming.retroarch.enable = true;
@@ -172,8 +174,36 @@ in
           # without this a connected gamepad does nothing in the Kodi UI
           # even though the kernel exposes it fine as /dev/input/js0.
           gaming.kodiLauncher.package =
-            inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm.withPackages
-              (p: [ p.joystick ]);
+            inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm.withPackages (
+              p: [
+                p.joystick
+
+                # Bluetooth pairing from inside Kodi. This is the only place
+                # it can live and still be usable from the couch: Kodi routes
+                # joystick input into its own UI, so a controller can drive
+                # it -- which a TUI like bluetuith fundamentally cannot
+                # receive, since a gamepad emits joystick events, not keys.
+                # It talks to bluez over D-Bus and implements Secure Simple
+                # Pairing (confirmation / passkey / PIN), so each device is
+                # confirmed on screen rather than leaving the adapter open to
+                # anything in range.
+                (p.buildKodiAddon {
+                  pname = "bluetooth-manager";
+                  namespace = "script.bluetooth.man";
+                  version = "1.0.6";
+                  src = pkgs.fetchFromGitHub {
+                    owner = "wastis";
+                    repo = "BluetoothManager";
+                    # 1.0.6 is untagged -- the tag list stops at v1.0.5, but
+                    # this commit's addon.xml declares 1.0.6 and carries the
+                    # SSP handlers (RequestConfirmation / RequestPasskey /
+                    # DisplayPinCode) that the older tags lack.
+                    rev = "3d2a31727bedecbbaa1b3dcd606390b006b7ca3a";
+                    hash = "sha256-hWNi2hm5FmkRPamxMSHF3WfQ+2V+qQzkkTJWuqazbAc=";
+                  };
+                })
+              ]
+            );
           system = {
             configuration.enable = true;
             internationalization.enable = true;
@@ -189,7 +219,8 @@ in
             virtualization.enable = true;
           };
         };
-      }
+        }
+      )
     ];
   };
 }
