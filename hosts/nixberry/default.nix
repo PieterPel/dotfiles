@@ -114,6 +114,45 @@ in
           })
         ];
       }
+      (
+        { pkgs, lib, ... }:
+        let
+          # Both managers are TUIs, so each needs a compositor and a terminal
+          # to live in: cage supplies the compositor (and, through the handoff
+          # unit, the GPU -- see kodi.nix), foot hosts the TUI.
+          tui =
+            name:
+            "${lib.getExe' pkgs.cage "cage"} -- ${lib.getExe' pkgs.foot "foot"} ${
+              lib.getExe' pkgs.${name} name
+            }";
+        in
+        {
+          # The Bluetooth stack simply wasn't installed -- bluetooth.service
+          # was `not-found`, even though the adapter (hci0), its firmware and
+          # the kernel modules were all present and unblocked.
+          hardware.bluetooth = {
+            enable = true;
+            powerOnBoot = true;
+          };
+
+          # Manage Bluetooth and Wi-Fi from the couch rather than over SSH.
+          # Driven by the Pi 400's built-in keyboard. Selecting one stops Kodi
+          # (which is what frees the GPU) and Kodi returns when you quit.
+          # impala drives iwd, which is already the running daemon here (it
+          # comes from nixos-raspberrypi's base config), so it manages the
+          # same state as `iwctl` -- including the PSKs under /var/lib/iwd.
+          modules.gaming.kodiLauncher.apps = [
+            {
+              name = "Bluetooth";
+              command = tui "bluetuith";
+            }
+            {
+              name = "Wi-Fi";
+              command = tui "impala";
+            }
+          ];
+        }
+      )
       ./_users
       ./_hardware-configuration.nix
       {
