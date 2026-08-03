@@ -45,7 +45,6 @@
             "notion-calendar"
             "bitwarden"
             "slack"
-            "microsoft-teams"
 
             # Empty package trick (broken on nixpkgs)
             "ghostty"
