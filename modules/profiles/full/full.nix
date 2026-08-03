@@ -79,13 +79,10 @@ let
         yazi = defaultEnable;
         sesh = defaultEnable;
         zoxide = defaultEnable;
-        gh-dash = defaultEnable;
         lazygit = defaultEnable;
         zellij-forgot = defaultEnable;
-        jjui = defaultEnable;
         nvim-popup = defaultEnable;
         git-session-layout = defaultEnable;
-        jujutsu = defaultEnable;
         delta = defaultEnable;
         werkboom = defaultEnable;
       };
