@@ -116,16 +116,6 @@ in
       }
       (
         { pkgs, lib, ... }:
-        let
-          # Both managers are TUIs, so each needs a compositor and a terminal
-          # to live in: cage supplies the compositor (and, through the handoff
-          # unit, the GPU -- see kodi.nix), foot hosts the TUI.
-          tui =
-            name:
-            "${lib.getExe' pkgs.cage "cage"} -- ${lib.getExe' pkgs.foot "foot"} ${
-              lib.getExe' pkgs.${name} name
-            }";
-        in
         {
           # The Bluetooth stack simply wasn't installed -- bluetooth.service
           # was `not-found`, even though the adapter (hci0), its firmware and
@@ -135,20 +125,26 @@ in
             powerOnBoot = true;
           };
 
-          # Manage Bluetooth and Wi-Fi from the couch rather than over SSH.
-          # Driven by the Pi 400's built-in keyboard. Selecting one stops Kodi
-          # (which is what frees the GPU) and Kodi returns when you quit.
-          # impala drives iwd, which is already the running daemon here (it
-          # comes from nixos-raspberrypi's base config), so it manages the
-          # same state as `iwctl` -- including the PSKs under /var/lib/iwd.
+          # No Bluetooth tile: pairing lives in the Kodi addon (see
+          # kodiLauncher.package). A tile launching a TUI was useless from the
+          # couch -- a gamepad emits joystick events and a TUI reads keys, so
+          # the controller did nothing in it. Kodi routes joystick input into
+          # its own UI, which is why the addon works and the tile didn't.
+          #
+          # Wi-Fi stays a TUI for now, so it needs the Pi 400's built-in
+          # keyboard. impala drives iwd, the daemon already running here (from
+          # nixos-raspberrypi's base config), so it manages the same state as
+          # `iwctl`, including the PSKs under /var/lib/iwd. Replaceable by a
+          # Kodi addon later: plugin.program.wifi drives nmcli, which would
+          # mean running NetworkManager with iwd as its backend.
           modules.gaming.kodiLauncher.apps = [
             {
-              name = "Bluetooth";
-              command = tui "bluetuith";
-            }
-            {
               name = "Wi-Fi";
-              command = tui "impala";
+              # cage supplies the compositor (and, through the handoff unit,
+              # the GPU -- see kodi.nix); foot hosts the TUI.
+              command = "${lib.getExe' pkgs.cage "cage"} -- ${lib.getExe' pkgs.foot "foot"} ${
+                lib.getExe' pkgs.impala "impala"
+              }";
             }
           ];
         }
