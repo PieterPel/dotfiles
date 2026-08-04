@@ -45,13 +45,25 @@
             ''cheevos_enable = "true"''
             ''cheevos_username = "${cfg.retroachievements.username}"''
           ]
+          ++ lib.concatLists (
+            lib.imap1 (i: device: [
+              ''input_player${toString i}_reserved_device = "${device}"''
+              # 1 = "preferred": the named pad takes this port whenever it is
+              # connected, but the port still accepts another pad when it is
+              # not. 2 would be "reserved", leaving the port dead unless that
+              # exact pad is on -- wrong here, since either controller should
+              # work on its own.
+              ''input_player${toString i}_device_reservation_type = "1"''
+            ]) cfg.playerDevices
+          )
         )
       );
       hasOverrides =
         cfg.saveDir != null
         || cfg.stateDir != null
         || cfg.colorTheme != null
-        || cfg.retroachievements.enable;
+        || cfg.retroachievements.enable
+        || cfg.playerDevices != [ ];
       appendConfigPaths =
         lib.optional hasOverrides "${overrideCfg}"
         ++ cfg.extraAppendConfigs;
@@ -123,6 +135,30 @@
               0 = Default (dark), 1 = Basic White, 2 = Dracula (purple),
               3 = Nord, 4 = Gruvbox Dark, 5 = Boysenberry.
             Null leaves the setting at RetroArch's default.
+          '';
+        };
+
+        playerDevices = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [
+            "8Bitdo SN30 Pro"
+            "Microsoft X-Box One pad"
+          ];
+          description = ''
+            Controller names, in player-port order: the first entry becomes
+            player 1, the second player 2, and so on.
+
+            Without this, RetroArch assigns ports by device *index* -- purely
+            enumeration order -- so which pad is player 1 depends on which one
+            happened to connect first. A wired pad present at boot and a
+            Bluetooth pad that associates seconds later will usually land in a
+            stable order, but not reliably, and powering them on in a fixed
+            sequence is a miserable way to control it.
+
+            Names must match the kernel's device name exactly; read them from
+            `/proc/bus/input/devices` (the `N: Name=` field) or from
+            RetroArch's own Port Controls screen.
           '';
         };
 
