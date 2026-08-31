@@ -38,9 +38,19 @@ in
               enable = true;
               package = pkgs.lix;
 
-              settings.trusted-users = [
-                "pieterpel"
-              ];
+              settings = {
+                trusted-users = [
+                  "pieterpel"
+                ];
+
+                # `mightyiam/files` uses `|>` in its module definitions, so the
+                # evaluating Nix needs pipe operators. determinate.nix sets this
+                # for Determinate hosts, but this host excludes that module (see
+                # above), so it has to be set here or every rebuild dies with
+                # "Pipe operator is disabled". Lix spells the feature singular;
+                # Determinate/CppNix wants `pipe-operators`.
+                experimental-features = [ "pipe-operator" ];
+              };
             };
 
             modules = {
