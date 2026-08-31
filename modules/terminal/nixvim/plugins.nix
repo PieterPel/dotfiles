@@ -5,8 +5,26 @@
     , pkgs
     , ...
     }:
+    let
+      cfg = config.modules.terminal.nixvim;
+
+      # Pinned so a fresh machine gets a working plugin with no clone.
+      # Override per-host with modules.terminal.nixvim.harntDevPath when
+      # actually developing it.
+      harnt-nvim = pkgs.vimUtils.buildVimPlugin {
+        pname = "harnt-nvim";
+        version = "2026-08-03";
+        src = pkgs.fetchFromGitHub {
+          owner = "PieterPel";
+          repo = "harnt.nvim";
+          # v0.1.1 plus a flake-only follows fix
+          rev = "f3e1301a550d8b4e8f5d90872fbbb357ae648d04";
+          hash = "sha256-pU9X9cUoXensmy+H0WpUerljsN2aw4Gm3vEh4NwuoaA=";
+        };
+      };
+    in
     {
-      config = lib.mkIf config.modules.terminal.nixvim.enable {
+      config = lib.mkIf cfg.enable {
         home.packages = [
           pkgs.ruff
           pkgs.prettierd
@@ -599,7 +617,9 @@
                 hash = "sha256-2kvs9HgNcLy7ym2C2XZRv3Qa2ttNLdpa9l7oRYy8KLQ=";
               };
             })
-          ];
+          ]
+          # Dev mode puts the checkout on the rtp instead; see extraConfigLua.
+          ++ lib.optional (cfg.harntDevPath == null) harnt-nvim;
 
           autoCmd = [
             {
@@ -661,16 +681,14 @@
               },
             })
 
-            -- DEV MODE: harnt.nvim isn't packaged via Nix yet, so edits to the
-            -- local checkout show up after just restarting nvim (no
-            -- home-manager switch needed). Once it stabilizes, replace this
-            -- with a pinned vimUtils.buildVimPlugin + fetchFromGitHub entry
-            -- in extraPlugins, like venv-selector/claudecode above.
-            local harnt_dev_path = os.getenv("HOME") .. "/home/private-projects/harnt.nvim"
-            if vim.fn.isdirectory(harnt_dev_path) == 1 then
-              vim.opt.rtp:prepend(harnt_dev_path)
-              require("harnt").setup({})
-            end
+            -- harnt.nvim ships as a pinned extraPlugins entry, so it's on the
+            -- rtp already. Setting modules.terminal.nixvim.harntDevPath swaps
+            -- that entry for the checkout below, so edits to the plugin apply
+            -- on restart without a home-manager switch.
+            ${lib.optionalString (cfg.harntDevPath != null) ''
+              vim.opt.rtp:prepend("${cfg.harntDevPath}")
+            ''}
+            require("harnt").setup({})
 
             -- Atlas has no cwd fallback: reviewing a PR checks out its
             -- branch, so it needs to know where every repo lives on disk,

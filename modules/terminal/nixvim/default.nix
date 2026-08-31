@@ -4,6 +4,20 @@ flakeArgs: {
     {
       options.modules.terminal.nixvim = {
         enable = lib.mkEnableOption "Enable nixvim configuration.";
+
+        harntDevPath = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          example = "/Users/pieterpel/home/private-projects/harnt.nvim";
+          description = ''
+            Load harnt.nvim from this local checkout instead of the pinned
+            release in extraPlugins. Only for hacking on the plugin itself:
+            edits apply on nvim restart with no home-manager switch.
+
+            Leave null everywhere else. Nix doesn't manage the checkout, so a
+            host that sets this and then loses the directory gets no plugin.
+          '';
+        };
       };
       imports = [
         flakeArgs.inputs.nixvim.homeModules.nixvim
