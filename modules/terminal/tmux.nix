@@ -112,52 +112,11 @@
 
       gitStatus = lib.getExe' gitStatusScript "tmux-git-status";
 
+      # Session numbering + current-session highlight only. Claude/Codex state
+      # is reported by tmux-agent-status off hooks now, so this no longer walks
+      # the process tree -- which is what made it cost ~250ms per redraw.
       sessionStatusScript = pkgs.writeShellScriptBin "tmux-session-status" ''
         set -euo pipefail
-
-        # Build pid->ppid table in one ps call instead of one subprocess per lookup
-        declare -A ppid_map
-        while read -r pid ppid; do
-          ppid_map[$pid]=$ppid
-        done < <(ps -eo pid=,ppid= 2>/dev/null)
-
-        find_claude_status() {
-          local pane_pid="$1"
-          for sf in "$HOME/.claude/sessions/"*.json; do
-            [ -f "$sf" ] || continue
-            local claude_pid cur depth
-            claude_pid=$(basename "$sf" .json)
-            cur="$claude_pid" depth=0
-            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
-              if [ "$cur" = "$pane_pid" ]; then
-                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
-                return
-              fi
-              cur="''${ppid_map[$cur]:-}"
-              depth=$((depth + 1))
-            done
-          done
-          echo ""
-        }
-
-        claude_badge() {
-          local session="$1" seg_fg="$2"
-          local busy=0 idle=0 waiting=0
-          while IFS= read -r pane_pid; do
-            case "$(find_claude_status "$pane_pid")" in
-              busy)    busy=$((busy + 1)) ;;
-              idle)    idle=$((idle + 1)) ;;
-              waiting) waiting=$((waiting + 1)) ;;
-            esac
-          done < <(tmux list-panes -s -t "$session" -F '#{pane_pid}' 2>/dev/null)
-          if [ "$busy" -gt 0 ]; then
-            printf ' #[fg=#a6e3a1]●%s#[fg=%s]' "$busy" "$seg_fg"
-          elif [ "$waiting" -gt 0 ]; then
-            printf ' #[fg=#f38ba8]●%s#[fg=%s]' "$waiting" "$seg_fg"
-          elif [ "$idle" -gt 0 ]; then
-            printf ' #[fg=#585b70]○%s#[fg=%s]' "$idle" "$seg_fg"
-          fi
-        }
 
         sessions=($(tmux list-sessions -F '#S' 2>/dev/null))
         current="''${TMUX_SESSION_OVERRIDE:-$(tmux display-message -p '#S')}"
@@ -178,8 +137,7 @@
             seg_bold="nobold"
           fi
 
-          badge=$(claude_badge "$s" "$seg_fg")
-          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $num $s$badge "
+          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $num $s "
 
           next_i=$((i + 1))
           if [ "$next_i" -lt "$count" ]; then
@@ -200,57 +158,6 @@
 
       sessionStatus = lib.getExe' sessionStatusScript "tmux-session-status";
 
-      # Receives a window_id (@N), checks all panes in that window so the status
-      # is visible regardless of which pane is currently focused.
-      claudeStatusScript = pkgs.writeShellScriptBin "tmux-claude-status" ''
-        set -euo pipefail
-
-        declare -A ppid_map
-        while read -r pid ppid; do
-          ppid_map[$pid]=$ppid
-        done < <(ps -eo pid=,ppid= 2>/dev/null)
-
-        find_claude_status() {
-          local pane_pid="$1"
-          for sf in "$HOME/.claude/sessions/"*.json; do
-            [ -f "$sf" ] || continue
-            local claude_pid cur depth
-            claude_pid=$(basename "$sf" .json)
-            cur="$claude_pid" depth=0
-            while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$depth" -lt 8 ]; do
-              if [ "$cur" = "$pane_pid" ]; then
-                ${pkgs.jq}/bin/jq -r '.status // ""' "$sf" 2>/dev/null
-                return
-              fi
-              cur="''${ppid_map[$cur]:-}"
-              depth=$((depth + 1))
-            done
-          done
-          echo ""
-        }
-
-        window_id="''${1:-}"
-        busy=0 waiting=0 idle=0
-
-        while IFS= read -r pane_pid; do
-          case "$(find_claude_status "$pane_pid")" in
-            busy)    busy=$((busy + 1)) ;;
-            waiting) waiting=$((waiting + 1)) ;;
-            idle)    idle=$((idle + 1)) ;;
-          esac
-        done < <(tmux list-panes -t "$window_id" -F '#{pane_pid}' 2>/dev/null)
-
-        if [ "$busy" -gt 0 ]; then
-          printf '#[fg=#a6e3a1]● '
-        elif [ "$waiting" -gt 0 ]; then
-          printf '#[fg=#f38ba8]● '
-        elif [ "$idle" -gt 0 ]; then
-          printf '#[fg=#585b70]○ '
-        fi
-      '';
-
-      claudeStatus = lib.getExe' claudeStatusScript "tmux-claude-status";
-
       sessionSwitchHookScript = pkgs.writeShellScriptBin "tmux-session-switch-hook" ''
         session="''${1:-}"
         bar=$(TMUX_SESSION_OVERRIDE="$session" ${sessionStatus} 2>/dev/null)
@@ -260,31 +167,80 @@
 
       sessionSwitchHook = lib.getExe' sessionSwitchHookScript "tmux-session-switch-hook";
 
-      agentSidebarSrc = pkgs.fetchFromGitHub {
-        owner = "hiroppy";
-        repo = "tmux-agent-sidebar";
-        rev = "ae45bbae16f44c0b229913eef995065ad9969fe0";
-        hash = "sha256-ZAjTaAWq7guImUD+7td88dUBQeSerVzRF7m2okdVR3w=";
-      };
-
-      agentSidebarBin = pkgs.rustPlatform.buildRustPackage {
-        pname = "tmux-agent-sidebar";
-        version = "0.13.0";
-        src = agentSidebarSrc;
-        cargoHash = "sha256-OerkrbT2O0ga47f9rIURWrLoiODGwuRgjLiG7VcbZ+c=";
-        nativeBuildInputs = [ pkgs.pkg-config ];
-        buildInputs = lib.optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
-        doCheck = false; # two git-detection tests fail in the nix sandbox
-      };
-
-      agentSidebarPlugin = pkgs.tmuxPlugins.mkTmuxPlugin {
-        pluginName = "tmux-agent-sidebar";
-        version = "0.13.0";
-        src = agentSidebarSrc;
-        rtpFilePath = "tmux-agent-sidebar.tmux";
+      # Upstream ships no .claude-plugin manifest (its README tells you to
+      # hand-edit ~/.claude/settings.json, which is a read-only store symlink
+      # here). We synthesise one in postInstall so the hooks register through
+      # programs.claude-code.plugins instead -- zellij.nix already owns
+      # settings.hooks, and a second definition of those keys would conflict.
+      agentStatusPlugin = pkgs.tmuxPlugins.mkTmuxPlugin {
+        pluginName = "tmux-agent-status";
+        version = "unstable-2026-07-31";
+        src = pkgs.fetchFromGitHub {
+          owner = "samleeney";
+          repo = "tmux-agent-status";
+          rev = "a323f10eedabc499fc1c8d4e1c73a564c6e3ae70";
+          hash = "sha256-JMZt88rZkvLYRXZriWDeY1wZtqD8t/wawcIG62nm9X4=";
+        };
+        rtpFilePath = "tmux-agent-status.tmux";
+        nativeBuildInputs = [ pkgs.makeWrapper ];
         postInstall = ''
-          install -Dm755 ${agentSidebarBin}/bin/tmux-agent-sidebar \
-            $out/share/tmux-plugins/tmux-agent-sidebar/bin/tmux-agent-sidebar
+          dir=$out/share/tmux-plugins/tmux-agent-status
+
+          # Some scripts ship non-executable and patchShebangs skips those, so
+          # chmod first. macOS /bin/bash is 3.2 and the plugin needs >= 4; with
+          # no Homebrew bash on this machine its own lookup would just fail.
+          chmod +x $dir/tmux-agent-status.tmux $dir/scripts/*.sh $dir/hooks/*.sh
+          patchShebangs $dir/tmux-agent-status.tmux $dir/scripts $dir/hooks
+
+          # scripts/lib/*.sh are sourced, not executed -- wrapping them would
+          # break the `source` calls, so only wrap what gets invoked directly.
+          for f in $dir/tmux-agent-status.tmux $dir/scripts/*.sh $dir/hooks/*.sh; do
+            [ -f "$f" ] || continue
+            wrapProgram "$f" --prefix PATH : ${
+              lib.makeBinPath [
+                pkgs.bashInteractive
+                pkgs.tmux
+                pkgs.jq
+                pkgs.fzf
+                pkgs.gnused
+                pkgs.gawk
+                pkgs.coreutils
+              ]
+            }
+          done
+
+          mkdir -p $dir/.claude-plugin
+          cat > $dir/.claude-plugin/plugin.json <<'EOF'
+          ${builtins.toJSON {
+            name = "tmux-agent-status";
+            version = "0.1.0";
+            description = "Report Claude Code agent state to the tmux-agent-status status line and sidebar";
+            repository = "https://github.com/samleeney/tmux-agent-status";
+          }}
+          EOF
+
+          cat > $dir/hooks/hooks.json <<'EOF'
+          ${builtins.toJSON {
+            hooks = lib.genAttrs
+              [
+                "UserPromptSubmit"
+                "PreToolUse"
+                "Stop"
+                "Notification"
+              ]
+              (event: [
+                {
+                  matcher = "";
+                  hooks = [
+                    {
+                      type = "command";
+                      command = ''"''${CLAUDE_PLUGIN_ROOT}/hooks/better-hook.sh" ${event}'';
+                    }
+                  ];
+                }
+              ]);
+          }}
+          EOF
         '';
       };
 
@@ -302,16 +258,6 @@
 
       sessionSwitchTo = lib.getExe' sessionSwitchToScript "tmux-session-switch-to";
 
-      # Runs every status-interval as a #() side effect: updates @session_status_bar
-      # without touching the display (returns ""). Keeps badges live between switches.
-      sessionLiveUpdaterScript = pkgs.writeShellScriptBin "tmux-session-live-updater" ''
-        current=$(tmux display-message -p '#S' 2>/dev/null) || exit 0
-        [ -z "$current" ] && exit 0
-        bar=$(TMUX_SESSION_OVERRIDE="$current" ${sessionStatus} 2>/dev/null) || exit 0
-        tmux set-option -gq @session_status_bar "$bar" 2>/dev/null || true
-      '';
-
-      sessionLiveUpdater = lib.getExe' sessionLiveUpdaterScript "tmux-session-live-updater";
     in
     {
       options.modules.terminal.tmux = {
@@ -319,15 +265,17 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # Enable the tmux-agent-sidebar Claude Code plugin declaratively. The
+        # Enable the tmux-agent-status Claude Code plugin declaratively. The
         # home-manager module turns each entry into a `--plugin-dir` wrapper
         # arg, so Claude loads the plugin's hooks/hooks.json (which report each
-        # session to the sidebar) without writing to the read-only settings.json.
-        # The dir must be the one holding .claude-plugin/plugin.json; the plugin's
-        # own bin/ resolves the binary via CLAUDE_PLUGIN_ROOT, so no PATH entry.
-        programs.claude-code.plugins = [
-          "${agentSidebarPlugin}/share/tmux-plugins/tmux-agent-sidebar"
-        ];
+        # session's state) without writing to the read-only settings.json.
+        # The dir must be the one holding .claude-plugin/plugin.json; the hooks
+        # resolve their own paths via CLAUDE_PLUGIN_ROOT, so no PATH entry.
+        # Attrset rather than a list: home-manager derives the plugin directory
+        # name from the key, so this stays `tmux-agent-status` instead of a
+        # store hash. (A list here also warns.)
+        programs.claude-code.plugins.tmux-agent-status =
+          "${agentStatusPlugin}/share/tmux-plugins/tmux-agent-status";
 
         programs.tmux = {
           enable = true;
@@ -342,15 +290,26 @@
             continuum
             resurrect
             yank
-            agentSidebarPlugin
+            {
+              plugin = agentStatusPlugin;
+              # Defaults collide with four existing binds: o (tmux-promote),
+              # p (previous-window), N (switch-client -n), W (choose-tree).
+              extraConfig = ''
+                set -g @agent-status-key 'S'
+                set -g @agent-sidebar-key 'b'
+                set -g @agent-park-key 'K'
+                set -g @agent-next-done-key 'J'
+                set -g @agent-wait-key 'Z'
+                set -g @agent-sidebar-width '42'
+                set -g @agent-switcher-default-mode 'tree'
+              '';
+            }
             {
               plugin = catppuccin;
               extraConfig = ''
                 set -g @catppuccin_flavor 'mocha'
                 set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
-                set -g @catppuccin_window_current_text '#(${claudeStatus} #{window_id})#W'
-                set -g @catppuccin_window_text '#(${claudeStatus} #{window_id})#W'
               '';
             }
             {
@@ -394,7 +353,11 @@
               #   format[1] (top):    session list with numbers and Claude badges
               set -g status 2
               set -g status-left ""
-              set -g status-right "#(${gitStatus} \"#{pane_current_path}\")"
+              # The agent summary must contain the literal "status-line.sh" --
+              # the plugin greps status-right for it and only auto-appends when
+              # absent, so placing it here keeps ordering ours and avoids a
+              # duplicate being tacked on the end.
+              set -g status-right "#(${agentStatusPlugin}/share/tmux-plugins/tmux-agent-status/scripts/status-line.sh) #(${gitStatus} \"#{pane_current_path}\")"
               set -g status-right-length 150
 
               # Override catppuccin's mauve accent to Rebels purple
@@ -403,16 +366,20 @@
               # format[0] (bottom): window tabs; tmux 3.6 default is empty so set explicitly
               set -g status-format[0] "#[align=left range=left]#{E:status-left}#[norange default]#[list=on align=#{status-justify}]#[list=left-marker]<#[list=right-marker]>#[list=on]#{W:#[range=window|#{window_id} #{E:window-status-style}]#[push-default]#{T:window-status-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}},#[range=window|#{window_id} list=focus #{?#{!=:#{E:window-status-current-style},default},#{E:window-status-current-style},#{E:window-status-style}}]#[push-default]#{T:window-status-current-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}}}#[nolist align=right range=right]#{E:status-right}#[norange default]"
 
-              # format[1] (top): session list — read from a tmux variable updated synchronously
-              # by the hook, so session switches never show a stale/wrong highlight
-              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}#(${sessionLiveUpdater})"
+              # format[1] (top): session list — pure tmux variable, no #() at all.
+              # It only shows session names/numbers now, which change on
+              # create/rename/close, so the hooks below cover every case and
+              # nothing needs to run per status-interval.
+              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}"
 
               # Initialize on startup/reload
               run-shell 'tmux set-option -gq @session_status_bar "$(${sessionStatus} 2>/dev/null)"'
 
-              # Update on session switch and on new session creation
+              # Update on session switch, creation, rename and close
               set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
               set-hook -g after-new-session 'run-shell "${sessionSwitchHook} #{session_name}"'
+              set-hook -g after-rename-session 'run-shell "${sessionSwitchHook} #{session_name}"'
+              set-hook -g session-closed 'run-shell "${sessionSwitchHook}"'
               set-hook -ga after-new-session 'send-keys "nvim" Enter'
 
               # Jump to session N with Prefix+Shift+N (1-9)
