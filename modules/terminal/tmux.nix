@@ -392,8 +392,8 @@
               #
               # Colours come from @thm_* rather than hardcoded hexes, so the row
               # follows the theme instead of drifting from it.
-              set -g @session_seg_cur '#[fg=#{E:@thm_crust},bg=#{E:@thm_mauve},bold] #{s|\$||:session_id} #{session_name} #[fg=#{E:@thm_mauve},bg=#{E:@thm_bg},nobold]#[default]'
-              set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}] #{s|\$||:session_id} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
+              set -g @session_seg_cur '#[fg=#{E:@thm_crust},bg=#{E:@thm_mauve},bold] #{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_mauve},bg=#{E:@thm_bg},nobold]#[default]'
+              set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}] #{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
               set -g status-format[1] "#[bg=#{E:@thm_bg}]#{S:#{?#{==:#{session_name},#{client_session}},#{E:@session_seg_cur},#{E:@session_seg_alt}} }"
 
               # Nothing fires when Claude exits -- better-hook.sh only handles
@@ -403,28 +403,18 @@
 
               set-hook -ga after-new-session 'send-keys "nvim" Enter'
 
-              # Jump to a session by the number shown in the row. That number is
-              # the session id, not a position, so what you see is always what
-              # you press -- unlike a positional index, which silently remaps
-              # every other session when one is killed.
-              bind '!' switch-client -t '$1'
-              bind '@' switch-client -t '$2'
-              bind '#' switch-client -t '$3'
-              bind '$' switch-client -t '$4'
-              bind '%' switch-client -t '$5'
-              bind '^' switch-client -t '$6'
-              bind '&' switch-client -t '$7'
-              bind '*' switch-client -t '$8'
-              bind '(' switch-client -t '$9'
-
-              # Not bound to $0. Session ids start at $0 only on a *fresh*
-              # server and are never recycled, so once $0 is killed there is no
-              # $0 again until the next reboot -- and with continuum restoring
-              # on boot you do not control which session gets it anyway. Bind
-              # this slot to a home session by name instead: -A attaches when it
-              # exists and creates it at ~ when it does not, so the key always
-              # lands somewhere sensible whatever number it happens to carry.
-              bind ')' new-session -A -s home -c '${config.home.homeDirectory}'
+              # Jump by the number shown in the row. Displayed number is
+              # the session id plus one, so the first session reads 1 and is
+              # reachable on shift-1 rather than shift-0 way off on the right.
+              bind '!' switch-client -t '$0'
+              bind '@' switch-client -t '$1'
+              bind '#' switch-client -t '$2'
+              bind '$' switch-client -t '$3'
+              bind '%' switch-client -t '$4'
+              bind '^' switch-client -t '$5'
+              bind '&' switch-client -t '$6'
+              bind '*' switch-client -t '$7'
+              bind '(' switch-client -t '$8'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
