@@ -112,61 +112,6 @@
 
       gitStatus = lib.getExe' gitStatusScript "tmux-git-status";
 
-      # Session numbering + current-session highlight only. Claude/Codex state
-      # is reported by tmux-agent-status off hooks now, so this no longer walks
-      # the process tree -- which is what made it cost ~250ms per redraw.
-      sessionStatusScript = pkgs.writeShellScriptBin "tmux-session-status" ''
-        set -euo pipefail
-
-        sessions=($(tmux list-sessions -F '#S' 2>/dev/null))
-        current="''${TMUX_SESSION_OVERRIDE:-$(tmux display-message -p '#S')}"
-        count=''${#sessions[@]}
-        output=""
-
-        for i in "''${!sessions[@]}"; do
-          s="''${sessions[$i]}"
-          num=$((i + 1))
-
-          if [ "$s" = "$current" ]; then
-            seg_bg="#6A18D1"
-            seg_fg="#ffffff"
-            seg_bold="bold"
-          else
-            seg_bg="#313244"
-            seg_fg="#bac2de"
-            seg_bold="nobold"
-          fi
-
-          output+="#[fg=$seg_fg,bg=$seg_bg,$seg_bold] $num $s "
-
-          next_i=$((i + 1))
-          if [ "$next_i" -lt "$count" ]; then
-            next_s="''${sessions[$next_i]}"
-            if [ "$next_s" = "$current" ]; then
-              next_bg="#6A18D1"
-            else
-              next_bg="#313244"
-            fi
-          else
-            next_bg="#1e1e2e"
-          fi
-          output+="#[fg=$seg_bg,bg=$next_bg,nobold]"
-        done
-
-        echo "$output"
-      '';
-
-      sessionStatus = lib.getExe' sessionStatusScript "tmux-session-status";
-
-      sessionSwitchHookScript = pkgs.writeShellScriptBin "tmux-session-switch-hook" ''
-        session="''${1:-}"
-        bar=$(TMUX_SESSION_OVERRIDE="$session" ${sessionStatus} 2>/dev/null)
-        tmux set-option -gq @session_status_bar "$bar"
-        tmux refresh-client -S
-      '';
-
-      sessionSwitchHook = lib.getExe' sessionSwitchHookScript "tmux-session-switch-hook";
-
       # Upstream ships no .claude-plugin manifest (its README tells you to
       # hand-edit ~/.claude/settings.json, which is a read-only store symlink
       # here). We synthesise one in postInstall so the hooks register through
@@ -308,20 +253,6 @@
         '';
       };
 
-      # Precomputes the status with the target session highlighted BEFORE switching,
-      # so the variable is ready the instant tmux redraws. No #() async lag.
-      sessionSwitchToScript = pkgs.writeShellScriptBin "tmux-session-switch-to" ''
-        n="''${1:-}"
-        target=$(tmux list-sessions -F '#S' | sed -n "''${n}p")
-        [ -z "$target" ] && exit 0
-        bar=$(TMUX_SESSION_OVERRIDE="$target" ${sessionStatus} 2>/dev/null)
-        tmux set-option -gq @session_status_bar "$bar"
-        tmux switch-client -t "$target"
-        tmux refresh-client -S
-      '';
-
-      sessionSwitchTo = lib.getExe' sessionSwitchToScript "tmux-session-switch-to";
-
     in
     {
       options.modules.terminal.tmux = {
@@ -443,37 +374,49 @@
               # format[0] (bottom): window tabs; tmux 3.6 default is empty so set explicitly
               set -g status-format[0] "#[align=left range=left]#{E:status-left}#[norange default]#[list=on align=#{status-justify}]#[list=left-marker]<#[list=right-marker]>#[list=on]#{W:#[range=window|#{window_id} #{E:window-status-style}]#[push-default]#{T:window-status-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}},#[range=window|#{window_id} list=focus #{?#{!=:#{E:window-status-current-style},default},#{E:window-status-current-style},#{E:window-status-style}}]#[push-default]#{T:window-status-current-format}#[pop-default]#[norange default]#{?window_end_flag,,#{window-status-separator}}}#[nolist align=right range=right]#{E:status-right}#[norange default]"
 
-              # format[1] (top): session list — pure tmux variable, no #() at all.
-              # It only shows session names/numbers now, which change on
-              # create/rename/close, so the hooks below cover every case and
-              # nothing needs to run per status-interval.
-              set -g status-format[1] "#[bg=#1e1e2e]#{@session_status_bar}"
-
-              # Initialize on startup/reload
-              run-shell 'tmux set-option -gq @session_status_bar "$(${sessionStatus} 2>/dev/null)"'
+              # format[1] (top): session list, rendered natively with #{S:...}.
+              #
+              # This used to be a bash script whose output was cached in
+              # @session_status_bar and refreshed by five hooks. The script
+              # existed for one reason: it chained the powerline slants, and
+              # drawing a slant that runs into the next segment needs to know
+              # the *next* session's colour -- lookahead a format loop cannot do.
+              #
+              # But catppuccin's own window tabs don't chain either. Each closes
+              # its slant against @thm_bg and is separated by a space
+              # (window-status-separator is " "). Matching that removes the need
+              # for lookahead entirely, so the whole thing collapses to one
+              # format string: no script, no cached variable, no hooks, and
+              # nothing to go stale -- which also fixes the bar being empty
+              # until the first session switch.
+              #
+              # Colours come from @thm_* rather than hardcoded hexes, so the row
+              # follows the theme instead of drifting from it.
+              set -g @session_seg_cur '#[fg=#{E:@thm_crust},bg=#{E:@thm_mauve},bold] #{s|\$||:session_id} #{session_name} #[fg=#{E:@thm_mauve},bg=#{E:@thm_bg},nobold]#[default]'
+              set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}] #{s|\$||:session_id} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
+              set -g status-format[1] "#[bg=#{E:@thm_bg}]#{S:#{?#{==:#{session_name},#{client_session}},#{E:@session_seg_cur},#{E:@session_seg_alt}} }"
 
               # Nothing fires when Claude exits -- better-hook.sh only handles
               # UserPromptSubmit/PreToolUse/Stop/Notification -- so a window
               # would keep its last dot forever. Clear it when the pane dies.
               set-hook -ga pane-exited 'set-option -w -u @claude_status'
 
-              # Update on session switch, creation, rename and close
-              set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
-              set-hook -g after-new-session 'run-shell "${sessionSwitchHook} #{session_name}"'
-              set-hook -g after-rename-session 'run-shell "${sessionSwitchHook} #{session_name}"'
-              set-hook -g session-closed 'run-shell "${sessionSwitchHook}"'
               set-hook -ga after-new-session 'send-keys "nvim" Enter'
 
-              # Jump to session N with Prefix+Shift+N (1-9)
-              bind '!' run-shell '${sessionSwitchTo} 1'
-              bind '@' run-shell '${sessionSwitchTo} 2'
-              bind '#' run-shell '${sessionSwitchTo} 3'
-              bind '$' run-shell '${sessionSwitchTo} 4'
-              bind '%' run-shell '${sessionSwitchTo} 5'
-              bind '^' run-shell '${sessionSwitchTo} 6'
-              bind '&' run-shell '${sessionSwitchTo} 7'
-              bind '*' run-shell '${sessionSwitchTo} 8'
-              bind '(' run-shell '${sessionSwitchTo} 9'
+              # Jump to a session by the number shown in the row. That number is
+              # the session id, not a position, so what you see is always what
+              # you press -- unlike a positional index, which silently remaps
+              # every other session when one is killed.
+              bind '!' switch-client -t '$1'
+              bind '@' switch-client -t '$2'
+              bind '#' switch-client -t '$3'
+              bind '$' switch-client -t '$4'
+              bind '%' switch-client -t '$5'
+              bind '^' switch-client -t '$6'
+              bind '&' switch-client -t '$7'
+              bind '*' switch-client -t '$8'
+              bind '(' switch-client -t '$9'
+              bind ')' switch-client -t '$0'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
