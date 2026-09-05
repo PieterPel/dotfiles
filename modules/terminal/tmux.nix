@@ -293,17 +293,23 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # Enable the tmux-agent-status Claude Code plugin declaratively. The
-        # home-manager module turns each entry into a `--plugin-dir` wrapper
-        # arg, so Claude loads the plugin's hooks/hooks.json (which report each
-        # session's state) without writing to the read-only settings.json.
-        # The dir must be the one holding .claude-plugin/plugin.json; the hooks
-        # resolve their own paths via CLAUDE_PLUGIN_ROOT, so no PATH entry.
-        # Attrset rather than a list: home-manager derives the plugin directory
-        # name from the key, so this stays `tmux-agent-status` instead of a
-        # store hash. (A list here also warns.)
-        programs.claude-code.plugins.tmux-agent-status =
-          "${agentStatusPlugin}/share/tmux-plugins/tmux-agent-status";
+        # Expose the status hook at a stable path, the same way the notify hook
+        # is wired. `programs.claude-code.plugins` does NOT work for this: it
+        # only symlinks the directory into ~/.claude/skills/, and Claude Code
+        # does not read hooks/hooks.json from a skills-directory plugin -- the
+        # generated wrapper carries no --plugin-dir argument at all. Verified by
+        # running a fresh session inside a tmux pane and watching
+        # ~/.cache/tmux-agent-status/panes/ stay empty.
+        #
+        # The consumer is claude-settings.json, which is hand-maintained and so
+        # cannot carry a /nix/store path (it would rot on GC). It references
+        # $HOME/.claude/hooks/tmux-agent-status; nix owns what sits there.
+        home.file.".claude/hooks/tmux-agent-status" = {
+          executable = true;
+          source = pkgs.writeShellScript "tmux-agent-status-hook" ''
+            exec ${agentStatusPlugin}/share/tmux-plugins/tmux-agent-status/hooks/better-hook.sh "$@"
+          '';
+        };
 
         programs.tmux = {
           enable = true;
