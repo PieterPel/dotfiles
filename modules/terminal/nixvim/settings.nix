@@ -193,6 +193,52 @@
               callback = set_mode_linenr_color,
             })
             set_mode_linenr_color()
+
+            -- Legible diff backgrounds.
+            --
+            -- base16-nvim hardcodes its diff backgrounds as an accent blended
+            -- 80-90% of the way toward base00, with no config knob for it
+            -- (lua/base16-colorscheme.lua:227-231). purpledream's base00 is
+            -- #100510, so that blend leaves add/delete/text as near-identical
+            -- dark smudges. Re-blend at a gentler ratio instead. Read from the
+            -- live palette rather than hardcoded hexes so this keeps working if
+            -- the stylix scheme changes.
+            local DIFF_BLEND = 0.4
+
+            local function set_diff_colors()
+              local base16 = package.loaded["base16-colorscheme"]
+              local c = base16 and base16.colors
+              if not (c and c.base00) then
+                return
+              end
+
+              local function rgb(h)
+                return tonumber(h:sub(2, 3), 16), tonumber(h:sub(4, 5), 16), tonumber(h:sub(6, 7), 16)
+              end
+              local br, bg, bb = rgb(c.base00)
+              local function blend(hex, pct)
+                local r, g, b = rgb(hex)
+                return string.format(
+                  "#%02x%02x%02x",
+                  math.floor(r + (br - r) * pct),
+                  math.floor(g + (bg - g) * pct),
+                  math.floor(b + (bb - b) * pct)
+                )
+              end
+
+              vim.api.nvim_set_hl(0, "DiffAdd", { bg = blend(c.base0B, DIFF_BLEND) })
+              vim.api.nvim_set_hl(0, "DiffDelete", { bg = blend(c.base08, DIFF_BLEND) })
+              vim.api.nvim_set_hl(0, "DiffText", { bg = blend(c.base09, DIFF_BLEND) })
+              -- Intra-line added region, brighter so it reads inside DiffAdd.
+              vim.api.nvim_set_hl(0, "DiffTextAdd", { bg = blend(c.base0B, DIFF_BLEND - 0.15) })
+              -- Changed lines stay neutral: base16 uses base01 here, and an
+              -- accent this loud on every changed line drowns out DiffText.
+              vim.api.nvim_set_hl(0, "DiffChange", { bg = c.base02 })
+            end
+            vim.api.nvim_create_autocmd("ColorScheme", {
+              callback = set_diff_colors,
+            })
+            set_diff_colors()
           '';
         };
       };
