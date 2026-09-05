@@ -416,7 +416,15 @@
               bind '&' switch-client -t '$7'
               bind '*' switch-client -t '$8'
               bind '(' switch-client -t '$9'
-              bind ')' switch-client -t '$0'
+
+              # Not bound to $0. Session ids start at $0 only on a *fresh*
+              # server and are never recycled, so once $0 is killed there is no
+              # $0 again until the next reboot -- and with continuum restoring
+              # on boot you do not control which session gets it anyway. Bind
+              # this slot to a home session by name instead: -A attaches when it
+              # exists and creates it at ~ when it does not, so the key always
+              # lands somewhere sensible whatever number it happens to carry.
+              bind ')' new-session -A -s home -c '${config.home.homeDirectory}'
 
             # Allow tmux to handle floating windows correctly
             set -g detach-on-destroy off  # Don't exit tmux when closing a session
