@@ -211,6 +211,20 @@
           sed -i 's|^"\$CURRENT_DIR/scripts/sidebar-collector.sh" &$|"$CURRENT_DIR/scripts/sidebar-collector.sh" >/dev/null 2>\&1 \&|' \
             $dir/tmux-agent-status.tmux
 
+          # ATTRIBUTION FIX. get_tmux_session runs `tmux display-message -p
+          # '#{session_name}'` with no target, which resolves against the
+          # *attached client's* session rather than the pane the hook fired in.
+          # The pane half of the key comes from $TMUX_PANE and is correct, so an
+          # agent in session B reporting while you look at session A writes
+          # A_<pane-of-B>. collect_status_agents then filters panes against that
+          # session's live panes, does not find it, and drops the agent -- hence
+          # both "statuses are wrong" and "agents don't show up". Target the pane
+          # explicitly; fall back to the old behaviour when TMUX_PANE is unset.
+          substituteInPlace $dir/hooks/better-hook.sh \
+            --replace-fail \
+              "tmux display-message -p '#{session_name}' 2>/dev/null" \
+              "tmux display-message ''${TMUX_PANE:+-t \"$TMUX_PANE\"} -p '#{session_name}' 2>/dev/null"
+
           # after-kill-window and after-switch-client are not hook names in tmux
           # 3.7b, so upstream's entrypoint prints "invalid option" twice on every
           # load. Both are redundant -- the sidebar already refreshes on
