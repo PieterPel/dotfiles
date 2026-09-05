@@ -666,10 +666,54 @@
             -- home-manager switch needed). Once it stabilizes, replace this
             -- with a pinned vimUtils.buildVimPlugin + fetchFromGitHub entry
             -- in extraPlugins, like venv-selector/claudecode above.
-            local harnt_dev_path = os.getenv("HOME") .. "/home/private-projects/harnt.nvim"
-            if vim.fn.isdirectory(harnt_dev_path) == 1 then
-              vim.opt.rtp:prepend(harnt_dev_path)
-              require("harnt").setup({})
+            -- Toggled per-shell, so switching checkouts is an nvim restart
+            -- rather than a home-manager switch. Unset keeps the old
+            -- behaviour (the standalone clone), so nothing changes by default:
+            --
+            --   HARNT_DEV=0                   off entirely
+            --   unset / 1                     ~/home/private-projects/harnt.nvim
+            --   HARNT_DEV=transparent-bg      that werkboom worktree
+            --   HARNT_DEV=/abs/path           that path
+            --   HARNT_OPTS='{"diff":{"style":"docked"}}'   merged into setup()
+            local harnt_root = os.getenv("HOME") .. "/home/private-projects"
+            local harnt_dev = os.getenv("HARNT_DEV")
+
+            local function harnt_path()
+              if harnt_dev == "0" or harnt_dev == "off" or harnt_dev == "false" then
+                return nil
+              end
+              if harnt_dev == nil or harnt_dev == "" or harnt_dev == "1" then
+                return harnt_root .. "/harnt.nvim"
+              end
+              if harnt_dev:sub(1, 1) == "/" then
+                return harnt_dev
+              end
+              -- bare name: a werkboom worktree of the harnt.nvim repo. Note
+              -- that is a *different* repo from the standalone clone above.
+              return harnt_root .. "/harnt.nvim.worktrees/" .. harnt_dev
+            end
+
+            local harnt_dev_path = harnt_path()
+            if harnt_dev_path ~= nil then
+              if vim.fn.isdirectory(harnt_dev_path) == 1 then
+                local harnt_opts = {}
+                local raw = os.getenv("HARNT_OPTS")
+                if raw ~= nil and raw ~= "" then
+                  local ok, decoded = pcall(vim.json.decode, raw)
+                  if ok and type(decoded) == "table" then
+                    harnt_opts = decoded
+                  else
+                    vim.notify("HARNT_OPTS is not valid JSON, ignoring: " .. raw, vim.log.levels.WARN)
+                  end
+                end
+                vim.opt.rtp:prepend(harnt_dev_path)
+                require("harnt").setup(harnt_opts)
+              elseif harnt_dev ~= nil and harnt_dev ~= "" then
+                -- Loud only when a checkout was asked for explicitly: a typo'd
+                -- HARNT_DEV otherwise looks exactly like "my edits aren't
+                -- taking effect". An absent default clone stays silent, as before.
+                vim.notify("HARNT_DEV points at a missing directory: " .. harnt_dev_path, vim.log.levels.ERROR)
+              end
             end
 
             -- Atlas has no cwd fallback: reviewing a PR checks out its
