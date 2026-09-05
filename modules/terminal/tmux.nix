@@ -225,6 +225,28 @@
               "tmux display-message -p '#{session_name}' 2>/dev/null" \
               "tmux display-message ''${TMUX_PANE:+-t \"$TMUX_PANE\"} -p '#{session_name}' 2>/dev/null"
 
+          # "NEEDS YOU" FIX. The Notification branch is commented "Claude is
+          # waiting for user input" and then writes "done" -- so an agent
+          # blocked on a permission prompt looks exactly like one that finished
+          # cleanly. Upstream already reads an "ask" state everywhere (INBOX
+          # grouping, summary colour) but nothing ever writes it: every
+          # occurrence of "ask" in the tree is a comparison. Make it real.
+          # sed, not substituteInPlace: nix strips the common indentation from
+          # an indented string, so a multi-line pattern loses the leading
+          # whitespace it needs to match. Address the comment line, then edit
+          # the line after it -- the other `"done"` write (the Stop branch) is
+          # indented differently and must not be touched.
+          sed -i '/# Claude is waiting for user input\./{n;s/"done"/"ask"/;}' \
+            $dir/hooks/better-hook.sh
+          grep -q 'set_status "\$TMUX_SESSION" "ask"' $dir/hooks/better-hook.sh
+
+          # Stamp a window-scoped tmux option alongside the pane file, so the
+          # window tabs can colour themselves from a format string with no
+          # #() shell-out at redraw. Targeting the pane resolves to its window.
+          sed -i '/echo "\$requested_status" > "\$pane_file"/a\        tmux set-option -w -t "$TMUX_PANE" @claude_status "$requested_status" 2>/dev/null || true' \
+            $dir/hooks/better-hook.sh
+          grep -q '@claude_status' $dir/hooks/better-hook.sh
+
           # after-kill-window and after-switch-client are not hook names in tmux
           # 3.7b, so upstream's entrypoint prints "invalid option" twice on every
           # load. Both are redundant -- the sidebar already refreshes on
@@ -354,10 +376,17 @@
             }
             {
               plugin = catppuccin;
+              # The dot reads @claude_status, a window-scoped option the hook
+              # stamps. Pure format expansion -- no #() per window per redraw,
+              # which is what made the old ps+jq badges cost ~360ms/s.
+              #   working (yellow) / ask, needs you (red) / done (green)
               extraConfig = ''
                 set -g @catppuccin_flavor 'mocha'
                 set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
+                set -g @claude_dot "#{?@claude_status,#{?#{==:#{@claude_status},working},#[fg=#f9e2af]● ,#{?#{==:#{@claude_status},ask},#[fg=#f38ba8]● ,#[fg=#a6e3a1]● }},}"
+                set -g @catppuccin_window_current_text '#{E:@claude_dot}#W'
+                set -g @catppuccin_window_text '#{E:@claude_dot}#W'
               '';
             }
             {
@@ -422,6 +451,11 @@
 
               # Initialize on startup/reload
               run-shell 'tmux set-option -gq @session_status_bar "$(${sessionStatus} 2>/dev/null)"'
+
+              # Nothing fires when Claude exits -- better-hook.sh only handles
+              # UserPromptSubmit/PreToolUse/Stop/Notification -- so a window
+              # would keep its last dot forever. Clear it when the pane dies.
+              set-hook -ga pane-exited 'set-option -w -u @claude_status'
 
               # Update on session switch, creation, rename and close
               set-hook -g client-session-changed 'run-shell "${sessionSwitchHook} #{session_name}"'
