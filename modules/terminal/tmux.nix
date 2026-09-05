@@ -192,6 +192,20 @@
             $dir/hooks/better-hook.sh
           grep -q '@claude_status' $dir/hooks/better-hook.sh
 
+          # The session-level rollup (working > wait > done) has no branch for
+          # "ask", so a pane that needs you never propagates to its session.
+          # Override after the loop rather than restructuring it: any pane in
+          # ask makes the session ask, which is the state worth surfacing.
+          sed -i '/^    echo "\$session_status" > "\$status_file"$/i\    grep -qx ask "$PANE_DIR/''${tmux_session}_"*.status 2>/dev/null \&\& session_status=ask' \
+            $dir/hooks/better-hook.sh
+
+          # And stamp it at session scope, so the session row can colour itself
+          # from a format string. Session options resolve per-session inside
+          # #{S:...}, exactly as window options do inside the window format.
+          sed -i '/^    echo "\$session_status" > "\$status_file"$/a\    tmux set-option -t "$tmux_session" @claude_session_status "$session_status" 2>/dev/null || true' \
+            $dir/hooks/better-hook.sh
+          grep -q '@claude_session_status' $dir/hooks/better-hook.sh
+
           # after-kill-window and after-switch-client are not hook names in tmux
           # 3.7b, so upstream's entrypoint prints "invalid option" twice on every
           # load. Both are redundant -- the sidebar already refreshes on
@@ -315,7 +329,7 @@
                 set -g @catppuccin_flavor 'mocha'
                 set -g @catppuccin_status_background '#1e1e2e'
                 set -g @catppuccin_window_status_style 'slanted'
-                set -g @claude_dot "#{?@claude_status,#{?#{==:#{@claude_status},working},#[fg=#f9e2af]● ,#{?#{==:#{@claude_status},ask},#[fg=#f38ba8]● ,#[fg=#a6e3a1]● }},}"
+                set -g @claude_dot "#{?@claude_status,#{?#{==:#{@claude_status},working},#[fg=#{@thm_yellow}]● ,#{?#{==:#{@claude_status},ask},#[fg=#{@thm_red}]● ,#[fg=#{@thm_green}]● }},}"
                 set -g @catppuccin_window_current_text '#{E:@claude_dot}#W'
                 set -g @catppuccin_window_text '#{E:@claude_dot}#W'
               '';
@@ -392,8 +406,9 @@
               #
               # Colours come from @thm_* rather than hardcoded hexes, so the row
               # follows the theme instead of drifting from it.
-              set -g @session_seg_cur '#[fg=#{E:@thm_crust},bg=#{E:@thm_mauve},bold] #{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_mauve},bg=#{E:@thm_bg},nobold]#[default]'
-              set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}] #{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
+              set -g @claude_sdot "#{?@claude_session_status,#{?#{==:#{@claude_session_status},working},#[fg=#{@thm_yellow}]● ,#{?#{==:#{@claude_session_status},ask},#[fg=#{@thm_red}]● ,#[fg=#{@thm_green}]● }},}"
+              set -g @session_seg_cur '#[fg=#{E:@thm_crust},bg=#{E:@thm_mauve},bold]#{E:@claude_sdot}#{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_mauve},bg=#{E:@thm_bg},nobold]#[default]'
+              set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}]#{E:@claude_sdot}#{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
               set -g status-format[1] "#[bg=#{E:@thm_bg}]#{S:#{?#{==:#{session_name},#{client_session}},#{E:@session_seg_cur},#{E:@session_seg_alt}} }"
 
               # Nothing fires when Claude exits -- better-hook.sh only handles
