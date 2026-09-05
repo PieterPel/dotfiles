@@ -192,6 +192,34 @@
           chmod +x $dir/tmux-agent-status.tmux $dir/scripts/*.sh $dir/hooks/*.sh
           patchShebangs $dir/tmux-agent-status.tmux $dir/scripts $dir/hooks
 
+          # HANG FIX. Upstream hooks daemon-monitor.sh onto session-created with
+          # a blocking `run-shell`, and that script ends with `( <infinite
+          # loop> ) &` -- the backgrounded subshell inherits stdout, so tmux
+          # waits on a pipe that never closes and *every new session hangs
+          # forever*. It only shows up when the monitor pid file is missing or
+          # stale (otherwise the script exits early), which makes it a race
+          # rather than a reliable failure. Fix both ends: detach the hook, and
+          # close the inherited fds in the script itself.
+          sed -i "s|run-shell '\$CURRENT_DIR/scripts/daemon-monitor.sh'|run-shell -b '\$CURRENT_DIR/scripts/daemon-monitor.sh'|" \
+            $dir/tmux-agent-status.tmux
+          sed -i 's|^) &$|) >/dev/null 2>\&1 \&|' $dir/scripts/daemon-monitor.sh
+
+          # Same bug one level up: the entrypoint launches the collector with a
+          # bare `&`, and the entrypoint itself is sourced by a blocking
+          # `run-shell`, so the collector's inherited stdout wedges tmux at
+          # config load too.
+          sed -i 's|^"\$CURRENT_DIR/scripts/sidebar-collector.sh" &$|"$CURRENT_DIR/scripts/sidebar-collector.sh" >/dev/null 2>\&1 \&|' \
+            $dir/tmux-agent-status.tmux
+
+          # after-kill-window and after-switch-client are not hook names in tmux
+          # 3.7b, so upstream's entrypoint prints "invalid option" twice on every
+          # load. Both are redundant -- the sidebar already refreshes on
+          # client-attached, client-session-changed, after-select-window,
+          # session-window-changed and window-pane-changed. Must run BEFORE the
+          # wrap loop below, or it edits the generated wrapper instead.
+          sed -i -e '/after-kill-window/d' -e '/after-switch-client/d' \
+            $dir/tmux-agent-status.tmux
+
           # scripts/lib/*.sh are sourced, not executed -- wrapping them would
           # break the `source` calls, so only wrap what gets invoked directly.
           for f in $dir/tmux-agent-status.tmux $dir/scripts/*.sh $dir/hooks/*.sh; do
