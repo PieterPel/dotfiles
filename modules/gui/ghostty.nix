@@ -10,10 +10,11 @@ in
     , ...
     }:
     let
-      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else
-      pkgs.emptyDirectory.overrideAttrs (old: {
-        meta = (old.meta or { }) // { mainProgram = "ghostty"; };
-      });
+      # Installed via Homebrew on Darwin; passing null tells home-manager's
+      # ghostty module to only manage config files, skipping both the package
+      # install and its config-validation `onChange` hook (which would
+      # otherwise try to run a binary that isn't nix-managed here).
+      ghosttyPackage = if pkgs.stdenv.isLinux then pkgs.ghostty else null;
       cfg = config.modules.${parent}.${module};
     in
     {
