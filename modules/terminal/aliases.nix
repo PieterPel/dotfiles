@@ -61,6 +61,12 @@
         # Sops
         gen-age = "nix-shell -p ssh-to-age --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'`";
 
+        # Claude Code
+        haiku = "claude --model haiku";
+        sonnet = "claude --model sonnet";
+        opus = "claude --model opus";
+        fable = "claude --model fable";
+
         # Git
         gs = "git status";
         ga = "git add";
