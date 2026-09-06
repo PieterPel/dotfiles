@@ -84,6 +84,11 @@
       url = "git+ssh://git@codeberg.org/PieterPel/mono.git?ref=trunk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    harnt-nvim = {
+      url = "github:PieterPel/harnt.nvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

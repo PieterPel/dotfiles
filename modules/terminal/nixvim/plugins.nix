@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   flake.modules.homeManager.nixvim-plugins =
     { config
@@ -599,6 +600,10 @@
                 hash = "sha256-2kvs9HgNcLy7ym2C2XZRv3Qa2ttNLdpa9l7oRYy8KLQ=";
               };
             })
+
+            # Packaged upstream as a flake output (packages.default) since
+            # v0.3.0 -- no more fetchFromGitHub/buildVimPlugin needed here.
+            inputs.harnt-nvim.packages.${pkgs.system}.default
           ];
 
           autoCmd = [
@@ -661,59 +666,59 @@
               },
             })
 
-            -- DEV MODE: harnt.nvim isn't packaged via Nix yet, so edits to the
-            -- local checkout show up after just restarting nvim (no
-            -- home-manager switch needed). Once it stabilizes, replace this
-            -- with a pinned vimUtils.buildVimPlugin + fetchFromGitHub entry
-            -- in extraPlugins, like venv-selector/claudecode above.
-            -- Toggled per-shell, so switching checkouts is an nvim restart
-            -- rather than a home-manager switch. Unset keeps the old
-            -- behaviour (the standalone clone), so nothing changes by default:
+            -- harnt.nvim: pinned via inputs.harnt-nvim.packages.''${system}.default
+            -- in extraPlugins above, so it's already on the runtimepath and
+            -- require("harnt") just works. HARNT_DEV overrides that with a
+            -- local checkout or werkboom worktree instead, for live iteration
+            -- without a home-manager switch:
             --
-            --   HARNT_DEV=0                   off entirely
-            --   unset / 1                     ~/home/private-projects/harnt.nvim
+            --   unset                         pinned package (default)
+            --   HARNT_DEV=0                   off entirely, don't call setup()
+            --   HARNT_DEV=1                   ~/home/private-projects/harnt.nvim
             --   HARNT_DEV=transparent-bg      that werkboom worktree
             --   HARNT_DEV=/abs/path           that path
-            --   HARNT_OPTS='{"diff":{"style":"docked"}}'   merged into setup()
+            --   HARNT_OPTS='{"diff":{"style":"split"}}'   overrides the inline default below
             local harnt_root = os.getenv("HOME") .. "/home/private-projects"
             local harnt_dev = os.getenv("HARNT_DEV")
 
-            local function harnt_path()
-              if harnt_dev == "0" or harnt_dev == "off" or harnt_dev == "false" then
-                return nil
-              end
-              if harnt_dev == nil or harnt_dev == "" or harnt_dev == "1" then
-                return harnt_root .. "/harnt.nvim"
-              end
-              if harnt_dev:sub(1, 1) == "/" then
-                return harnt_dev
-              end
-              -- bare name: a werkboom worktree of the harnt.nvim repo. Note
-              -- that is a *different* repo from the standalone clone above.
-              return harnt_root .. "/harnt.nvim.worktrees/" .. harnt_dev
-            end
-
-            local harnt_dev_path = harnt_path()
-            if harnt_dev_path ~= nil then
-              if vim.fn.isdirectory(harnt_dev_path) == 1 then
-                local harnt_opts = {}
-                local raw = os.getenv("HARNT_OPTS")
-                if raw ~= nil and raw ~= "" then
-                  local ok, decoded = pcall(vim.json.decode, raw)
-                  if ok and type(decoded) == "table" then
-                    harnt_opts = decoded
-                  else
-                    vim.notify("HARNT_OPTS is not valid JSON, ignoring: " .. raw, vim.log.levels.WARN)
-                  end
-                end
-                vim.opt.rtp:prepend(harnt_dev_path)
-                require("harnt").setup(harnt_opts)
+            if harnt_dev ~= "0" and harnt_dev ~= "off" and harnt_dev ~= "false" then
+              local dev_path = nil
+              if harnt_dev == "1" then
+                dev_path = harnt_root .. "/harnt.nvim"
               elseif harnt_dev ~= nil and harnt_dev ~= "" then
-                -- Loud only when a checkout was asked for explicitly: a typo'd
-                -- HARNT_DEV otherwise looks exactly like "my edits aren't
-                -- taking effect". An absent default clone stays silent, as before.
-                vim.notify("HARNT_DEV points at a missing directory: " .. harnt_dev_path, vim.log.levels.ERROR)
+                -- bare name: a werkboom worktree of the harnt.nvim repo. Note
+                -- that is a *different* repo from the standalone clone above.
+                dev_path = harnt_dev:sub(1, 1) == "/" and harnt_dev
+                  or (harnt_root .. "/harnt.nvim.worktrees/" .. harnt_dev)
               end
+
+              if dev_path ~= nil then
+                if vim.fn.isdirectory(dev_path) == 1 then
+                  vim.opt.rtp:prepend(dev_path)
+                else
+                  -- Loud only when a checkout was asked for explicitly: a
+                  -- typo'd HARNT_DEV otherwise looks exactly like "my edits
+                  -- aren't taking effect".
+                  vim.notify("HARNT_DEV points at a missing directory: " .. dev_path, vim.log.levels.ERROR)
+                end
+              end
+
+              -- Inline diff presenter: a single editable buffer with removed
+              -- lines struck through and changed/added lines highlighted,
+              -- instead of the default side-by-side vimdiff in a new tab.
+              -- HARNT_OPTS can still override this per-shell.
+              local harnt_opts = { diff = { style = "inline" } }
+              local raw = os.getenv("HARNT_OPTS")
+              if raw ~= nil and raw ~= "" then
+                local ok, decoded = pcall(vim.json.decode, raw)
+                if ok and type(decoded) == "table" then
+                  harnt_opts = vim.tbl_deep_extend("force", harnt_opts, decoded)
+                else
+                  vim.notify("HARNT_OPTS is not valid JSON, ignoring: " .. raw, vim.log.levels.WARN)
+                end
+              end
+
+              require("harnt").setup(harnt_opts)
             end
 
             -- Atlas has no cwd fallback: reviewing a PR checks out its
