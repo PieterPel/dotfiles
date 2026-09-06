@@ -42,6 +42,12 @@ let
       config = lib.mkIf config.modules.theming.stylix.enable {
         packages = with pkgs; [ base16-schemes ];
         # gtk.gtk4.theme = null; # NOTE: had this then got an error, dont know why I had it in the first place
+        # Several stylix hm targets (x11, gtk, ...) set home.pointerCursor.*.enable
+        # unconditionally, regardless of platform. Combined with home-manager's
+        # auto-`enable` inference for home.pointerCursor, that trips evaluation
+        # on Darwin since stylix's own cursor forwarding (stylix/hm/cursor.nix)
+        # is correctly Linux-only and never sets cfg.name there.
+        home.pointerCursor.enable = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin false;
         stylix = {
           enable = true;
           override.base0F = "ff729a";
@@ -62,6 +68,11 @@ let
             tmux.enable = false;
             zellij.enable = false;
             opencode.enable = false;
+            # Not gated to Linux upstream, so it sets home.pointerCursor.x11.enable
+            # on Darwin too; combined with home-manager's newer auto-`enable`
+            # inference for home.pointerCursor, that trips on missing cfg.name
+            # since stylix's own cursor forwarding is (correctly) Linux-only.
+            x11.enable = false;
           };
         };
       };
