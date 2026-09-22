@@ -6,11 +6,6 @@ version: 0.1.0
 
 dependencies:
   apm:
-    # Persistent cross-session memory. Claude Code plugin -- the plugin manifest
-    # lives at .claude-plugin/plugin.json in the repo root, so the bare repo ref
-    # is enough for APM to pick it up.
-    - thedotmack/claude-mem
-
     # werkboom's own skill, vendored out of the Codeberg monorepo. Not a
     # top-level package, hence the object form with an explicit subpath.
     - git: https://codeberg.org/PieterPel/mono.git
