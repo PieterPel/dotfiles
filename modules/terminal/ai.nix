@@ -22,6 +22,7 @@
             gemini-cli
             code # Codex fork that also supports claude and gemini
             claude-agent-acp # ACP provider for agentic.nvim
+            pi
 
             # Assistant
             # picoclaw # Hash mismatch
@@ -42,6 +43,13 @@
 
             # Security
             claudebox # Containerize claude code easily
+
+            # GUI
+            claude-desktop
+            bb-app
+
+            # Markdown
+            plannotator-tui
           ]
           ++ [
             pkgs.apm-cli
