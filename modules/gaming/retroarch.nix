@@ -38,7 +38,18 @@
       # cloud-sync WebDAV password) that must never land in the world-readable store.
       overrideCfg = pkgs.writeText "retroarch-overrides.cfg" (
         lib.concatStringsSep "\n" (
-          lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
+          # Pin the video driver and context explicitly. Left to auto-select,
+          # RetroArch picks the *glcore* driver (desktop OpenGL 3.3 core) on this
+          # host, which the Pi 4's V3D cannot provide -- EGL then rejects the
+          # context with EGL_BAD_MATCH and the N64 core dies the moment it asks
+          # for a hardware render context (mupen64plus-next defaults to
+          # ParaLLEl-RDP, which needs a HW context). Forcing `gl` + the `egl`
+          # context makes RetroArch take the GLES3/EGL path that V3D does
+          # support. Settings pinned here are never written back, so this does
+          # not fight RetroArch's config_save_on_exit.
+          [ ''video_driver = "gl"'' ]
+          ++ [ ''video_context_driver = "egl"'' ]
+          ++ lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
           ++ lib.optional (cfg.stateDir != null) ''savestate_directory = "${cfg.stateDir}"''
           ++ lib.optional (cfg.colorTheme != null) ''ozone_menu_color_theme = "${toString cfg.colorTheme}"''
           ++ lib.optionals cfg.retroachievements.enable [
@@ -58,12 +69,8 @@
           )
         )
       );
-      hasOverrides =
-        cfg.saveDir != null
-        || cfg.stateDir != null
-        || cfg.colorTheme != null
-        || cfg.retroachievements.enable
-        || cfg.playerDevices != [ ];
+      # The video pins above are unconditional, so the overlay is always emitted.
+      hasOverrides = true;
       appendConfigPaths =
         lib.optional hasOverrides "${overrideCfg}"
         ++ cfg.extraAppendConfigs;
