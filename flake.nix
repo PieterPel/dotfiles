@@ -2,7 +2,7 @@
   description = "Dendritic flake configuration for NixOS, nix-darwin, and home-manager";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/e94cb152ed51bd6e24eb4a41f1460252beb52cd2";
 
     home-manager = {
       url = "github:nix-community/home-manager";

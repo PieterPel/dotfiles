@@ -46,6 +46,11 @@ in
             modules = {
               profiles.full.enable = true;
               security.sops.enable = false;
+
+              # Apple-silicon only: the Virtualization.framework backend has no
+              # Intel support, so this stays host-level rather than going into
+              # the shared darwin profile. See the module for the rest.
+              virtualization.linux-builder.enable = true;
             };
           };
         }
