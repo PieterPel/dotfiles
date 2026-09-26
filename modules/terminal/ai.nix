@@ -47,9 +47,6 @@
             # GUI
             claude-desktop
             bb-app
-
-            # Markdown
-            plannotator-tui
           ]
           ++ [
             pkgs.apm-cli
