@@ -14,7 +14,11 @@
 
       # Curated libretro core set. Adjust to taste — verify names against
       # `nix search nixpkgs libretro` (a wrong attr is an eval error).
-      retroarch = pkgsStock.retroarch.withCores (
+      #
+      # This is the DEFAULT frontend/cores; a caller may replace the whole thing
+      # via the `package` option below (see its description for why that matters
+      # on hardware whose GL/GLES capabilities don't match a stock build).
+      defaultPackage = pkgsStock.retroarch.withCores (
         cores: with cores; [
           snes9x # SNES
           nestopia # NES
@@ -27,6 +31,8 @@
           # so it compiles on the Pi. Re-add once you want arcade + can wait on it.
         ]
       );
+
+      retroarch = cfg.package;
 
       # Config overlays layered on top of retroarch.cfg via --appendconfig: appended
       # config takes precedence and is NOT written back, so it pins settings without
@@ -71,9 +77,7 @@
       );
       # The video pins above are unconditional, so the overlay is always emitted.
       hasOverrides = true;
-      appendConfigPaths =
-        lib.optional hasOverrides "${overrideCfg}"
-        ++ cfg.extraAppendConfigs;
+      appendConfigPaths = lib.optional hasOverrides "${overrideCfg}" ++ cfg.extraAppendConfigs;
       appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
         # RetroArch delimits multiple --appendconfig files with '|' (NOT ','). The
         # value MUST be shell-quoted: unquoted, the '|' is parsed as a shell pipe,
@@ -92,6 +96,41 @@
     {
       options.modules.gaming.retroarch = {
         enable = lib.mkEnableOption "Enable RetroArch emulation";
+
+        package = lib.mkOption {
+          type = lib.types.package;
+          default = defaultPackage;
+          defaultText = lib.literalMD "`retroarch.withCores` over the curated core set above";
+          example = lib.literalExpression ''
+            (pkgs.retroarch.override {
+              retroarch-bare = pkgs.retroarch-bare.overrideAttrs (old: {
+                configureFlags = old.configureFlags ++ [ "--enable-opengles3" ];
+              });
+            }).withCores (cores: [ cores.mupen64plus ])
+          '';
+          description = ''
+            The RetroArch build (frontend + cores) to install and launch.
+
+            Defaults to the stock nixpkgs `retroarch.withCores` over the curated
+            core list, which is what you want on any host whose graphics stack
+            matches the stock build.
+
+            Override it when it does not. RetroArch compiles against EITHER
+            desktop OpenGL OR OpenGL ES — `runloop.c`'s
+            `dynamic_request_hw_context()` guards the two behind mutually
+            exclusive `HAVE_OPENGL` / `HAVE_OPENGLES` defines, and refuses a
+            context from the other family at runtime. The same split exists in
+            the cores: GLideN64 (mupen64plus-next's fast RDP plugin) asks for a
+            desktop GL 3.3 core context, which a GLES-only GPU cannot provide
+            (EGL returns `EGL_BAD_MATCH` and the core segfaults). On such a host
+            both the frontend and the core must be rebuilt for GLES — see
+            `libretro.mupen64plus` `FORCE_GLES3=1` for the core half.
+
+            Note this is all-or-nothing per frontend: one binary serves every
+            core, so switching it to GLES revokes desktop-GL hardware contexts
+            for the whole set, not just the core you were fixing.
+          '';
+        };
 
         user = lib.mkOption {
           type = lib.types.str;
