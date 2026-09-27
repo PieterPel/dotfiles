@@ -8,10 +8,11 @@ let
       options.modules.system.tailscale = {
         enable = lib.mkEnableOption "Enable Tailscale";
         server = lib.mkEnableOption ''
-          headless-server networking: Tailscale SSH, client subnet routing, a
-          firewall opened for the tailnet, and the base CLI tools a remote box
-          needs. Intended for machines administered purely over the tailnet
-          (e.g. an external flake's NixOS VM), not desktops'';
+          headless-server networking: Tailscale SSH, client subnet routing, and the
+          base CLI tools a remote box needs. Intended for machines administered
+          purely over the tailnet (e.g. an external flake's NixOS VM), not
+          desktops. The firewall of such a box is not opened here: it is rendered
+          from `tailnet.openPorts` (modules/system/tailnet.nix)'';
       };
 
       config = lib.mkIf cfg.enable (lib.mkMerge [
