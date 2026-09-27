@@ -1,0 +1,31 @@
+--- a/gfx/drivers_context/wayland_ctx.c	2026-09-26 23:12:53
++++ b/gfx/drivers_context/wayland_ctx.c	2026-09-26 23:12:53
+@@ -216,15 +216,24 @@
+ #ifdef HAVE_OPENGLES
+ #ifdef HAVE_OPENGLES3
+ #ifdef EGL_KHR_create_context
+-         if (g_egl_major >= 3)
+-            attrib_ptr = egl_attribs_gles3;
+-         else
++         /* Always use the ES3 attribute array.  Upstream's "else" branch
++          * assigns egl_attribs_gles, which only exists when HAVE_OPENGLES2
++          * is defined; in an ES3-only build (HAVE_OPENGLES2 undefined) that
++          * leaves attrib_ptr NULL and egl_init_context() dereferences it in
++          * the HAVE_DYLIB attribute scan -> SIGSEGV.  ES3 configs satisfy an
++          * ES2 request too, so reusing the ES3 array is safe. */
++         attrib_ptr = egl_attribs_gles3;
++#else
++#ifdef HAVE_OPENGLES2
++         attrib_ptr = egl_attribs_gles;
+ #endif
+ #endif
++#else
+ #ifdef HAVE_OPENGLES2
+-            attrib_ptr = egl_attribs_gles;
++         attrib_ptr = egl_attribs_gles;
+ #endif
+ #endif
++#endif
+          break;
+       case GFX_CTX_OPENVG_API:
+ #ifdef HAVE_VG
