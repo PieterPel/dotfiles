@@ -1,0 +1,151 @@
+{
+	"overwrite": true,
+	"folderId": 0,
+	"dashboard": {
+		"uid": "system-metrics",
+		"title": "System",
+		"timezone": "browser",
+		"schemaVersion": 38,
+		"refresh": "30s",
+		"time": { "from": "now-6h", "to": "now" },
+		"templating": {
+			"list": [
+				{
+					"type": "query",
+					"name": "host",
+					"label": "Host",
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"query": {
+						"query": "label_values(node_uname_info, host)",
+						"refId": "A"
+					},
+					"multi": true,
+					"includeAll": true,
+					"allValue": ".+",
+					"current": {},
+					"sort": 1,
+					"refresh": 2
+				}
+			]
+		},
+		"panels": [
+			{
+				"type": "timeseries",
+				"title": "CPU usage %",
+				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}}",
+						"expr": "100 - (avg by (host) (rate(node_cpu_seconds_total{mode=\"idle\", host=~\"$host\"}[5m])) * 100)"
+					}
+				],
+				"fieldConfig": {
+					"defaults": { "unit": "percent", "min": 0, "max": 100 }
+				}
+			},
+			{
+				"type": "timeseries",
+				"title": "RAM used",
+				"gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}}",
+						"expr": "node_memory_MemTotal_bytes{host=~\"$host\"} - node_memory_MemAvailable_bytes{host=~\"$host\"}"
+					}
+				],
+				"fieldConfig": { "defaults": { "unit": "bytes" } }
+			},
+			{
+				"type": "timeseries",
+				"title": "Root disk usage %",
+				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}}",
+						"expr": "100 - (node_filesystem_avail_bytes{host=~\"$host\", mountpoint=\"/\"} / node_filesystem_size_bytes{host=~\"$host\", mountpoint=\"/\"} * 100)"
+					}
+				],
+				"fieldConfig": {
+					"defaults": { "unit": "percent", "min": 0, "max": 100 }
+				}
+			},
+			{
+				"type": "timeseries",
+				"title": "Temperature",
+				"description": "hwmon sensors — added specifically to catch thermal throttling on nixberry (the Pi), which node_exporter's default collector set wouldn't surface.",
+				"gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}} {{chip}} {{sensor}}",
+						"expr": "node_hwmon_temp_celsius{host=~\"$host\"}"
+					}
+				],
+				"fieldConfig": { "defaults": { "unit": "celsius" } }
+			},
+			{
+				"type": "timeseries",
+				"title": "Network in/out",
+				"gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}} {{device}} rx",
+						"expr": "rate(node_network_receive_bytes_total{host=~\"$host\", device!=\"lo\"}[5m])"
+					},
+					{
+						"refId": "B",
+						"legendFormat": "{{host}} {{device}} tx",
+						"expr": "rate(node_network_transmit_bytes_total{host=~\"$host\", device!=\"lo\"}[5m])"
+					}
+				],
+				"fieldConfig": { "defaults": { "unit": "Bps" } }
+			},
+			{
+				"type": "timeseries",
+				"title": "System load",
+				"gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"legendFormat": "{{host}} load1",
+						"expr": "node_load1{host=~\"$host\"}"
+					},
+					{
+						"refId": "B",
+						"legendFormat": "{{host}} load5",
+						"expr": "node_load5{host=~\"$host\"}"
+					},
+					{
+						"refId": "C",
+						"legendFormat": "{{host}} load15",
+						"expr": "node_load15{host=~\"$host\"}"
+					}
+				]
+			},
+			{
+				"type": "table",
+				"title": "Failed systemd units",
+				"gridPos": { "h": 6, "w": 24, "x": 0, "y": 24 },
+				"datasource": { "type": "prometheus", "uid": "prometheus" },
+				"targets": [
+					{
+						"refId": "A",
+						"instant": true,
+						"format": "table",
+						"expr": "node_systemd_unit_state{host=~\"$host\", state=\"failed\"} == 1"
+					}
+				]
+			}
+		]
+	}
+}

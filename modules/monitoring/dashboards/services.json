@@ -1,0 +1,140 @@
+{
+	"overwrite": true,
+	"folderId": 0,
+	"dashboard": {
+		"uid": "services-logs",
+		"title": "Services",
+		"timezone": "browser",
+		"schemaVersion": 38,
+		"refresh": "10s",
+		"time": { "from": "now-1h", "to": "now" },
+		"templating": {
+			"list": [
+				{
+					"type": "query",
+					"name": "unit",
+					"label": "Service",
+					"datasource": { "type": "loki", "uid": "loki" },
+					"query": {
+						"label": "unit",
+						"refId": "A",
+						"stream": "{job=\"systemd-journal\"}",
+						"type": 1
+					},
+					"multi": false,
+					"includeAll": false,
+					"current": {},
+					"sort": 1,
+					"refresh": 2
+				},
+				{
+					"type": "query",
+					"name": "level",
+					"label": "Level",
+					"datasource": { "type": "loki", "uid": "loki" },
+					"query": {
+						"label": "level",
+						"refId": "B",
+						"stream": "{job=\"systemd-journal\"}",
+						"type": 1
+					},
+					"multi": true,
+					"includeAll": true,
+					"allValue": ".+",
+					"current": {},
+					"sort": 1,
+					"refresh": 2
+				}
+			]
+		},
+		"panels": [
+			{
+				"type": "timeseries",
+				"title": "Log volume — $unit",
+				"gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+				"datasource": { "type": "loki", "uid": "loki" },
+				"targets": [
+					{
+						"refId": "A",
+						"expr": "sum by (level) (count_over_time({job=\"systemd-journal\", unit=\"$unit\"}[1m]))"
+					}
+				],
+				"fieldConfig": {
+					"defaults": {
+						"custom": {
+							"drawStyle": "bars",
+							"fillOpacity": 80,
+							"lineWidth": 0,
+							"stacking": { "mode": "normal", "group": "A" }
+						}
+					},
+					"overrides": [
+						{
+							"matcher": { "id": "byName", "options": "error" },
+							"properties": [
+								{
+									"id": "color",
+									"value": { "mode": "fixed", "fixedColor": "red" }
+								}
+							]
+						},
+						{
+							"matcher": { "id": "byName", "options": "warning" },
+							"properties": [
+								{
+									"id": "color",
+									"value": { "mode": "fixed", "fixedColor": "orange" }
+								}
+							]
+						},
+						{
+							"matcher": { "id": "byName", "options": "info" },
+							"properties": [
+								{
+									"id": "color",
+									"value": { "mode": "fixed", "fixedColor": "green" }
+								}
+							]
+						},
+						{
+							"matcher": { "id": "byName", "options": "notice" },
+							"properties": [
+								{
+									"id": "color",
+									"value": { "mode": "fixed", "fixedColor": "blue" }
+								}
+							]
+						}
+					]
+				},
+				"options": {
+					"legend": { "displayMode": "list", "placement": "bottom" },
+					"tooltip": { "mode": "multi", "sort": "desc" }
+				}
+			},
+			{
+				"type": "logs",
+				"title": "Logs — $unit",
+				"gridPos": { "h": 25, "w": 24, "x": 0, "y": 7 },
+				"datasource": { "type": "loki", "uid": "loki" },
+				"targets": [
+					{
+						"refId": "A",
+						"expr": "{job=\"systemd-journal\", unit=\"$unit\", level=~\"${level:regex}\"}"
+					}
+				],
+				"options": {
+					"showTime": true,
+					"showLabels": false,
+					"showCommonLabels": true,
+					"wrapLogMessage": true,
+					"prettifyLogMessage": false,
+					"enableLogDetails": true,
+					"sortOrder": "Descending",
+					"dedupStrategy": "none",
+					"fontSize": "default"
+				}
+			}
+		]
+	}
+}
