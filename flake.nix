@@ -62,6 +62,28 @@
       # WARNING: do not follow nixpkgs here!
     };
 
+    # Second copy of nixos-raspberrypi, pinned to a `develop` commit, used
+    # ONLY for its prebuilt `packages.aarch64-linux.kodi-gbm` (see
+    # hosts/nixberry). Their cachix is only ever populated by CI runs on
+    # `develop` -- the workflow is `on: push` for all branches, but the
+    # Actions history has zero runs for `nixos-unstable`, and upstream's own
+    # nixos-unstable build of kodi-gbm 404s on their cache. This exact
+    # develop commit matches their last successful cachix push (2026-07-26)
+    # and dry-runs as 0 built / 357 fetched.
+    #
+    # It is deliberately NOT the input used for the nixosSystem itself:
+    # develop pins nixpkgs 26.05, and evaluating our modules against that
+    # breaks them (stylix's kmscon module sets services.kmscon.config, which
+    # only exists in 26.11). Taking just the built package sidesteps all of
+    # that -- a closure is self-contained, it doesn't care which nixpkgs the
+    # rest of the system came from.
+    nixos-raspberrypi-pkgs = {
+      url = "github:nvmd/nixos-raspberrypi/7a988e466a9a98196bf1a85d0d594bcc4aa2b82d";
+      # WARNING: do not follow nixpkgs here either -- following it would
+      # rebuild kodi against our nixpkgs and lose every cache hit, which is
+      # the entire point of this input.
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
     };
