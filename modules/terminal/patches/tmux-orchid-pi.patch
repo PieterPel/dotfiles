@@ -10,6 +10,34 @@ index 54458a0..1eb6629 100644
  	{"kilo", AgentKilo, false},
  }
  
+diff --git a/detector/status.go b/detector/status.go
+index 699ca09..4895b76 100644
+--- a/detector/status.go
++++ b/detector/status.go
+@@ -129,6 +129,23 @@ var statusRules = []statusRule{
+ 	{AgentWindsurf, "generating", StatusThinking},
+ 	{AgentWindsurf, "writing", StatusToolUse},
+ 	{AgentWindsurf, "error", StatusError},
++
++	// ── Pi ──────────────────────────────────────────────────────────
++	// Pi embeds its activity in the input-box border. While a turn is
++	// running the border reads "╭─ ⠋ Working…" — a braille spinner
++	// frame (rotates every 80ms) followed by the working message; an idle
++	// box is a plain dashed rule, "╭────".
++	// Matching on "working…" (with the ellipsis) rather than the bare
++	// word keeps transcript prose like "that correction loop working"
++	// from being read as activity.
++	// The real prompt keybinding is "esc to interrupt", and long turns can
++	// append " (esc to interrupt)" to the message, so the suffix is not
++	// part of the match.
++	{AgentPi, "working…", StatusThinking},
++	{AgentPi, "compacting context", StatusThinking},
++	{AgentPi, "summarizing branch", StatusThinking},
++	{AgentPi, "retrying (", StatusError},
++	{AgentPi, "╭──", StatusIdle},
+ }
+ 
+ // tailLines is the number of lines from the bottom of pane content to scan.
 diff --git a/detector/types.go b/detector/types.go
 index e22d7ed..c0df9d3 100644
 --- a/detector/types.go
