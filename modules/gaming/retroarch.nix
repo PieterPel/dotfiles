@@ -1,0 +1,258 @@
+{
+  flake.modules.nixos.retroarch =
+    {
+      config,
+      lib,
+      pkgs,
+      self,
+      ...
+    }:
+    let
+      cfg = config.modules.gaming.retroarch;
+
+      pkgsStock = self.lib.mkStockPkgs pkgs.stdenv.hostPlatform.system;
+
+      # Curated libretro core set. Adjust to taste — verify names against
+      # `nix search nixpkgs libretro` (a wrong attr is an eval error).
+      #
+      # This is the DEFAULT frontend/cores; a caller may replace the whole thing
+      # via the `package` option below (see its description for why that matters
+      # on hardware whose GL/GLES capabilities don't match a stock build).
+      defaultPackage = pkgsStock.retroarch.withCores (
+        cores: with cores; [
+          snes9x # SNES
+          nestopia # NES
+          genesis-plus-gx # Genesis / Master System / Game Gear
+          mgba # GB / GBC / GBA
+          mupen64plus # N64
+          pcsx-rearmed # PS1 (ARM-optimised)
+          beetle-psx-hw # PS1 (accurate, HW-rendered)
+          # fbneo (arcade) omitted for now: its stock aarch64 build isn't cached,
+          # so it compiles on the Pi. Re-add once you want arcade + can wait on it.
+        ]
+      );
+
+      retroarch = cfg.package;
+
+      # Config overlays layered on top of retroarch.cfg via --appendconfig: appended
+      # config takes precedence and is NOT written back, so it pins settings without
+      # fighting RetroArch's own config_save_on_exit.
+      #
+      # The save/state overlay is a plain store file (non-secret). Additional overlays
+      # come in via `extraAppendConfigs` as raw path strings — so the private layer
+      # can point at a file rendered at runtime (e.g. a sops template holding the
+      # cloud-sync WebDAV password) that must never land in the world-readable store.
+      overrideCfg = pkgs.writeText "retroarch-overrides.cfg" (
+        lib.concatStringsSep "\n" (
+          # Pin the video driver and context explicitly. Left to auto-select,
+          # RetroArch picks the *glcore* driver (desktop OpenGL 3.3 core) on this
+          # host, which the Pi 4's V3D cannot provide -- EGL then rejects the
+          # context with EGL_BAD_MATCH and the N64 core dies the moment it asks
+          # for a hardware render context (mupen64plus-next defaults to
+          # ParaLLEl-RDP, which needs a HW context). Forcing `gl` + the `egl`
+          # context makes RetroArch take the GLES3/EGL path that V3D does
+          # support. Settings pinned here are never written back, so this does
+          # not fight RetroArch's config_save_on_exit.
+          [ ''video_driver = "gl"'' ]
+          ++ [ ''video_context_driver = "egl"'' ]
+          ++ lib.optional (cfg.saveDir != null) ''savefile_directory = "${cfg.saveDir}"''
+          ++ lib.optional (cfg.stateDir != null) ''savestate_directory = "${cfg.stateDir}"''
+          ++ lib.optional (cfg.colorTheme != null) ''ozone_menu_color_theme = "${toString cfg.colorTheme}"''
+          ++ lib.optionals cfg.retroachievements.enable [
+            ''cheevos_enable = "true"''
+            ''cheevos_username = "${cfg.retroachievements.username}"''
+          ]
+          ++ lib.concatLists (
+            lib.imap1 (i: device: [
+              ''input_player${toString i}_reserved_device = "${device}"''
+              # 1 = "preferred": the named pad takes this port whenever it is
+              # connected, but the port still accepts another pad when it is
+              # not. 2 would be "reserved", leaving the port dead unless that
+              # exact pad is on -- wrong here, since either controller should
+              # work on its own.
+              ''input_player${toString i}_device_reservation_type = "1"''
+            ]) cfg.playerDevices
+          )
+        )
+      );
+      # The video pins above are unconditional, so the overlay is always emitted.
+      hasOverrides = true;
+      appendConfigPaths = lib.optional hasOverrides "${overrideCfg}" ++ cfg.extraAppendConfigs;
+      appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
+        # RetroArch delimits multiple --appendconfig files with '|' (NOT ','). The
+        # value MUST be shell-quoted: unquoted, the '|' is parsed as a shell pipe,
+        # so only the first overlay reaches RetroArch and the rest are run as
+        # commands ("Permission denied"). Quoting passes the whole list literally.
+        " --appendconfig \"${lib.concatStringsSep "|" appendConfigPaths}\""
+      );
+
+      # RetroArch launch script (no display-mode logic — the shared kiosk module
+      # forces the mode via wlr-randr before running this). Exposed as `kioskScript`
+      # so the Pegasus launcher can reference it as a collection entry.
+      launchScript = pkgs.writeShellScript "retroarch-launch" ''
+        exec ${lib.getExe retroarch}${appendFlag}
+      '';
+    in
+    {
+      options.modules.gaming.retroarch = {
+        enable = lib.mkEnableOption "Enable RetroArch emulation";
+
+        package = lib.mkOption {
+          type = lib.types.package;
+          default = defaultPackage;
+          defaultText = lib.literalMD "`retroarch.withCores` over the curated core set above";
+          example = lib.literalExpression ''
+            (pkgs.retroarch.override {
+              retroarch-bare = pkgs.retroarch-bare.overrideAttrs (old: {
+                configureFlags = old.configureFlags ++ [ "--enable-opengles3" ];
+              });
+            }).withCores (cores: [ cores.mupen64plus ])
+          '';
+          description = ''
+            The RetroArch build (frontend + cores) to install and launch.
+
+            Defaults to the stock nixpkgs `retroarch.withCores` over the curated
+            core list, which is what you want on any host whose graphics stack
+            matches the stock build.
+
+            Override it when it does not. RetroArch compiles against EITHER
+            desktop OpenGL OR OpenGL ES — `runloop.c`'s
+            `dynamic_request_hw_context()` guards the two behind mutually
+            exclusive `HAVE_OPENGL` / `HAVE_OPENGLES` defines, and refuses a
+            context from the other family at runtime. The same split exists in
+            the cores: GLideN64 (mupen64plus-next's fast RDP plugin) asks for a
+            desktop GL 3.3 core context, which a GLES-only GPU cannot provide
+            (EGL returns `EGL_BAD_MATCH` and the core segfaults). On such a host
+            both the frontend and the core must be rebuilt for GLES — see
+            `libretro.mupen64plus` `FORCE_GLES3=1` for the core half.
+
+            Note this is all-or-nothing per frontend: one binary serves every
+            core, so switching it to GLES revokes desktop-GL hardware contexts
+            for the whole set, not just the core you were fixing.
+          '';
+        };
+
+        user = lib.mkOption {
+          type = lib.types.str;
+          default = "guest";
+          description = "User RetroArch runs as in the kiosk.";
+        };
+
+        romDir = lib.mkOption {
+          type = lib.types.path;
+          default = "/var/lib/roms";
+          description = ''
+            Directory RetroArch reads ROMs from. The private layer's sync job
+            writes here; kept as an option so both sides agree on one path.
+          '';
+        };
+
+        saveDir = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = ''
+            If set, pin RetroArch's savefile_directory (battery/.srm saves) here.
+            Pinning makes the location deterministic so the private layer can back
+            it up (otherwise saves can land next to the ROMs, non-deterministically).
+          '';
+        };
+
+        stateDir = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = "If set, pin RetroArch's savestate_directory (.state snapshots) here.";
+        };
+
+        retroachievements = {
+          enable = lib.mkEnableOption "RetroAchievements integration";
+          username = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = "RetroAchievements account username.";
+          };
+        };
+
+        colorTheme = lib.mkOption {
+          type = lib.types.nullOr lib.types.int;
+          default = null;
+          example = 2;
+          description = ''
+            Ozone menu color theme index. Common values:
+              0 = Default (dark), 1 = Basic White, 2 = Dracula (purple),
+              3 = Nord, 4 = Gruvbox Dark, 5 = Boysenberry.
+            Null leaves the setting at RetroArch's default.
+          '';
+        };
+
+        playerDevices = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [
+            "8Bitdo SN30 Pro"
+            "Microsoft X-Box One pad"
+          ];
+          description = ''
+            Controller names, in player-port order: the first entry becomes
+            player 1, the second player 2, and so on.
+
+            Without this, RetroArch assigns ports by device *index* -- purely
+            enumeration order -- so which pad is player 1 depends on which one
+            happened to connect first. A wired pad present at boot and a
+            Bluetooth pad that associates seconds later will usually land in a
+            stable order, but not reliably, and powering them on in a fixed
+            sequence is a miserable way to control it.
+
+            Names must match the kernel's device name exactly; read them from
+            `/proc/bus/input/devices` (the `N: Name=` field) or from
+            RetroArch's own Port Controls screen.
+          '';
+        };
+
+        extraAppendConfigs = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [ "/run/secrets/retroarch-cloud.cfg" ];
+          description = ''
+            Extra config files to layer on via RetroArch's `--appendconfig` (in
+            addition to the save/state overlay). Given as raw path strings, not store
+            paths, so a caller can point at a file rendered at runtime — e.g. a sops
+            template holding cloud-sync WebDAV credentials — that must stay out of the
+            world-readable Nix store.
+          '';
+        };
+
+        kioskScript = lib.mkOption {
+          type = lib.types.package;
+          internal = true;
+          description = ''
+            The script that launches RetroArch (with all --appendconfig overlays).
+            Exposed so the Pegasus launcher module can reference it as a collection
+            entry without duplicating the logic.
+          '';
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        environment.systemPackages = [ retroarch ];
+
+        # Expose the launch script for the Pegasus module's RetroArch entry.
+        modules.gaming.retroarch.kioskScript = launchScript;
+
+        # Drive the shared kiosk with RetroArch by default. mkDefault so the Pegasus
+        # module can take over `program` (and the kiosk `user`) when enabled.
+        modules.gaming.kiosk = {
+          enable = lib.mkDefault true;
+          user = lib.mkDefault cfg.user;
+          program = lib.mkDefault launchScript;
+        };
+
+        # ROM dir (+ save/state dirs), owned by the kiosk user so the sync job can
+        # populate them and RetroArch can read/write them.
+        systemd.tmpfiles.rules = [
+          "d ${cfg.romDir} 0775 ${cfg.user} users - -"
+        ]
+        ++ lib.optional (cfg.saveDir != null) "d ${cfg.saveDir} 0775 ${cfg.user} users - -"
+        ++ lib.optional (cfg.stateDir != null) "d ${cfg.stateDir} 0775 ${cfg.user} users - -";
+      };
+    };
+}

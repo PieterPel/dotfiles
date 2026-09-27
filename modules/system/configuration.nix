@@ -23,7 +23,6 @@ let
       config = lib.mkIf config.modules.system.configuration.enable {
         environment.sessionVariables = config.envVars;
         security.polkit.enable = true;
-        programs.firefox.enable = true;
         nix.gc.dates = "daily";
         services.onedrive.enable = false;
       };
