@@ -152,11 +152,47 @@ in
       ./_users
       ./_hardware-configuration.nix
       (
-        { pkgs, ... }:
+        { config, pkgs, ... }:
+        let
+          # V3D offers OpenGL ES 3.1 but no desktop GL 3.3 core, so the stock
+          # desktop-GL RetroArch refuses the GLES3 context mupen64plus-next's
+          # GLideN64 plugin asks for (EGL_BAD_MATCH -> SIGSEGV). Rebuilding
+          # only the core is not enough -- the frontend refuses first -- so both
+          # halves are swapped together. That also swaps the frontend for every
+          # other core: one binary serves all of them, and RetroArch is built
+          # against either desktop GL or GLES, never both. The other cores here
+          # are software renderers or GLES-compatible.
+          gles3Core = config.libretro.mkGles3Core { core = pkgs.libretro.mupen64plus; };
+
+          # The N64 core with the Vulkan/paraLLEl paths compiled out. With
+          # HAVE_PARALLEL_RSP on (nixpkgs' default) the core silently falls back
+          # to it -- "Selected HLE RSP with Angrylion, falling back to Parallel
+          # RSP!" -- which pulls a Vulkan compute renderer and its worker threads
+          # into the process. The same audio path is clean on snes9x, so that is
+          # the remaining suspect for N64 crackling.
+          n64Core = config.libretro.mkLeanCore {
+            core = gles3Core;
+            parallelRdp = false;
+            parallelRsp = false;
+          };
+          retroarchGles3 = config.libretro.mkGles3Frontend {
+            inherit pkgs;
+            cores = [
+              n64Core
+              pkgs.libretro.snes9x
+              pkgs.libretro.nestopia
+              pkgs.libretro.genesis-plus-gx
+              pkgs.libretro.mgba
+              pkgs.libretro.pcsx-rearmed
+              pkgs.libretro.beetle-psx-hw
+            ];
+          };
+        in
         {
         modules = {
           profiles.rpi.enable = true;
           gaming.retroarch.enable = true;
+          gaming.retroarch.package = retroarchGles3;
           # RPi-tuned Kodi, taken prebuilt from nixos-raspberrypi's cachix
           # rather than rebuilt locally via inject-overlays-global (see the
           # note in the imports above, and the `package` option's docs).

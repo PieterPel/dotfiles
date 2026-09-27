@@ -1,0 +1,15 @@
+--- a/gfx/common/egl_common.c	2026-09-26 23:12:53
++++ b/gfx/common/egl_common.c	2026-09-26 23:12:53
+@@ -617,6 +617,12 @@
+ #endif
+ 
+    EGLDisplay dpy = get_egl_display(platform, display_data);
++
++   if (!attrib_ptr)
++   {
++      RARCH_ERR("[EGL] No EGL config attributes given; cannot create context.\n");
++      return false;
++   }
+ 
+    if (dpy == EGL_NO_DISPLAY)
+    {
