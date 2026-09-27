@@ -1,0 +1,37 @@
+diff --git a/detector/agent.go b/detector/agent.go
+index 54458a0..1eb6629 100644
+--- a/detector/agent.go
++++ b/detector/agent.go
+@@ -29,6 +29,7 @@ var agentPatterns = []agentPattern{
+ 	{"opencode", AgentOpenCode, false},
+ 	{"goose", AgentGoose, false},
+ 	{"amp", AgentAmplitude, true},
++	{"pi", AgentPi, true},
+ 	{"kilo", AgentKilo, false},
+ }
+ 
+diff --git a/detector/types.go b/detector/types.go
+index e22d7ed..c0df9d3 100644
+--- a/detector/types.go
++++ b/detector/types.go
+@@ -32,6 +32,8 @@ const (
+ 	AgentKilo AgentType = "kilo-code"
+ 	// AgentOpenCode is the OpenCode AI coding agent.
+ 	AgentOpenCode AgentType = "opencode"
++	// AgentPi is the pi agentic coding editor (the `pi` CLI harness).
++	AgentPi AgentType = "pi"
+ )
+ 
+ // Status represents the current activity state of a detected agent.
+diff --git a/spawner/spawner.go b/spawner/spawner.go
+index 15ffbec..6d3a58b 100644
+--- a/spawner/spawner.go
++++ b/spawner/spawner.go
+@@ -31,6 +31,7 @@ func DefaultAgents() []AgentDef {
+ 		{Label: "Gemini CLI", Command: "gemini"},
+ 		{Label: "Goose", Command: "goose"},
+ 		{Label: "Amp", Command: "amp"},
++		{Label: "Pi", Command: "pi"},
+ 	}
+ }
+ 

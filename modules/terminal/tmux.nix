@@ -42,6 +42,26 @@
         meta.mainProgram = "claude-tmux";
       };
 
+      # tmux-orchid: an agent-agnostic Bubble Tea dashboard that discovers AI
+      # coding agents across every tmux pane (process-tree classification plus
+      # pane scraping) and lets you jump to them or spawn new ones. Upstream
+      # publishes no release tarball, so it is built from source. The local patch
+      # adds first-class `pi` support (detection + spawn entry), which upstream
+      # lacks -- see patches/tmux-orchid-pi.patch.
+      tmuxOrchid = pkgs.buildGoModule {
+        pname = "tmux-orchid";
+        version = "unstable-2026-03-18";
+        src = pkgs.fetchFromGitHub {
+          owner = "FelipeAfonso";
+          repo = "tmux-orchid";
+          rev = "e116b7ecb5c3094ae260369126630244450c9653";
+          hash = "sha256-FWmlEiZSSwyPPZY2lMbSl1EnL2Be6UvrryjgJVH8sCo=";
+        };
+        vendorHash = "sha256-JDnqDtGoXuPIE0eAlcPcYohD5U9JMI9eSaTdWVv9yio=";
+        patches = [ ./patches/tmux-orchid-pi.patch ];
+        meta.mainProgram = "tmux-orchid";
+      };
+
       paletteScript = pkgs.writeShellScriptBin "tmux-command-palette" ''
         set -euo pipefail
 
@@ -292,6 +312,27 @@
           '';
         };
 
+        packages = [ tmuxOrchid ];
+
+        # tmux-orchid keeps its dashboard in a dedicated "orchid" tmux session
+        # and, while it is running, installs a prefix keybind to jump back to
+        # it. Upstream defaults that keybind to `d`, which this config already
+        # uses for split-window -h, so pin it to `g`. Writing the file here
+        # (rather than letting the tool write its own default on first run)
+        # keeps the choice in nix and reviewable.
+        home.file.".config/tmux-orchid/config.toml".text = ''
+          # tmux-orchid configuration -- managed by nix (modules/terminal/tmux.nix).
+          poll_interval = "2s"
+
+          [session]
+          name = "orchid"
+          keybind = "g"
+          use_prefix = true
+
+          [theme]
+          color_scheme = "auto"
+        '';
+
         programs.tmux = {
           enable = true;
           terminal = "tmux-256color";
@@ -449,6 +490,14 @@
 
             # Claude Code picker (claude-tmux TUI)
             bind a display-popup -E -w 80% -h 50% "${lib.getExe claudeTmux}"
+
+            # Agent dashboard (tmux-orchid): discovers agents across every tmux
+            # pane and can spawn new ones. Runs in its own full-screen "orchid"
+            # session, so it is a run-shell rather than a popup; re-invoking it
+            # just switches back to the running dashboard.
+            bind t run-shell "${lib.getExe tmuxOrchid}"
+            # Same, but kill the existing dashboard session first.
+            bind T run-shell "${lib.getExe tmuxOrchid} --restart"
 
             # Navigation between panes
             bind h select-pane -L
