@@ -193,6 +193,8 @@ in
           profiles.rpi.enable = true;
           gaming.retroarch.enable = true;
           gaming.retroarch.package = retroarchGles3;
+          # Metrics for the central Prometheus (modules/monitoring/node-exporter.nix).
+          monitoring.nodeExporter.enable = true;
           # RPi-tuned Kodi, taken prebuilt from nixos-raspberrypi's cachix
           # rather than rebuilt locally via inject-overlays-global (see the
           # note in the imports above, and the `package` option's docs).
