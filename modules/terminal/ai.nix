@@ -77,6 +77,7 @@
           mistral-vibe
           sidecar # Terminal-based companion to orchestrate your AI agents alongside Neovim
           claude-agent-acp # ACP provider for agentic.nvim
+          pi
 
           # Assistant
           # picoclaw # Hash mismatch
@@ -96,6 +97,7 @@
           happy-coder # easy remote sessions
           ccusage # Usage for claude code
           gitnexus # Repo as KG for agents
+          codegraph # Graph for code
 
           # Appearance
           ccstatusline # statusline for claude
@@ -105,6 +107,12 @@
 
           # LLM proxy for claude code
           cli-proxy-api
+
+          # GUI
+          claude-desktop
+          bb-app
+        ] ++ [
+          pkgs.apm-cli
         ];
         programs = {
           claude-code = {
@@ -112,7 +120,7 @@
             settings = {
               model = "claude-sonnet-4-6";
               hooks.Notification = lib.optionals pkgs.stdenv.isDarwin [
-                { hooks = [ { type = "command"; command = "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg notifyScript}"; } ]; }
+                { hooks = [{ type = "command"; command = "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg notifyScript}"; }]; }
               ];
             };
           };
