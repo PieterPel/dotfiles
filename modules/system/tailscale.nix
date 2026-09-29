@@ -1,5 +1,9 @@
 let
-  mkModule =
+  # `server` mode pulls in `networking.firewall`, which only exists on NixOS
+  # (nix-darwin has no such option, and nixpkgs now validates option paths
+  # even inside a false `mkIf`). So nixos and darwin get separate module
+  # bodies rather than one shared `mkModule`.
+  nixosModule =
     { config, lib, pkgs, ... }:
     let
       cfg = config.modules.system.tailscale;
@@ -43,8 +47,23 @@ let
         })
       ]);
     };
+
+  darwinModule =
+    { config, lib, ... }:
+    let
+      cfg = config.modules.system.tailscale;
+    in
+    {
+      options.modules.system.tailscale = {
+        enable = lib.mkEnableOption "Enable Tailscale";
+      };
+
+      config = lib.mkIf cfg.enable {
+        services.tailscale.enable = true;
+      };
+    };
 in
 {
-  flake.modules.nixos.tailscale = mkModule;
-  flake.modules.darwin.tailscale = mkModule;
+  flake.modules.nixos.tailscale = nixosModule;
+  flake.modules.darwin.tailscale = darwinModule;
 }
