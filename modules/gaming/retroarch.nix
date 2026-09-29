@@ -1,11 +1,10 @@
 {
   flake.modules.nixos.retroarch =
-    {
-      config,
-      lib,
-      pkgs,
-      self,
-      ...
+    { config
+    , lib
+    , pkgs
+    , self
+    , ...
     }:
     let
       cfg = config.modules.gaming.retroarch;
@@ -63,28 +62,29 @@
             ''cheevos_username = "${cfg.retroachievements.username}"''
           ]
           ++ lib.concatLists (
-            lib.imap1 (i: device: [
-              ''input_player${toString i}_reserved_device = "${device}"''
-              # 1 = "preferred": the named pad takes this port whenever it is
-              # connected, but the port still accepts another pad when it is
-              # not. 2 would be "reserved", leaving the port dead unless that
-              # exact pad is on -- wrong here, since either controller should
-              # work on its own.
-              ''input_player${toString i}_device_reservation_type = "1"''
-            ]) cfg.playerDevices
+            lib.imap1
+              (i: device: [
+                ''input_player${toString i}_reserved_device = "${device}"''
+                # 1 = "preferred": the named pad takes this port whenever it is
+                # connected, but the port still accepts another pad when it is
+                # not. 2 would be "reserved", leaving the port dead unless that
+                # exact pad is on -- wrong here, since either controller should
+                # work on its own.
+                ''input_player${toString i}_device_reservation_type = "1"''
+              ])
+              cfg.playerDevices
           )
         )
       );
       # The video pins above are unconditional, so the overlay is always emitted.
       hasOverrides = true;
       appendConfigPaths = lib.optional hasOverrides "${overrideCfg}" ++ cfg.extraAppendConfigs;
-      appendFlag = lib.optionalString (appendConfigPaths != [ ]) (
-        # RetroArch delimits multiple --appendconfig files with '|' (NOT ','). The
-        # value MUST be shell-quoted: unquoted, the '|' is parsed as a shell pipe,
-        # so only the first overlay reaches RetroArch and the rest are run as
-        # commands ("Permission denied"). Quoting passes the whole list literally.
-        " --appendconfig \"${lib.concatStringsSep "|" appendConfigPaths}\""
-      );
+      # RetroArch delimits multiple --appendconfig files with '|' (NOT ','). The
+      # value MUST be shell-quoted: unquoted, the '|' is parsed as a shell pipe,
+      # so only the first overlay reaches RetroArch and the rest are run as
+      # commands ("Permission denied"). Quoting passes the whole list literally.
+      appendFlag = lib.optionalString (appendConfigPaths != [ ])
+        " --appendconfig \"${lib.concatStringsSep "|" appendConfigPaths}\"";
 
       # RetroArch launch script (no display-mode logic — the shared kiosk module
       # forces the mode via wlr-randr before running this). Exposed as `kioskScript`

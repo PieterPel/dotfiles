@@ -1,11 +1,10 @@
 {
   flake.modules.nixos.kodiLauncher =
-    {
-      config,
-      lib,
-      pkgs,
-      self,
-      ...
+    { config
+    , lib
+    , pkgs
+    , self
+    , ...
     }:
     let
       cfg = config.modules.gaming.kodiLauncher;
@@ -105,11 +104,13 @@
         }";
       };
 
-      appHandoffs = map (app: {
-        slug = slugify app.name;
-        fullname = app.name;
-        inherit (app) command icon;
-      }) cfg.apps;
+      appHandoffs = map
+        (app: {
+          slug = slugify app.name;
+          fullname = app.name;
+          inherit (app) command icon;
+        })
+        cfg.apps;
 
       allHandoffs = retroarchHandoff ++ appHandoffs;
 
@@ -221,103 +222,109 @@
         # single attrset cannot define both that and `systemd.services`.
         { systemd.services = handoffServices; }
         {
-        systemd.tmpfiles.rules = [
-          "d /home/${cfg.user}/.kodi/userdata 0755 ${cfg.user} users - -"
-          # Kodi doesn't create this itself on first run -- it tries to open
-          # temp/kodi.log for writing before that point and aborts if missing.
-          "d /home/${cfg.user}/.kodi/temp 0755 ${cfg.user} users - -"
-          "L+ /home/${cfg.user}/.kodi/userdata/favourites.xml - - - - ${favouritesXml}"
-        ];
+          # kodi-gbm owns tty1's DRM master directly (see kodiGbm above) --
+          # it does NOT run inside cage. Force the shared kiosk off so
+          # cage-tty1.service doesn't also try to claim tty1.
+          modules.gaming.kiosk.enable = lib.mkForce false;
 
-        # kodi-gbm owns tty1's DRM master directly (see kodiGbm above) --
-        # it does NOT run inside cage. Force the shared kiosk off so
-        # cage-tty1.service doesn't also try to claim tty1.
-        modules.gaming.kiosk.enable = lib.mkForce false;
+          hardware.graphics.enable = lib.mkDefault true;
 
-        # Kodi runs as an unprivileged user, so starting a handoff unit needs
-        # authorisation. Scoped to exactly the handoff units by name -- not
-        # blanket manage-units rights.
-        security.polkit.extraConfig = lib.mkIf (allHandoffs != [ ]) ''
-          polkit.addRule(function(action, subject) {
-            if (action.id == "org.freedesktop.systemd1.manage-units" &&
-                subject.user == "${cfg.user}") {
-              var handoffUnits = ${builtins.toJSON (map (h: "${handoffUnit h}.service") allHandoffs)};
-              if (handoffUnits.indexOf(action.lookup("unit")) !== -1) {
-                return polkit.Result.YES;
-              }
-            }
-          });
-        '';
+          security = {
+            # Kodi runs as an unprivileged user, so starting a handoff unit needs
+            # authorisation. Scoped to exactly the handoff units by name -- not
+            # blanket manage-units rights.
+            polkit.extraConfig = lib.mkIf (allHandoffs != [ ]) ''
+              polkit.addRule(function(action, subject) {
+                if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                    subject.user == "${cfg.user}") {
+                  var handoffUnits = ${builtins.toJSON (map (h: "${handoffUnit h}.service") allHandoffs)};
+                  if (handoffUnits.indexOf(action.lookup("unit")) !== -1) {
+                    return polkit.Result.YES;
+                  }
+                }
+              });
+            '';
 
-        # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. Duplicated here
-        # (rather than relying on kiosk.nix's copy) because kiosk is forced
-        # off above. The handoff no longer switches VTs, but leaving this in
-        # place keeps a manual escape hatch to a console.
-        security.wrappers.chvt = {
-          source = "${pkgs.kbd}/bin/chvt";
-          capabilities = "cap_sys_tty_config+ep";
-          owner = "root";
-          group = "root";
-          permissions = "u+rx,g+x,o+x";
-        };
+            # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. Duplicated here
+            # (rather than relying on kiosk.nix's copy) because kiosk is forced
+            # off above. The handoff no longer switches VTs, but leaving this in
+            # place keeps a manual escape hatch to a console.
+            wrappers.chvt = {
+              source = "${pkgs.kbd}/bin/chvt";
+              capabilities = "cap_sys_tty_config+ep";
+              owner = "root";
+              group = "root";
+              permissions = "u+rx,g+x,o+x";
+            };
 
-        # Mirrors nixpkgs' services.cage module (and this repo's earlier
-        # EGLFS/Pegasus attempt) -- the known-working pattern for a
-        # kiosk-on-tty1 systemd unit that gets DRM access via a logind
-        # session, just running kodi-standalone directly instead of
-        # `cage -- <program>`.
-        security.polkit.enable = true;
-        security.pam.services.kodi.text = ''
-          auth    required pam_unix.so nullok
-          account required pam_unix.so
-          session required pam_unix.so
-          session required pam_env.so conffile=/etc/pam/environment readenv=0
-          session required ${config.systemd.package}/lib/security/pam_systemd.so
-        '';
-        hardware.graphics.enable = lib.mkDefault true;
-        systemd.defaultUnit = "graphical.target";
-        systemd.targets.graphical.wants = [ "kodi-tty1.service" ];
-        systemd.services.kodi-tty1 = {
-          enable = true;
-          after = [
-            "systemd-user-sessions.service"
-            "plymouth-start.service"
-            "plymouth-quit.service"
-            "systemd-logind.service"
-            "getty@tty1.service"
-          ];
-          before = [ "graphical.target" ];
-          wants = [
-            "dbus.socket"
-            "systemd-logind.service"
-            "plymouth-quit.service"
-          ];
-          wantedBy = [ "graphical.target" ];
-          conflicts = [ "getty@tty1.service" ];
-          # Must be true. With `false`, switch-to-configuration still *stops*
-          # this unit when its definition changes but is then forbidden from
-          # starting it again -- so every deploy left the box with Kodi dead
-          # and a getty squatting on tty1, needing a manual start. Restarting
-          # costs a few seconds of black screen during a deploy, which is a
-          # deliberate act anyway.
-          restartIfChanged = true;
-          unitConfig.ConditionPathExists = "/dev/tty1";
-          serviceConfig = {
-            ExecStart = "${launchScript}";
-            User = cfg.user;
-            IgnoreSIGPIPE = "no";
-            UtmpIdentifier = "%n";
-            UtmpMode = "user";
-            TTYPath = "/dev/tty1";
-            TTYReset = "yes";
-            TTYVHangup = "yes";
-            TTYVTDisallocate = "yes";
-            StandardInput = "tty-fail";
-            StandardOutput = "journal";
-            StandardError = "journal";
-            PAMName = "kodi";
+            # Mirrors nixpkgs' services.cage module (and this repo's earlier
+            # EGLFS/Pegasus attempt) -- the known-working pattern for a
+            # kiosk-on-tty1 systemd unit that gets DRM access via a logind
+            # session, just running kodi-standalone directly instead of
+            # `cage -- <program>`.
+            polkit.enable = true;
+            pam.services.kodi.text = ''
+              auth    required pam_unix.so nullok
+              account required pam_unix.so
+              session required pam_unix.so
+              session required pam_env.so conffile=/etc/pam/environment readenv=0
+              session required ${config.systemd.package}/lib/security/pam_systemd.so
+            '';
           };
-        };
+
+          systemd = {
+            tmpfiles.rules = [
+              "d /home/${cfg.user}/.kodi/userdata 0755 ${cfg.user} users - -"
+              # Kodi doesn't create this itself on first run -- it tries to open
+              # temp/kodi.log for writing before that point and aborts if missing.
+              "d /home/${cfg.user}/.kodi/temp 0755 ${cfg.user} users - -"
+              "L+ /home/${cfg.user}/.kodi/userdata/favourites.xml - - - - ${favouritesXml}"
+            ];
+
+            defaultUnit = "graphical.target";
+            targets.graphical.wants = [ "kodi-tty1.service" ];
+            services.kodi-tty1 = {
+              enable = true;
+              after = [
+                "systemd-user-sessions.service"
+                "plymouth-start.service"
+                "plymouth-quit.service"
+                "systemd-logind.service"
+                "getty@tty1.service"
+              ];
+              before = [ "graphical.target" ];
+              wants = [
+                "dbus.socket"
+                "systemd-logind.service"
+                "plymouth-quit.service"
+              ];
+              wantedBy = [ "graphical.target" ];
+              conflicts = [ "getty@tty1.service" ];
+              # Must be true. With `false`, switch-to-configuration still *stops*
+              # this unit when its definition changes but is then forbidden from
+              # starting it again -- so every deploy left the box with Kodi dead
+              # and a getty squatting on tty1, needing a manual start. Restarting
+              # costs a few seconds of black screen during a deploy, which is a
+              # deliberate act anyway.
+              restartIfChanged = true;
+              unitConfig.ConditionPathExists = "/dev/tty1";
+              serviceConfig = {
+                ExecStart = "${launchScript}";
+                User = cfg.user;
+                IgnoreSIGPIPE = "no";
+                UtmpIdentifier = "%n";
+                UtmpMode = "user";
+                TTYPath = "/dev/tty1";
+                TTYReset = "yes";
+                TTYVHangup = "yes";
+                TTYVTDisallocate = "yes";
+                StandardInput = "tty-fail";
+                StandardOutput = "journal";
+                StandardError = "journal";
+                PAMName = "kodi";
+              };
+            };
+          };
         }
       ]);
     };

@@ -189,70 +189,72 @@ in
           };
         in
         {
-        modules = {
-          profiles.rpi.enable = true;
-          gaming.retroarch.enable = true;
-          gaming.retroarch.package = retroarchGles3;
-          # Metrics for the central Prometheus (modules/monitoring/node-exporter.nix).
-          monitoring.nodeExporter.enable = true;
-          # RPi-tuned Kodi, taken prebuilt from nixos-raspberrypi's cachix
-          # rather than rebuilt locally via inject-overlays-global (see the
-          # note in the imports above, and the `package` option's docs).
-          # Verified: `nix build --dry-run` on this package resolves to
-          # 0 derivations built, 357 paths fetched.
-          # `.withPackages` adds binary addons without rebuilding Kodi -- the
-          # package itself still substitutes; only the addon and its
-          # kodi-platform helper build (both small). The base package ships
-          # no binary addons at all (it has no lib/kodi/addons directory),
-          # and Kodi cannot read joysticks without peripheral.joystick, so
-          # without this a connected gamepad does nothing in the Kodi UI
-          # even though the kernel exposes it fine as /dev/input/js0.
-          gaming.kodiLauncher.package =
-            inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm.withPackages (
-              p: [
-                p.joystick
+          modules = {
+            profiles.rpi.enable = true;
+            # Metrics for the central Prometheus (modules/monitoring/node-exporter.nix).
+            monitoring.nodeExporter.enable = true;
+            gaming = {
+              retroarch.enable = true;
+              retroarch.package = retroarchGles3;
+              # RPi-tuned Kodi, taken prebuilt from nixos-raspberrypi's cachix
+              # rather than rebuilt locally via inject-overlays-global (see the
+              # note in the imports above, and the `package` option's docs).
+              # Verified: `nix build --dry-run` on this package resolves to
+              # 0 derivations built, 357 paths fetched.
+              # `.withPackages` adds binary addons without rebuilding Kodi -- the
+              # package itself still substitutes; only the addon and its
+              # kodi-platform helper build (both small). The base package ships
+              # no binary addons at all (it has no lib/kodi/addons directory),
+              # and Kodi cannot read joysticks without peripheral.joystick, so
+              # without this a connected gamepad does nothing in the Kodi UI
+              # even though the kernel exposes it fine as /dev/input/js0.
+              kodiLauncher.package =
+                inputs.nixos-raspberrypi-pkgs.packages.aarch64-linux.kodi-gbm.withPackages (
+                  p: [
+                    p.joystick
 
-                # Bluetooth pairing from inside Kodi. This is the only place
-                # it can live and still be usable from the couch: Kodi routes
-                # joystick input into its own UI, so a controller can drive
-                # it -- which a TUI like bluetuith fundamentally cannot
-                # receive, since a gamepad emits joystick events, not keys.
-                # It talks to bluez over D-Bus and implements Secure Simple
-                # Pairing (confirmation / passkey / PIN), so each device is
-                # confirmed on screen rather than leaving the adapter open to
-                # anything in range.
-                (p.buildKodiAddon {
-                  pname = "bluetooth-manager";
-                  namespace = "script.bluetooth.man";
-                  version = "1.0.6";
-                  src = pkgs.fetchFromGitHub {
-                    owner = "wastis";
-                    repo = "BluetoothManager";
-                    # 1.0.6 is untagged -- the tag list stops at v1.0.5, but
-                    # this commit's addon.xml declares 1.0.6 and carries the
-                    # SSP handlers (RequestConfirmation / RequestPasskey /
-                    # DisplayPinCode) that the older tags lack.
-                    rev = "3d2a31727bedecbbaa1b3dcd606390b006b7ca3a";
-                    hash = "sha256-hWNi2hm5FmkRPamxMSHF3WfQ+2V+qQzkkTJWuqazbAc=";
-                  };
-                })
-              ]
-            );
-          system = {
-            configuration.enable = true;
-            internationalization.enable = true;
-            updating.enable = true;
+                    # Bluetooth pairing from inside Kodi. This is the only place
+                    # it can live and still be usable from the couch: Kodi routes
+                    # joystick input into its own UI, so a controller can drive
+                    # it -- which a TUI like bluetuith fundamentally cannot
+                    # receive, since a gamepad emits joystick events, not keys.
+                    # It talks to bluez over D-Bus and implements Secure Simple
+                    # Pairing (confirmation / passkey / PIN), so each device is
+                    # confirmed on screen rather than leaving the adapter open to
+                    # anything in range.
+                    (p.buildKodiAddon {
+                      pname = "bluetooth-manager";
+                      namespace = "script.bluetooth.man";
+                      version = "1.0.6";
+                      src = pkgs.fetchFromGitHub {
+                        owner = "wastis";
+                        repo = "BluetoothManager";
+                        # 1.0.6 is untagged -- the tag list stops at v1.0.5, but
+                        # this commit's addon.xml declares 1.0.6 and carries the
+                        # SSP handlers (RequestConfirmation / RequestPasskey /
+                        # DisplayPinCode) that the older tags lack.
+                        rev = "3d2a31727bedecbbaa1b3dcd606390b006b7ca3a";
+                        hash = "sha256-hWNi2hm5FmkRPamxMSHF3WfQ+2V+qQzkkTJWuqazbAc=";
+                      };
+                    })
+                  ]
+                );
+            };
+            system = {
+              configuration.enable = true;
+              internationalization.enable = true;
+              updating.enable = true;
+            };
+            security = {
+              sops.enable = true;
+            };
+            package-management = {
+              nix.enable = true;
+            };
+            virtualization = {
+              virtualization.enable = true;
+            };
           };
-          security = {
-            sops.enable = true;
-          };
-          package-management = {
-            nix.enable = true;
-          };
-          virtualization = {
-            virtualization.enable = true;
-          };
-        };
         }
       )
     ];

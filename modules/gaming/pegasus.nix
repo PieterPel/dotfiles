@@ -1,11 +1,10 @@
 {
   flake.modules.nixos.pegasus =
-    {
-      config,
-      lib,
-      pkgs,
-      inputs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , inputs
+    , ...
     }:
     let
       cfg = config.modules.gaming.pegasus;
@@ -61,19 +60,21 @@
         description: Play your retro game collection
       '';
 
-      extraEntries = lib.concatMapStrings (
-        app:
-        let
-          script = mkAppScript app;
-        in
-        ''
+      extraEntries = lib.concatMapStrings
+        (
+          app:
+          let
+            script = mkAppScript app;
+          in
+          ''
 
           game: ${app.name}
           file: ${script}
           launch: {file.path}
           ${lib.optionalString (app.description != "") "description: ${app.description}"}
         ''
-      ) cfg.apps;
+        )
+        cfg.apps;
 
       metadataFile = pkgs.writeText "pegasus-metadata.pegasus.txt" ''
         collection: Apps
@@ -155,85 +156,91 @@
       config = lib.mkIf cfg.enable {
         environment.systemPackages = [ pkgsStock.pegasus-frontend ];
 
-        systemd.tmpfiles.rules = [
-          # Game/app collection directory — contains the metadata file Pegasus reads.
-          "d /var/lib/pegasus/apps 0755 ${cfg.user} users - -"
-          # Config dir Pegasus writes its settings to (XDG_CONFIG_HOME override).
-          "d /var/lib/pegasus/config/pegasus-frontend 0755 ${cfg.user} users - -"
-          # Data dir for Pegasus cache / theme data (XDG_DATA_HOME override).
-          "d /var/lib/pegasus/data 0755 ${cfg.user} users - -"
-          # Always-current symlink to the Nix-generated metadata file.
-          "L+ /var/lib/pegasus/apps/metadata.pegasus.txt - - - - ${metadataFile}"
-          # game_dirs.txt (not settings.txt — there is no `game_dir` settings key;
-          # Pegasus silently ignores it) tells Pegasus which directories to scan
-          # for metadata.pegasus.txt collections: one absolute path per line.
-          # f+ truncates and rewrites on each activation so it tracks rebuilds.
-          "f+ /var/lib/pegasus/config/pegasus-frontend/game_dirs.txt 0644 ${cfg.user} users - /var/lib/pegasus/apps"
-        ];
-
         # Pegasus does NOT join the shared cage/Wayland kiosk (see launchScript)
         # — force it off so cage-tty1.service doesn't also try to claim tty1.
         modules.gaming.kiosk.enable = lib.mkForce false;
 
-        # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. A capability
-        # wrapper grants it narrowly (just this one binary) rather than full
-        # root via sudo — used by retroarchLaunch's VT handoff above.
-        security.wrappers.chvt = {
-          source = "${pkgs.kbd}/bin/chvt";
-          capabilities = "cap_sys_tty_config+ep";
-          owner = "root";
-          group = "root";
-          permissions = "u+rx,g+x,o+x";
+        security = {
+          # `chvt` needs CAP_SYS_TTY_CONFIG; guest has none. A capability
+          # wrapper grants it narrowly (just this one binary) rather than full
+          # root via sudo — used by retroarchLaunch's VT handoff above.
+          wrappers.chvt = {
+            source = "${pkgs.kbd}/bin/chvt";
+            capabilities = "cap_sys_tty_config+ep";
+            owner = "root";
+            group = "root";
+            permissions = "u+rx,g+x,o+x";
+          };
+
+          # Mirrors nixpkgs' services.cage module (nixos/modules/services/wayland/cage.nix)
+          # almost exactly, since that's the known-working pattern for a
+          # kiosk-on-tty1 systemd unit — just running pegasus-launch (EGLFS)
+          # directly instead of `cage -- <program>`.
+          polkit.enable = true;
+          pam.services.pegasus.text = ''
+            auth    required pam_unix.so nullok
+            account required pam_unix.so
+            session required pam_unix.so
+            session required pam_env.so conffile=/etc/pam/environment readenv=0
+            session required ${config.systemd.package}/lib/security/pam_systemd.so
+          '';
         };
 
-        # Mirrors nixpkgs' services.cage module (nixos/modules/services/wayland/cage.nix)
-        # almost exactly, since that's the known-working pattern for a
-        # kiosk-on-tty1 systemd unit — just running pegasus-launch (EGLFS)
-        # directly instead of `cage -- <program>`.
-        security.polkit.enable = true;
-        security.pam.services.pegasus.text = ''
-          auth    required pam_unix.so nullok
-          account required pam_unix.so
-          session required pam_unix.so
-          session required pam_env.so conffile=/etc/pam/environment readenv=0
-          session required ${config.systemd.package}/lib/security/pam_systemd.so
-        '';
         hardware.graphics.enable = lib.mkDefault true;
-        systemd.defaultUnit = "graphical.target";
-        systemd.targets.graphical.wants = [ "pegasus-tty1.service" ];
-        systemd.services.pegasus-tty1 = {
-          enable = true;
-          after = [
-            "systemd-user-sessions.service"
-            "plymouth-start.service"
-            "plymouth-quit.service"
-            "systemd-logind.service"
-            "getty@tty1.service"
+
+        systemd = {
+          tmpfiles.rules = [
+            # Game/app collection directory — contains the metadata file Pegasus reads.
+            "d /var/lib/pegasus/apps 0755 ${cfg.user} users - -"
+            # Config dir Pegasus writes its settings to (XDG_CONFIG_HOME override).
+            "d /var/lib/pegasus/config/pegasus-frontend 0755 ${cfg.user} users - -"
+            # Data dir for Pegasus cache / theme data (XDG_DATA_HOME override).
+            "d /var/lib/pegasus/data 0755 ${cfg.user} users - -"
+            # Always-current symlink to the Nix-generated metadata file.
+            "L+ /var/lib/pegasus/apps/metadata.pegasus.txt - - - - ${metadataFile}"
+            # game_dirs.txt (not settings.txt — there is no `game_dir` settings key;
+            # Pegasus silently ignores it) tells Pegasus which directories to scan
+            # for metadata.pegasus.txt collections: one absolute path per line.
+            # f+ truncates and rewrites on each activation so it tracks rebuilds.
+            "f+ /var/lib/pegasus/config/pegasus-frontend/game_dirs.txt 0644 ${cfg.user} users - /var/lib/pegasus/apps"
           ];
-          before = [ "graphical.target" ];
-          wants = [
-            "dbus.socket"
-            "systemd-logind.service"
-            "plymouth-quit.service"
-          ];
-          wantedBy = [ "graphical.target" ];
-          conflicts = [ "getty@tty1.service" ];
-          restartIfChanged = false;
-          unitConfig.ConditionPathExists = "/dev/tty1";
-          serviceConfig = {
-            ExecStart = "${launchScript}";
-            User = cfg.user;
-            IgnoreSIGPIPE = "no";
-            UtmpIdentifier = "%n";
-            UtmpMode = "user";
-            TTYPath = "/dev/tty1";
-            TTYReset = "yes";
-            TTYVHangup = "yes";
-            TTYVTDisallocate = "yes";
-            StandardInput = "tty-fail";
-            StandardOutput = "journal";
-            StandardError = "journal";
-            PAMName = "pegasus";
+
+          defaultUnit = "graphical.target";
+          targets.graphical.wants = [ "pegasus-tty1.service" ];
+          services.pegasus-tty1 = {
+            enable = true;
+            after = [
+              "systemd-user-sessions.service"
+              "plymouth-start.service"
+              "plymouth-quit.service"
+              "systemd-logind.service"
+              "getty@tty1.service"
+            ];
+            before = [ "graphical.target" ];
+            wants = [
+              "dbus.socket"
+              "systemd-logind.service"
+              "plymouth-quit.service"
+            ];
+            wantedBy = [ "graphical.target" ];
+            conflicts = [ "getty@tty1.service" ];
+            restartIfChanged = false;
+            unitConfig.ConditionPathExists = "/dev/tty1";
+            serviceConfig = {
+              ExecStart = "${launchScript}";
+              User = cfg.user;
+              IgnoreSIGPIPE = "no";
+              UtmpIdentifier = "%n";
+              UtmpMode = "user";
+              TTYPath = "/dev/tty1";
+              TTYReset = "yes";
+              TTYVHangup = "yes";
+              TTYVTDisallocate = "yes";
+              StandardInput = "tty-fail";
+              StandardOutput = "journal";
+              StandardError = "journal";
+              PAMName = "pegasus";
+            };
           };
         };
       };

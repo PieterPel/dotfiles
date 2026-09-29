@@ -5,12 +5,11 @@
   # regardless of which frontend is active — enabling a different one no
   # longer shuffles the wlr-randr logic around.
   flake.modules.nixos.kiosk =
-    {
-      config,
-      lib,
-      pkgs,
-      self,
-      ...
+    { config
+    , lib
+    , pkgs
+    , self
+    , ...
     }:
     let
       cfg = config.modules.gaming.kiosk;
@@ -93,7 +92,7 @@
 
         services.cage = {
           enable = true;
-          user = cfg.user;
+          inherit (cfg) user;
           package = pkgsStock.cage; # stock cage/wlroots -> fetched, not ARM-rebuilt
           program = launcher;
         };
