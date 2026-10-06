@@ -54,6 +54,9 @@
 
             # Not in nixpkgs
             "claude"
+
+            # Something broken in nixpkgs
+            "cloudflare-warp"
           ];
         };
       };
