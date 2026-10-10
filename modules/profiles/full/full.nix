@@ -85,6 +85,7 @@ let
         git-session-layout = defaultEnable;
         delta = defaultEnable;
         werkboom = defaultEnable;
+        werkbord = defaultEnable;
       };
       theming.stylix = defaultEnable;
       security.sops = defaultEnable;
