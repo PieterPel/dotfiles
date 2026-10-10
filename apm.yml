@@ -6,12 +6,16 @@ version: 0.1.0
 
 dependencies:
   apm:
-    # werkboom's own skill, vendored out of the Codeberg monorepo. Not a
-    # top-level package, hence the object form with an explicit subpath.
+    # The mono apps' own skills, vendored out of the Codeberg monorepo. Not
+    # top-level packages, hence the object form with an explicit subpath.
     - git: https://codeberg.org/PieterPel/mono.git
-      path: apps/rust/werkboom/.claude/skills/werkboom
+      path: apps/rust/werkboom/skills/werkboom
       ref: trunk
       alias: werkboom
+    - git: https://codeberg.org/PieterPel/mono.git
+      path: apps/rust/werkbord/skills/werkbord
+      ref: trunk
+      alias: werkbord
 
   mcp:
     # codegraph is not an APM/Claude plugin -- it's a CLI that speaks MCP over
