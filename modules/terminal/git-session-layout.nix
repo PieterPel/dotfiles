@@ -16,6 +16,20 @@
         cd "$path" 2>/dev/null || exit 0
         git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
+        # The board's session is werkbord's own.
+        if tmux show-environment -t "=$session" WERKBORD_BOARD >/dev/null 2>&1; then
+          exit 0
+        fi
+
+        # A werkbord task session: window 1 is the agent (with the board
+        # beside it), so the editor and shell come after it.
+        if tmux show-environment -t "=$session" WERKBORD_TASK >/dev/null 2>&1; then
+          tmux new-window -d -t "=$session:" -n "nvim" -c "$path"
+          tmux send-keys -t "=$session:nvim" "nvim ." Enter
+          tmux new-window -d -t "=$session:" -n "shell" -c "$path"
+          exit 0
+        fi
+
         tmux rename-window -t "$session:1" "nvim"
         tmux send-keys -t "$session:1" "nvim ." Enter
 
