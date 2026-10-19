@@ -1,10 +1,11 @@
 { inputs, ... }:
 {
   flake.modules.homeManager.werkbord =
-    { config
-    , lib
-    , pkgs
-    , ...
+    {
+      config,
+      lib,
+      pkgs,
+      ...
     }:
     let
       cfg = config.modules.terminal.werkbord;
@@ -38,13 +39,15 @@
 
       # A dot from the status werkbord stamps on an agent's window (and its
       # task session): working, needs you, ready for review, approved.
-      dot = option: lib.concatStrings [
-        "#{?${option},"
-        "#{?#{==:#{${option}},working},#[fg=#{@thm_blue}]● ,"
-        "#{?#{m:needs-*,#{${option}}},#[fg=#{@thm_red}]? ,"
-        "#{?#{==:#{${option}},ready-for-review},#[fg=#{@thm_green}]◆ ,"
-        "#{?#{==:#{${option}},approved},#[fg=#{@thm_green}]✓ ,}}}},}"
-      ];
+      dot =
+        option:
+        lib.concatStrings [
+          "#{?${option},"
+          "#{?#{==:#{${option}},working},#[fg=#{@thm_blue}]● ,"
+          "#{?#{m:needs-*,#{${option}}},#[fg=#{@thm_red}]? ,"
+          "#{?#{==:#{${option}},ready-for-review},#[fg=#{@thm_green}]◆ ,"
+          "#{?#{==:#{${option}},approved},#[fg=#{@thm_green}]✓ ,}}}},}"
+        ];
     in
     {
       options.modules.terminal.werkbord = {
@@ -62,8 +65,6 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = [ package ];
-
         programs.tmux.extraConfig = lib.mkAfter ''
           # werkbord: the board is its own session; every task gets a session
           # with the board as a sidebar beside its agent.
@@ -77,6 +78,11 @@
           set -g @agent_dot "${dot "@werkbord_status"}"
           set -g @agent_sdot "${dot "@werkbord_status"}"
         '';
+        packages = [
+          package
+        ]
+        # Apple's `container`: the VMs werkbord's boxed agents run in.
+        ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.container ];
       };
     };
 }

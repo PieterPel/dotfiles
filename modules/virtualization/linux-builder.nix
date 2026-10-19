@@ -9,6 +9,23 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # The VZ VM asks macOS to start a DNS proxy on port 53. WARP needs
+        # that port first, so let the existing builder service wait for WARP
+        # before it starts the VM. mkBefore preserves nix-darwin's builder
+        # startup script, including its persistent disk setup. The builder
+        # stays pending if WARP cannot connect.
+        launchd.daemons.linux-builder.script = lib.mkBefore ''
+          warp_cli="/Applications/Cloudflare WARP.app/Contents/Resources/warp-cli"
+          if [ -x "$warp_cli" ]; then
+            while ! "$warp_cli" connect >/dev/null 2>&1; do
+              sleep 5
+            done
+            until "$warp_cli" --json status 2>/dev/null | ${lib.getExe pkgs.jq} -e '.status == "Connected"' >/dev/null; do
+              sleep 5
+            done
+          fi
+        '';
+
         # `darwin.linux-builder-vz` runs the build VM on Apple's
         # Virtualization.framework instead of QEMU. Two consequences worth
         # knowing before touching the settings below:
