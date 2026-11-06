@@ -1,11 +1,10 @@
 { inputs, ... }:
 {
   flake.modules.homeManager.werkbord =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
+    { config
+    , lib
+    , pkgs
+    , ...
     }:
     let
       cfg = config.modules.terminal.werkbord;
@@ -78,6 +77,27 @@
           set -g @agent_dot "${dot "@werkbord_status"}"
           set -g @agent_sdot "${dot "@werkbord_status"}"
         '';
+        # Claude Code steers toward the board: a status line with what waits on
+        # you, and hooks that offer `werkbord launch` for pasted links and
+        # hand-made worktrees. From PATH: these subcommands are newer than
+        # the pinned mono input.
+        programs.claude-code.settings = {
+          statusLine = {
+            type = "command";
+            command = "werkbord claude statusline";
+            refreshInterval = 5;
+          };
+          hooks = {
+            UserPromptSubmit = [{ hooks = [{ type = "command"; command = "werkbord claude hook"; }]; }];
+            SessionStart = [{ hooks = [{ type = "command"; command = "werkbord claude hook"; }]; }];
+            PreToolUse = [
+              {
+                matcher = "Bash";
+                hooks = [{ type = "command"; command = "werkbord claude hook"; }];
+              }
+            ];
+          };
+        };
         packages = [
           package
         ]
