@@ -36,12 +36,14 @@
         # After tmux.nix's status-right and session row: the plugin adds to
         # the one and replaces the other. From PATH, like Claude's settings:
         # its subcommands are newer than the pinned mono input's binary.
-        programs.tmux.extraConfig = lib.mkIf (tmuxPlugin != null) (lib.mkAfter ''
-          set -g @werkbord_bin werkbord
-          set -g @werkbord_board_session "${cfg.boardSession}"
-          set -g @werkbord_sidebar_width "${toString cfg.sidebarWidth}"
-          run-shell ${tmuxPlugin}/share/tmux-plugins/werkbord/werkbord.tmux
-        '');
+        programs.tmux.extraConfig = lib.mkIf (tmuxPlugin != null) (
+          lib.mkAfter ''
+            set -g @werkbord_bin werkbord
+            set -g @werkbord_board_session "${cfg.boardSession}"
+            set -g @werkbord_sidebar_width "${toString cfg.sidebarWidth}"
+            run-shell ${tmuxPlugin}/share/tmux-plugins/werkbord/werkbord.tmux
+          ''
+        );
         # Claude Code steers toward the board: werkbord's plugin (handoff,
         # inbox, orchestrator, hooks) from mono's marketplace, and the status
         # line, which a plugin can't set. From PATH: these subcommands are
@@ -60,9 +62,9 @@
         };
         packages = [
           package
-        ]
+        ];
         # Apple's `container`: the VMs werkbord's boxed agents run in.
-        ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.container ];
+        # ++ lib.optionals pkgs.stdenv.isDarwin [ pkgs.container ]
       };
     };
 }
