@@ -23,10 +23,10 @@
     # input only, so the closure gains just the resulting PNG.
     svgToPng =
       pkgs:
-      {
-        name,
-        src,
-        size ? 256,
+      { name
+      , src
+      , size ? 256
+      ,
       }:
       pkgs.runCommand "${name}.png" { nativeBuildInputs = [ pkgs.librsvg ]; } ''
         rsvg-convert \
