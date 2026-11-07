@@ -27,7 +27,7 @@
         };
         sidebarWidth = lib.mkOption {
           type = lib.types.ints.positive;
-          default = 34;
+          default = 28;
           description = "Columns of the sidebar the toggle opens ([multiplexer] sidebar_width).";
         };
       };
