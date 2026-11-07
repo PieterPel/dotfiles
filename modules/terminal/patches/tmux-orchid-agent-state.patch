@@ -38,10 +38,18 @@ index d070de6..0c03cef 100644
  	{AgentClaudeCode, "what would you like to do", StatusIdle},
  	{AgentClaudeCode, "how can i help", StatusIdle},
 diff --git a/state/manager.go b/state/manager.go
-index 8c3a631..54ea155 100644
+index 8c3a631..80dd47c 100644
 --- a/state/manager.go
 +++ b/state/manager.go
-@@ -132,6 +132,10 @@ func (m *Manager) poll(ctx context.Context) {
+@@ -5,6 +5,7 @@ import (
+ 	"log/slog"
+ 	"path/filepath"
+ 	"sort"
++	"strconv"
+ 	"sync"
+ 	"time"
+ 
+@@ -132,6 +133,10 @@ func (m *Manager) poll(ctx context.Context) {
  
  	events := diffSnapshots(old, snap)
  
@@ -52,7 +60,7 @@ index 8c3a631..54ea155 100644
  	m.mu.Lock()
  	m.current = snap
  	m.mu.Unlock()
-@@ -145,6 +149,32 @@ func (m *Manager) poll(ctx context.Context) {
+@@ -145,6 +150,40 @@ func (m *Manager) poll(ctx context.Context) {
  	m.emit(events)
  }
  
@@ -65,19 +73,27 @@ index 8c3a631..54ea155 100644
 +// tmux status line: idle, thinking, tool_use, error, done or unknown.
 +const AgentStateOption = "@agent_state"
 +
-+// tagPanes keeps AgentStateOption on each agent's pane in step with what
-+// this poll saw: set when it appears or changes, unset when it's gone.
++// AgentSinceOption holds when that status began, in Unix seconds: what has
++// waited longest comes first, however much it redraws meanwhile.
++const AgentSinceOption = "@agent_since"
++
++// tagPanes keeps AgentStateOption and AgentSinceOption on each agent's pane
++// in step with what this poll saw: set when it appears or changes, unset
++// when it's gone.
 +func tagPanes(ctx context.Context, t paneTagger, events []Event) {
++	now := strconv.FormatInt(time.Now().Unix(), 10)
 +	for _, ev := range events {
 +		if ev.PaneID == "" {
 +			continue
 +		}
-+		value := string(ev.Agent.Status)
++		state, since := string(ev.Agent.Status), now
 +		if ev.Kind == EventAgentRemoved {
-+			value = ""
++			state, since = "", ""
 +		}
-+		if err := t.SetPaneOption(ctx, ev.PaneID, AgentStateOption, value); err != nil {
-+			slog.Debug("tagging pane", "pane", ev.PaneID, "error", err)
++		for name, value := range map[string]string{AgentStateOption: state, AgentSinceOption: since} {
++			if err := t.SetPaneOption(ctx, ev.PaneID, name, value); err != nil {
++				slog.Debug("tagging pane", "pane", ev.PaneID, "option", name, "error", err)
++			}
 +		}
 +	}
 +}
@@ -87,10 +103,10 @@ index 8c3a631..54ea155 100644
  func (m *Manager) filterSessions(panes []tmux.Pane) []tmux.Pane {
 diff --git a/state/tag_test.go b/state/tag_test.go
 new file mode 100644
-index 0000000..809cf10
+index 0000000..7f36a09
 --- /dev/null
 +++ b/state/tag_test.go
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,44 @@
 +package state
 +
 +import (
@@ -100,10 +116,15 @@ index 0000000..809cf10
 +	"github.com/FelipeAfonso/tmux-orchid/detector"
 +)
 +
-+type fakeTagger struct{ set map[string]string }
++type fakeTagger struct{ set, since map[string]string }
 +
 +func (f *fakeTagger) SetPaneOption(_ context.Context, pane, name, value string) error {
-+	if name != AgentStateOption {
++	if name == AgentSinceOption {
++		if value != "" {
++			f.since[pane] = value
++		} else {
++			delete(f.since, pane)
++		}
 +		return nil
 +	}
 +	if value == "" {
@@ -115,7 +136,7 @@ index 0000000..809cf10
 +}
 +
 +func TestTagPanesFollowsAgents(t *testing.T) {
-+	f := &fakeTagger{set: map[string]string{"%3": "idle"}}
++	f := &fakeTagger{set: map[string]string{"%3": "idle"}, since: map[string]string{"%3": "1"}}
 +	tagPanes(context.Background(), f, []Event{
 +		{Kind: EventAgentAdded, PaneID: "%1", Agent: detector.AgentInfo{Status: detector.StatusThinking}},
 +		{Kind: EventAgentStatusChanged, PaneID: "%2", Agent: detector.AgentInfo{Status: detector.StatusIdle}},
@@ -125,6 +146,9 @@ index 0000000..809cf10
 +	want := map[string]string{"%1": "thinking", "%2": "idle"}
 +	if len(f.set) != len(want) || f.set["%1"] != want["%1"] || f.set["%2"] != want["%2"] {
 +		t.Fatalf("got %v, want %v", f.set, want)
++	}
++	if _, gone := f.since["%3"]; gone || f.since["%1"] == "" || f.since["%2"] == "" {
++		t.Fatalf("since: got %v", f.since)
 +	}
 +}
 diff --git a/tmux/client.go b/tmux/client.go
