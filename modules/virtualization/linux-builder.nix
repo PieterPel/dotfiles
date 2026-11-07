@@ -71,6 +71,14 @@
             };
             cores = 6;
           };
+
+          # The host's own key, so a build can target the VM's store directly
+          # (`--store ssh-ng://builder@linux-builder?ssh-key=~/.ssh/id_ed25519`)
+          # instead of copying every intermediate result back to the host. The
+          # key nix-darwin generates for the daemon is readable by root only.
+          config.users.users.builder.openssh.authorizedKeys.keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEyfpqG451PQTrv6WkJWiGtllJUX0q0Owql5M28qcxv4 p.pel@rebelsai.nl"
+          ];
         };
       };
     };
