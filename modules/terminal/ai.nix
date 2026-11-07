@@ -49,7 +49,10 @@
       # writable file, keeping any local edits (e.g. enabledPlugins).
       seedSettings = pkgs.writeShellApplication {
         name = "seed-claude-settings";
-        runtimeInputs = [ pkgs.jq pkgs.coreutils ];
+        runtimeInputs = [
+          pkgs.jq
+          pkgs.coreutils
+        ];
         text = ''
           target=$1
           baseline=$2
@@ -70,57 +73,66 @@
       };
 
       config = lib.mkIf cfg.enable {
-        packages = with inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}; [
-          # TUI
-          gemini-cli
-          code # Codex fork that also supports claude and gemini
-          mistral-vibe
-          sidecar # Terminal-based companion to orchestrate your AI agents alongside Neovim
-          claude-agent-acp # ACP provider for agentic.nvim
-          pi
+        packages =
+          with inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+          [
+            # TUI
+            gemini-cli
+            code # Codex fork that also supports claude and gemini
+            mistral-vibe
+            sidecar # Terminal-based companion to orchestrate your AI agents alongside Neovim
+            claude-agent-acp # ACP provider for agentic.nvim
+            pi
 
-          # Assistant
-          # picoclaw # Hash mismatch
+            # Assistant
+            # picoclaw # Hash mismatch
 
-          # Dev
-          tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
-          spec-kit # Bootstrap strict technical specs for Claude Max to follow
+            # Dev
+            tuicr # Review AI-generated diffs like a GitHub pull request, right from your terminal
+            spec-kit # Bootstrap strict technical specs for Claude Max to follow
 
-          # Multiagent / Workspace
-          workmux # Easily make new tmux window + git worktree
-          agent-deck # AI Agent command center
+            # Multiagent / Workspace
+            workmux # Easily make new tmux window + git worktree
+            agent-deck # AI Agent command center
 
-          # Util
-          entire # links AI sessions to code changes
-          rtk # Reduce input tokens
-          openskills # port SKILLS.md to other providers
-          happy-coder # easy remote sessions
-          ccusage # Usage for claude code
-          gitnexus # Repo as KG for agents
-          codegraph # Graph for code
+            # Util
+            entire # links AI sessions to code changes
+            rtk # Reduce input tokens
+            happy-coder # easy remote sessions
+            ccusage # Usage for claude code
+            gitnexus # Repo as KG for agents
+            codegraph # Graph for code
 
-          # Appearance
-          ccstatusline # statusline for claude
+            # Appearance
+            ccstatusline # statusline for claude
 
-          # Security
-          claudebox # Containerize claude code easily
+            # Security
+            claudebox # Containerize claude code easily
 
-          # LLM proxy for claude code
-          cli-proxy-api
+            # LLM proxy for claude code
+            cli-proxy-api
 
-          # GUI
-          claude-desktop
-          bb-app
-        ] ++ [
-          pkgs.apm-cli
-        ];
+            # GUI
+            claude-desktop
+            bb-app
+          ]
+          ++ [
+            pkgs.apm-cli
+          ];
         programs = {
           claude-code = {
             enable = true;
             settings = {
               model = "claude-sonnet-4-6";
               hooks.Notification = lib.optionals pkgs.stdenv.isDarwin [
-                { hooks = [{ type = "command"; command = "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg notifyScript}"; }]; }
+                {
+                  hooks = [
+                    {
+                      type = "command";
+                      command = "${pkgs.python3}/bin/python3 -c ${lib.escapeShellArg notifyScript}";
+                    }
+                  ];
+                }
               ];
             };
           };
@@ -132,8 +144,9 @@
         };
 
         home.file.".claude/settings.json".enable = lib.mkForce false;
-        home.activation.claudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ]
-          "run ${lib.getExe seedSettings} ${config.home.homeDirectory}/.claude/settings.json ${settingsFile}";
+        home.activation.claudeSettings =
+          lib.hm.dag.entryAfter [ "writeBoundary" ]
+            "run ${lib.getExe seedSettings} ${config.home.homeDirectory}/.claude/settings.json ${settingsFile}";
       };
     };
 }
