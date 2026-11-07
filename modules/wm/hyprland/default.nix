@@ -54,7 +54,6 @@
           kitty
           rofi
           wlogout
-          pw-volume
           playerctl
           brightnessctl
           networkmanagerapplet
