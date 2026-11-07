@@ -51,6 +51,10 @@ let
         stylix = {
           enable = true;
           override.base0F = "ff729a";
+          fonts.monospace = {
+            package = pkgs.nerd-fonts.jetbrains-mono;
+            name = "JetBrainsMono Nerd Font Mono";
+          };
           opacity = {
             desktop = 0.5;
             terminal = 0.8;
