@@ -1,5 +1,10 @@
 {
-  flake.modules.darwin.linux-builder = { config, lib, pkgs, ... }:
+  flake.modules.darwin.linux-builder =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       cfg = config.modules.virtualization.linux-builder;
     in
@@ -64,21 +69,30 @@
           # how much work can run at once.
           maxJobs = 6;
 
-          config.virtualisation = {
-            darwin-builder = {
-              diskSize = 60 * 1024; # MiB, a maximum: the qcow2 is sparse
-              memorySize = 8 * 1024; # MiB ceiling, not a reservation
+          config = {
+            virtualisation = {
+              darwin-builder = {
+                diskSize = 60 * 1024; # MiB, a maximum: the qcow2 is sparse
+                memorySize = 8 * 1024; # MiB ceiling, not a reservation
+              };
+              cores = 6;
             };
-            cores = 6;
-          };
 
-          # The host's own key, so a build can target the VM's store directly
-          # (`--store ssh-ng://builder@linux-builder?ssh-key=~/.ssh/id_ed25519`)
-          # instead of copying every intermediate result back to the host. The
-          # key nix-darwin generates for the daemon is readable by root only.
-          config.users.users.builder.openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEyfpqG451PQTrv6WkJWiGtllJUX0q0Owql5M28qcxv4 p.pel@rebelsai.nl"
-          ];
+            # The host's own key, so a build can target the VM's store directly
+            # (`--store ssh-ng://builder@linux-builder?ssh-key=~/.ssh/id_ed25519`)
+            # instead of copying every intermediate result back to the host. The
+            # key nix-darwin generates for the daemon is readable by root only.
+            users.users.builder.openssh.authorizedKeys.keys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEyfpqG451PQTrv6WkJWiGtllJUX0q0Owql5M28qcxv4 p.pel@rebelsai.nl"
+            ];
+            # nixpkgs' VZ builder profile mkForces sshd to read only the daemon's
+            # shared key, which drops the per-user file the key above lands in.
+            # mkOverride 40 outranks that mkForce (50) and keeps both.
+            services.openssh.authorizedKeysFiles = lib.mkOverride 40 [
+              "/run/builder-keys/%u_ed25519.pub"
+              "/etc/ssh/authorized_keys.d/%u"
+            ];
+          };
         };
       };
     };

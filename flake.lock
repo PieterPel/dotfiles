@@ -2512,11 +2512,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794046395,
-        "narHash": "sha256-7/uOO6Z3WHVdnxVv2QrFlZqHwDPpq6z53eNO+blvcoc=",
+        "lastModified": 1794057648,
+        "narHash": "sha256-iaNwYG1akichMzZ7b7Y8PCSpOtChzFsDdZO/+512O/E=",
         "ref": "trunk",
-        "rev": "6cf53eb2a5490368a292927f494b8c29d461d771",
-        "revCount": 207,
+        "rev": "08613abefc0ac5d15ff963955abb0f19cc257a06",
+        "revCount": 209,
         "type": "git",
         "url": "https://codeberg.org/PieterPel/mono.git"
       },
@@ -2539,17 +2539,17 @@
         "treefmt-nix": "treefmt-nix_7"
       },
       "locked": {
-        "lastModified": 1791631539,
-        "narHash": "sha256-D9ZsRgqQWYYcyjCyDqyBhoQ+ggHm1g5h6ZunoKPYEdc=",
+        "lastModified": 1794070348,
+        "narHash": "sha256-2XVVuc03aVeMTIhIwm9f2fLHheTXGAVpWu4PZxP5aic=",
         "ref": "refs/heads/trunk",
-        "rev": "c5bbb9e7578c2c0682a7599de739f12a6088f68f",
-        "revCount": 14,
+        "rev": "8e9db7a0f7780f97e1bd6e8597325a26ec3b3bff",
+        "revCount": 18,
         "type": "git",
         "url": "https://codeberg.org/PieterPel/base-mono.git"
       },
       "original": {
         "type": "git",
-        "url": "https://codeberg.org/PieterPel/base-mono.git"
+        "url": "ssh://git@codeberg.org/PieterPel/base-mono.git"
       }
     },
     "neovim-nightly-overlay": {
