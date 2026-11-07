@@ -2518,12 +2518,12 @@
         "rev": "6cf53eb2a5490368a292927f494b8c29d461d771",
         "revCount": 207,
         "type": "git",
-        "url": "ssh://git@codeberg.org/PieterPel/mono.git"
+        "url": "https://codeberg.org/PieterPel/mono.git"
       },
       "original": {
         "ref": "trunk",
         "type": "git",
-        "url": "ssh://git@codeberg.org/PieterPel/mono.git"
+        "url": "https://codeberg.org/PieterPel/mono.git"
       }
     },
     "mono-base": {
@@ -2545,11 +2545,11 @@
         "rev": "c5bbb9e7578c2c0682a7599de739f12a6088f68f",
         "revCount": 14,
         "type": "git",
-        "url": "ssh://git@codeberg.org/PieterPel/base-mono.git"
+        "url": "https://codeberg.org/PieterPel/base-mono.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@codeberg.org/PieterPel/base-mono.git"
+        "url": "https://codeberg.org/PieterPel/base-mono.git"
       }
     },
     "neovim-nightly-overlay": {
