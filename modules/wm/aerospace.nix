@@ -1,5 +1,10 @@
 {
-  flake.modules.darwin.aerospace = { config, lib, pkgs, ... }:
+  flake.modules.darwin.aerospace =
+    { config
+    , lib
+    , pkgs
+    , ...
+    }:
     let
       baseConfig = {
         # You can use it to add commands that run after AeroSpace startup.
@@ -290,7 +295,6 @@
 
       homebrewAppPath = name: "/Applications/${name}.app";
       nixPkgsAppPath = drv: name: "${drv}/Applications/${name}.app";
-      braveAppPath = name: "~/Applications/Brave Browser Apps.localized/${name}.app";
       coreServicesAppPath = name: "/System/Library/CoreServices/${name}.app";
 
       appedConfig = {
@@ -315,11 +319,6 @@
             "workspace 1"
           ];
 
-          "alt-a" = [
-            # Google Agenda (Brave) *Broken*
-            "exec-and-forget open ${braveAppPath "Google\ Agenda"}"
-            "workspace A"
-          ];
           "alt-b" = [
             # Bitwarden (homebrew)
             "exec-and-forget open ${homebrewAppPath "Bitwarden"}"
@@ -373,7 +372,7 @@
           ];
           "alt-w" = [
             # Brave (nixpkgs) *Broken*
-            "exec-and-forget open ${nixPkgsAppPath pkgs.brave "Brave\ Browser"}"
+            "exec-and-forget open ${homebrewAppPath "Brave\ Browser"}"
             "workspace W"
           ];
           "alt-x" = [
