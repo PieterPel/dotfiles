@@ -13,7 +13,7 @@
             "$modifier,L,exec,hyprlock"
             "$modifier,C,exec, codium"
             "$modifier,G,exec,gimp"
-            "$modifier,M,exec,pw-volume"
+            "$modifier,M,exec,pavucontrol"
             "$modifier,Q,killactive,"
             "$modifier,P,exec,pypr toggle volume"
             "$modifier SHIFT,P,pseudo,"

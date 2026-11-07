@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -103,8 +108,12 @@
     };
 
     mono = {
-      url = "git+ssh://git@codeberg.org/PieterPel/mono.git?ref=trunk";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # Public dependency: CI and external consumers must not need SSH credentials.
+      url = "git+https://codeberg.org/PieterPel/mono.git?ref=trunk";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        mono-base.url = "git+https://codeberg.org/PieterPel/base-mono.git";
+      };
     };
 
     harnt-nvim = {
