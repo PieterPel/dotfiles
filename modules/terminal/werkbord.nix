@@ -9,44 +9,13 @@
     let
       cfg = config.modules.terminal.werkbord;
       package = inputs.mono.packages.${pkgs.stdenv.hostPlatform.system}.werkbord;
-      werkbord = lib.getExe package;
 
-      # The board is a session of its own; `werkbord` started in it runs the
-      # board, and WERKBORD_BOARD keeps the after-new-session hooks off it.
-      boardScript = pkgs.writeShellScriptBin "werkbord-board" ''
-        set -euo pipefail
-        if ! tmux has-session -t "=${cfg.boardSession}" 2>/dev/null; then
-          tmux new-session -d -s "${cfg.boardSession}" -e WERKBORD_BOARD=1 "${werkbord}"
-        fi
-        tmux switch-client -t "=${cfg.boardSession}"
-      '';
-
-      # The sidebar werkbord puts beside its agents, toggled in any window:
-      # werkbord tags its pane, so it's found again by that.
-      sidebarScript = pkgs.writeShellScriptBin "werkbord-sidebar-toggle" ''
-        set -euo pipefail
-        pane=$(tmux list-panes -F '#{pane_id} #{@werkbord_sidebar}' | awk '$2 == "1" { print $1; exit }')
-        if [ -n "$pane" ]; then
-          tmux kill-pane -t "$pane"
-          exit 0
-        fi
-        task=$(tmux show-environment WERKBORD_TASK 2>/dev/null | sed -n 's/^WERKBORD_TASK=//p')
-        new=$(tmux split-window -d -h -b -l ${toString cfg.sidebarWidth} -P -F '#{pane_id}' \
-          -c "#{pane_current_path}" -- "${werkbord}" sidebar ''${task:+--task "$task"})
-        tmux set-option -p -t "$new" @werkbord_sidebar 1
-      '';
-
-      # A dot from the status werkbord stamps on an agent's window (and its
-      # task session): working, needs you, ready for review, approved.
-      dot =
-        option:
-        lib.concatStrings [
-          "#{?${option},"
-          "#{?#{==:#{${option}},working},#[fg=#{@thm_blue}]● ,"
-          "#{?#{m:needs-*,#{${option}}},#[fg=#{@thm_red}]? ,"
-          "#{?#{==:#{${option}},ready-for-review},#[fg=#{@thm_green}]◆ ,"
-          "#{?#{==:#{${option}},approved},#[fg=#{@thm_green}]✓ ,}}}},}"
-        ];
+      # werkbord's tmux plugin: dots for every agent's status (werkbord's
+      # own, or tmux-orchid's @agent_state for any other), the session row
+      # sorted by what needs you, and keys for the board, the sidebar, a
+      # task's menu, answering, a picker and wrapping up.
+      # Absent from a mono input pinned before it existed.
+      tmuxPlugin = inputs.mono.packages.${pkgs.stdenv.hostPlatform.system}.werkbord-tmux or null;
     in
     {
       options.modules.terminal.werkbord = {
@@ -64,19 +33,15 @@
       };
 
       config = lib.mkIf cfg.enable {
-        programs.tmux.extraConfig = lib.mkAfter ''
-          # werkbord: the board is its own session; every task gets a session
-          # with the board as a sidebar beside its agent.
-          bind B run-shell "${lib.getExe boardScript}"
-          bind J run-shell "${werkbord} next"
-          bind b run-shell "${lib.getExe sidebarScript}"
-
-          set -ga status-right " #(${werkbord} status-line --tmux)"
-
-          # tmux.nix shows these on the window tabs and the session row.
-          set -g @agent_dot "${dot "@werkbord_status"}"
-          set -g @agent_sdot "${dot "@werkbord_status"}"
-        '';
+        # After tmux.nix's status-right and session row: the plugin adds to
+        # the one and replaces the other. From PATH, like Claude's settings:
+        # its subcommands are newer than the pinned mono input's binary.
+        programs.tmux.extraConfig = lib.mkIf (tmuxPlugin != null) (lib.mkAfter ''
+          set -g @werkbord_bin werkbord
+          set -g @werkbord_board_session "${cfg.boardSession}"
+          set -g @werkbord_sidebar_width "${toString cfg.sidebarWidth}"
+          run-shell ${tmuxPlugin}/share/tmux-plugins/werkbord/werkbord.tmux
+        '');
         # Claude Code steers toward the board: werkbord's plugin (handoff,
         # inbox, orchestrator, hooks) from mono's marketplace, and the status
         # line, which a plugin can't set. From PATH: these subcommands are

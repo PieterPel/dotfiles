@@ -1,0 +1,152 @@
+diff --git a/detector/claude2_test.go b/detector/claude2_test.go
+new file mode 100644
+index 0000000..49b9938
+--- /dev/null
++++ b/detector/claude2_test.go
+@@ -0,0 +1,15 @@
++package detector
++
++import "testing"
++
++func TestClaudeCode2Screens(t *testing.T) {
++	working := "  For forty-one years, an error in the bash script...\n" +
++		"────────\n❯\n────────\n  ⏵⏵ auto mode on (shift+tab to cycle) · esc to interrupt\n"
++	if got := DetectStatus(AgentClaudeCode, working); got != StatusThinking {
++		t.Fatalf("working screen: got %s", got)
++	}
++	idle := "  The error was in the bash script.\n✻ Cogitated for 1s\n────────\n❯\n────────\n  ⏵⏵ auto mode on (shift+tab to cycle)\n"
++	if got := DetectStatus(AgentClaudeCode, idle); got != StatusIdle {
++		t.Fatalf("idle screen: got %s", got)
++	}
++}
+diff --git a/detector/status.go b/detector/status.go
+index d070de6..0c03cef 100644
+--- a/detector/status.go
++++ b/detector/status.go
+@@ -15,6 +15,13 @@ type statusRule struct {
+ // by agent, with more specific patterns listed before generic ones.
+ var statusRules = []statusRule{
+ 	// ── Claude Code ──────────────────────────────────────────────────
++	// Claude Code 2.x keeps its input box ("❯", the space after it
++	// trimmed by capture-pane) on screen at all times and says "esc to
++	// interrupt" in its footer only while a turn runs, so that comes
++	// first; the box alone is idle. The older patterns below match words
++	// that transcript text is full of as well.
++	{AgentClaudeCode, "esc to interrupt", StatusThinking},
++	{AgentClaudeCode, "❯", StatusIdle},
+ 	{AgentClaudeCode, "waiting for input", StatusIdle},
+ 	{AgentClaudeCode, "what would you like to do", StatusIdle},
+ 	{AgentClaudeCode, "how can i help", StatusIdle},
+diff --git a/state/manager.go b/state/manager.go
+index 8c3a631..54ea155 100644
+--- a/state/manager.go
++++ b/state/manager.go
+@@ -132,6 +132,10 @@ func (m *Manager) poll(ctx context.Context) {
+ 
+ 	events := diffSnapshots(old, snap)
+ 
++	if t, ok := m.source.(paneTagger); ok {
++		tagPanes(ctx, t, events)
++	}
++
+ 	m.mu.Lock()
+ 	m.current = snap
+ 	m.mu.Unlock()
+@@ -145,6 +149,32 @@ func (m *Manager) poll(ctx context.Context) {
+ 	m.emit(events)
+ }
+ 
++// paneTagger writes onto a pane. Satisfied by tmux.Client.
++type paneTagger interface {
++	SetPaneOption(ctx context.Context, paneID, name, value string) error
++}
++
++// AgentStateOption is the pane option holding an agent's status, for the
++// tmux status line: idle, thinking, tool_use, error, done or unknown.
++const AgentStateOption = "@agent_state"
++
++// tagPanes keeps AgentStateOption on each agent's pane in step with what
++// this poll saw: set when it appears or changes, unset when it's gone.
++func tagPanes(ctx context.Context, t paneTagger, events []Event) {
++	for _, ev := range events {
++		if ev.PaneID == "" {
++			continue
++		}
++		value := string(ev.Agent.Status)
++		if ev.Kind == EventAgentRemoved {
++			value = ""
++		}
++		if err := t.SetPaneOption(ctx, ev.PaneID, AgentStateOption, value); err != nil {
++			slog.Debug("tagging pane", "pane", ev.PaneID, "error", err)
++		}
++	}
++}
++
+ // filterSessions limits panes to those belonging to the configured session
+ // names. If no filter is set, all panes pass through.
+ func (m *Manager) filterSessions(panes []tmux.Pane) []tmux.Pane {
+diff --git a/state/tag_test.go b/state/tag_test.go
+new file mode 100644
+index 0000000..809cf10
+--- /dev/null
++++ b/state/tag_test.go
+@@ -0,0 +1,36 @@
++package state
++
++import (
++	"context"
++	"testing"
++
++	"github.com/FelipeAfonso/tmux-orchid/detector"
++)
++
++type fakeTagger struct{ set map[string]string }
++
++func (f *fakeTagger) SetPaneOption(_ context.Context, pane, name, value string) error {
++	if name != AgentStateOption {
++		return nil
++	}
++	if value == "" {
++		delete(f.set, pane)
++	} else {
++		f.set[pane] = value
++	}
++	return nil
++}
++
++func TestTagPanesFollowsAgents(t *testing.T) {
++	f := &fakeTagger{set: map[string]string{"%3": "idle"}}
++	tagPanes(context.Background(), f, []Event{
++		{Kind: EventAgentAdded, PaneID: "%1", Agent: detector.AgentInfo{Status: detector.StatusThinking}},
++		{Kind: EventAgentStatusChanged, PaneID: "%2", Agent: detector.AgentInfo{Status: detector.StatusIdle}},
++		{Kind: EventAgentRemoved, PaneID: "%3"},
++		{Kind: EventSnapshotUpdated},
++	})
++	want := map[string]string{"%1": "thinking", "%2": "idle"}
++	if len(f.set) != len(want) || f.set["%1"] != want["%1"] || f.set["%2"] != want["%2"] {
++		t.Fatalf("got %v, want %v", f.set, want)
++	}
++}
+diff --git a/tmux/client.go b/tmux/client.go
+index f3a4d29..4968141 100644
+--- a/tmux/client.go
++++ b/tmux/client.go
+@@ -40,6 +40,18 @@ func (c *Client) run(ctx context.Context, args ...string) (string, error) {
+ 	return string(out), nil
+ }
+ 
++// SetPaneOption sets the user option name on paneID, or unsets it when
++// value is empty. tmux's status line reads it: an agent's status for its
++// window and session, whatever is drawing the bar.
++func (c *Client) SetPaneOption(ctx context.Context, paneID, name, value string) error {
++	if value == "" {
++		_, err := c.run(ctx, "set-option", "-p", "-u", "-t", paneID, name)
++		return err
++	}
++	_, err := c.run(ctx, "set-option", "-p", "-t", paneID, name, value)
++	return err
++}
++
+ // Ping checks whether the tmux server is reachable by running `tmux info`.
+ // It returns nil if the server responds, or an error otherwise.
+ func (c *Client) Ping(ctx context.Context) error {

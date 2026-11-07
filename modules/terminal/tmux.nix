@@ -47,7 +47,10 @@
       # pane scraping) and lets you jump to them or spawn new ones. Upstream
       # publishes no release tarball, so it is built from source. The local patch
       # adds first-class `pi` support (detection + spawn entry), which upstream
-      # lacks -- see patches/tmux-orchid-pi.patch.
+      # lacks -- see patches/tmux-orchid-pi.patch. A second patch has it
+      # write each agent's status onto its pane as @agent_state, for the
+      # status bar's dots, and reads Claude Code 2.x's screen right -- see
+      # patches/tmux-orchid-agent-state.patch.
       tmuxOrchid = pkgs.buildGoModule {
         pname = "tmux-orchid";
         version = "unstable-2026-03-18";
@@ -58,7 +61,10 @@
           hash = "sha256-FWmlEiZSSwyPPZY2lMbSl1EnL2Be6UvrryjgJVH8sCo=";
         };
         vendorHash = "sha256-JDnqDtGoXuPIE0eAlcPcYohD5U9JMI9eSaTdWVv9yio=";
-        patches = [ ./patches/tmux-orchid-pi.patch ];
+        patches = [
+          ./patches/tmux-orchid-pi.patch
+          ./patches/tmux-orchid-agent-state.patch
+        ];
         meta.mainProgram = "tmux-orchid";
       };
 
@@ -222,6 +228,11 @@
               set -g status-interval 1
               set -g focus-events on
 
+              # tmux-orchid in the background from the start, in its own
+              # session (the bar leaves it out): it writes each agent's status
+              # onto its pane as @agent_state, which the window dots read.
+              run-shell -b "tmux has-session -t =orchid 2>/dev/null || tmux new-session -d -s orchid ${lib.getExe tmuxOrchid}"
+
               # Two-row status bar:
               #   format[0] (bottom): catppuccin window tabs — clickable (default tmux row)
               #   format[1] (top):    session list with numbers and Claude badges
@@ -258,9 +269,10 @@
               set -g @session_seg_alt '#[fg=#{E:@thm_fg},bg=#{E:@thm_surface_0}]#{E:@agent_sdot}#{e|+|:#{s|\$||:session_id},1} #{session_name} #[fg=#{E:@thm_surface_0},bg=#{E:@thm_bg}]#[default]'
               set -g status-format[1] "#[bg=#{E:@thm_bg}]#{S:#{?#{==:#{session_name},#{client_session}},#{E:@session_seg_cur},#{E:@session_seg_alt}} }"
 
-              # Not in sessions werkbord makes: typing there would land in
-              # an agent's prompt, or press the board's keys.
-              set-hook -ga after-new-session 'run-shell "tmux show-environment -t #{q:session_id} WERKBORD_TASK >/dev/null 2>&1 || tmux show-environment -t #{q:session_id} WERKBORD_BOARD >/dev/null 2>&1 || tmux send-keys -t #{q:session_id} nvim Enter"'
+              # Not in tmux-orchid's dashboard, nor in sessions werkbord
+              # makes: typing there would press the dashboard's or the
+              # board's keys, or land in an agent's prompt.
+              set-hook -ga after-new-session 'run-shell "[ #{q:session_name} = orchid ] || tmux show-environment -t #{q:session_id} WERKBORD_TASK >/dev/null 2>&1 || tmux show-environment -t #{q:session_id} WERKBORD_BOARD >/dev/null 2>&1 || tmux send-keys -t #{q:session_id} nvim Enter"'
 
               # Jump by the number shown in the row. Displayed number is
               # the session id plus one, so the first session reads 1 and is
