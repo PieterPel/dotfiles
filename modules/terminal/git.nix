@@ -15,7 +15,7 @@
 
       config = lib.mkIf cfg.enable {
         packages = with pkgs; [
-          pre-commit
+          # pre-commit
         ];
 
         programs.gh = {
