@@ -44,22 +44,6 @@
             run-shell ${tmuxPlugin}/share/tmux-plugins/werkbord/werkbord.tmux
           ''
         );
-        # Claude Code steers toward the board: werkbord's plugin (handoff,
-        # inbox, orchestrator, hooks) from mono's marketplace, and the status
-        # line, which a plugin can't set. From PATH: these subcommands are
-        # newer than the pinned mono input.
-        programs.claude-code.settings = {
-          extraKnownMarketplaces.mono.source = {
-            source = "git";
-            url = "https://codeberg.org/PieterPel/mono.git";
-          };
-          enabledPlugins."werkbord@mono" = true;
-          statusLine = {
-            type = "command";
-            command = "werkbord claude statusline";
-            refreshInterval = 5;
-          };
-        };
         packages = [
           package
         ];
