@@ -22,9 +22,6 @@ in
           [
             # Font
             montserrat
-
-            # Browser
-            brave
           ]
           ++ lib.optionals pkgs.stdenv.isLinux [
             # Photoshop

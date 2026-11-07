@@ -54,6 +54,7 @@
 
             # Not in nixpkgs
             "claude"
+            "brave-browser"
 
             # Something broken in nixpkgs
             "cloudflare-warp"
