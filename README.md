@@ -30,6 +30,35 @@ The repository is structured as follows:
 -   `lib/`: Contains helper functions, like `mkUser.nix` for creating users.
 -   `secrets/`: Contains secrets managed by `sops-nix`.
 
+## Reusable VM baseline
+
+External flakes can import `modules.nixos.vm-baseline` and
+`modules.nixos.vm-disk` from this flake, then enable the baseline:
+
+```nix
+{
+  imports = [
+    inputs.dotfiles.modules.nixos.vm-baseline
+    inputs.dotfiles.modules.nixos.vm-disk
+  ];
+  modules.system.vmBaseline = {
+    enable = true;
+    hostname = "hetzner-app";
+  };
+}
+```
+
+The opt-in baseline configures QEMU boot, a BIOS GRUB/ext4 root disk (`/dev/sda`),
+a separate data filesystem (`data` at `/mnt/data`), a 4 GiB swap file, and automatic
+Nix garbage collection. Disk paths, labels, swap size, timezone and state version
+are configurable. The disk module carries its own `disko` dependency; consumers do
+not need to pass dotfiles' inputs through NixOS `specialArgs`. These exports do not
+enable or deploy a VM by themselves. Never change an existing host's state version
+or run disk-formatting commands as part of an ordinary rebuild.
+
+Run `nix build .#checks.aarch64-darwin.vm-baseline` (or use your Linux system) to
+check the disabled, default and customized configurations without deploying them.
+
 ## Installation and Usage
 
 To use these dotfiles, you will need Nix installed with flake support enabled.
