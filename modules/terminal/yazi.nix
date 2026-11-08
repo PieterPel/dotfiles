@@ -35,8 +35,8 @@
                   pkgs.fetchFromGitHub {
                     owner = "yazi-rs";
                     repo = "plugins";
-                    rev = "56d6277d16479424edf380798cee597a40e5b563";
-                    hash = "sha256-Lg3ZKAFE9SJjoIToPJ6gf9vEKUsIxk1dLD63NcL29J4=";
+                    rev = "c0529fc34e4649effb79ff6f4a86aec46beebb7f";
+                    hash = "sha256-Wf10m6iY4xWKALLFQBOz1vgGXOQpPzryPnFS+s40QFg=";
                   }
                 }/git.yazi";
               };
