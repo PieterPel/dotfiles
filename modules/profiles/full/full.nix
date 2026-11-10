@@ -1,5 +1,4 @@
 { lib
-, inputs
 , ...
 }:
 let
@@ -39,7 +38,7 @@ let
     modules = {
       home."home-manager" = defaultEnable;
       package-management = {
-        homebrew = defaultEnable;
+        # homebrew = defaultEnable;
         nix = defaultEnable;
       };
       security.sops = defaultEnable;
@@ -50,7 +49,6 @@ let
       };
       theming.stylix = defaultEnable;
       wm.aerospace = defaultEnable;
-      virtualization.docker-mcp = defaultEnable;
     };
   };
 
