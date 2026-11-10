@@ -461,12 +461,53 @@
             };
 
             copilot-chat.enable = false;
-            windsurf-nvim = {
+
+            minuet = {
               enable = true;
               settings = {
-                virtual_text = {
-                  enabled = true;
-                  keybindings = { };
+                provider = "openai_fim_compatible";
+                n_completions = 1;
+                context_window = 512;
+
+                provider_options = {
+                  openai_fim_compatible = {
+                    api_key = "TERM";
+                    name = "Llama.cpp";
+                    end_point = "http://localhost:8012/v1/completions";
+                    model = "PLACEHOLDER";
+                    optional = {
+                      max_tokens = 56;
+                      top_p = 0.9;
+                    };
+                    template = {
+                      # In Nixvim, Lua functions must be passed as raw strings
+                      prompt = {
+                        __raw = ''
+                          function(context_before_cursor, context_after_cursor, _)
+                            return '<|fim_prefix|>'
+                              .. context_before_cursor
+                              .. '<|fim_suffix|>'
+                              .. context_after_cursor
+                              .. '<|fim_middle|>'
+                          end
+                        '';
+                      };
+                      suffix = false;
+                    };
+                  };
+                };
+
+                virtualtext = {
+                  # Note: If auto_trigger_ft expects a list of filetypes, use [] instead of {} in Nix
+                  auto_trigger_ft = [ ];
+                  keymap = {
+                    accept = "<A-A>";
+                    accept_line = "<A-a>";
+                    accept_n_lines = "<A-z>";
+                    prev = "<A-[>";
+                    next = "<A-]>";
+                    dismiss = "<A-e>";
+                  };
                 };
               };
             };
