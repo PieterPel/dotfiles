@@ -611,6 +611,17 @@
             options.desc = "Toggle Outline Sidebar";
           }
 
+          # Minuet
+          {
+            mode = "n";
+            key = "<leader>ct";
+            action = "<cmd>Minuet virtualtext toggle<CR>";
+            options = {
+              desc = "Toggle Minuet AI virtual text";
+              silent = true;
+            };
+          }
+
         ];
 
       };

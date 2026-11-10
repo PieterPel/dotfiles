@@ -467,7 +467,7 @@
               settings = {
                 provider = "openai_fim_compatible";
                 n_completions = 1;
-                context_window = 512;
+                context_window = 1024;
 
                 provider_options = {
                   openai_fim_compatible = {
@@ -501,8 +501,8 @@
                   # Note: If auto_trigger_ft expects a list of filetypes, use [] instead of {} in Nix
                   auto_trigger_ft = [ "*" ];
                   keymap = {
-                    accept = "<A-A>";
-                    accept_line = "<A-a>";
+                    accept = "<C-A>";
+                    accept_line = "<C-a>";
                     accept_n_lines = "<A-z>";
                     prev = "<A-[>";
                     next = "<A-]>";
