@@ -499,7 +499,7 @@
 
                 virtualtext = {
                   # Note: If auto_trigger_ft expects a list of filetypes, use [] instead of {} in Nix
-                  auto_trigger_ft = [ ];
+                  auto_trigger_ft = [ "*" ];
                   keymap = {
                     accept = "<A-A>";
                     accept_line = "<A-a>";
